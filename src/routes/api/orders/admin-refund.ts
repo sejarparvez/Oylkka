@@ -240,12 +240,27 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             const paymentRef = bkashRefundInfo.paymentRef;
 
             if (bkashPaymentID && (bkashTrxID || paymentRef)) {
-              await refundBkashPayment({
+              const refundResult = await refundBkashPayment({
                 paymentID: bkashPaymentID,
                 trxID: (bkashTrxID || paymentRef) as string,
                 amount: body.amount,
                 reason: body.reason,
               });
+
+              // Persist the gateway refund reference so a later refund can
+              // be reconciled and duplicates detected.
+              if (refundResult?.refundTrxID) {
+                const persisted = await prisma.order.update({
+                  where: { id: body.orderId },
+                  data: {
+                    metadata: {
+                      ...((bkashRefundInfo.metadata ?? {}) as OrderMetadata),
+                      bkashRefundTrxID: refundResult.refundTrxID,
+                    },
+                  },
+                });
+                updated.metadata = persisted.metadata;
+              }
             }
           }
 

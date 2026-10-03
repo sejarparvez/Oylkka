@@ -12,20 +12,6 @@ async function getVariantStatus(
   });
 }
 
-import type { prisma } from '@/lib/db';
-
-type PrismaTx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
-
-async function getVariantStatus(
-  tx: PrismaTx,
-  variantId: string,
-): Promise<{ status: string; reservedStock: number; stock: number } | null> {
-  return tx.productVariant.findUnique({
-    where: { id: variantId },
-    select: { status: true, reservedStock: true, stock: true },
-  });
-}
-
 export async function reserveStock(
   tx: PrismaTx,
   variantId: string,

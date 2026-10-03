@@ -23,4 +23,5 @@ export type OrderMetadata = {
   cashbackAmount?: number;
   bkashPaymentID?: string;
   bkashTrxID?: string;
+  bkashRefundTrxID?: string;
 };

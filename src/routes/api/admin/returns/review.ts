@@ -1,9 +1,28 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
+import { refundBkashPayment } from '@/lib/bkash';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderRefundHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
+import type { OrderMetadata } from '@/types/orders';
+
+class ReturnConflictError extends Error {
+  constructor() {
+    super('Return request was modified by another request');
+    this.name = 'ReturnConflictError';
+  }
+}
+
+// Statuses from which a refund may still be issued. REJECTED and REFUNDED
+// are terminal and must never be refunded again.
+const REFUNDABLE_SOURCES = [
+  'PENDING',
+  'APPROVED',
+  'AWAITING_SHIPMENT',
+  'SHIPPED',
+  'RECEIVED',
+];
 
 export const Route = createFileRoute('/api/admin/returns/review')({
   server: {
@@ -48,6 +67,8 @@ export const Route = createFileRoute('/api/admin/returns/review')({
                   paymentStatus: true,
                   shippingName: true,
                   shippingEmail: true,
+                  metadata: true,
+                  paymentRef: true,
                 },
               },
             },
@@ -60,35 +81,196 @@ export const Route = createFileRoute('/api/admin/returns/review')({
             );
           }
 
-          const updateData: Record<string, unknown> = {
-            status: newStatus as never,
-            reviewedBy: session.user.id,
-            reviewedAt: new Date(),
-          };
-
-          if (adminNote) updateData.adminNote = adminNote;
-
-          // Process refund if status is REFUNDED
-          if (newStatus === 'REFUNDED') {
-            const amount =
-              refundAmount ??
-              Number(returnRequest.order.total) -
-                Number(returnRequest.order.refundAmount ?? 0);
-
-            if (amount <= 0) {
+          // --- Approve / reject: simple one-way transition from PENDING ---
+          if (newStatus !== 'REFUNDED') {
+            if (returnRequest.status !== 'PENDING') {
               return Response.json(
-                { error: 'Refund amount must be positive' },
+                { error: 'Return request has already been reviewed' },
                 { status: 400 },
               );
             }
 
-            if (returnRequest.order.paymentMethod === 'WALLET') {
-              // Credit the customer's wallet
-              await prisma.$transaction(async (tx) => {
+            const updated = await prisma.returnRequest.updateMany({
+              where: { id: returnId, status: 'PENDING' },
+              data: {
+                status: newStatus as never,
+                adminNote: adminNote ?? null,
+                reviewedBy: session.user.id,
+                reviewedAt: new Date(),
+              },
+            });
+
+            if (updated.count === 0) {
+              return Response.json(
+                { error: 'Return request was already reviewed' },
+                { status: 409 },
+              );
+            }
+
+            const returnRow = await prisma.returnRequest.findUniqueOrThrow({
+              where: { id: returnId },
+            });
+
+            return Response.json({ return: returnRow });
+          }
+
+          // --- Refund transition ---
+          if (!REFUNDABLE_SOURCES.includes(returnRequest.status)) {
+            return Response.json(
+              {
+                error: `Return request cannot be refunded from status ${returnRequest.status}`,
+              },
+              { status: 400 },
+            );
+          }
+
+          const order = returnRequest.order;
+          const paymentMethod = order.paymentMethod;
+
+          if (paymentMethod !== 'WALLET' && paymentMethod !== 'BKASH') {
+            return Response.json(
+              {
+                error:
+                  'Cash-on-delivery refunds must be processed from the order page',
+                redirect: `/admin/orders/${order.id}`,
+              },
+              { status: 400 },
+            );
+          }
+
+          // A refund must only ever touch money the customer actually paid.
+          const wasPaid =
+            order.paymentStatus === 'PAID' ||
+            order.paymentStatus === 'PARTIALLY_REFUNDED';
+          if (!wasPaid) {
+            return Response.json(
+              { error: 'Order has not been paid; cannot issue a refund' },
+              { status: 400 },
+            );
+          }
+
+          const alreadyRefunded = Number(order.refundAmount ?? 0);
+          const remaining = Number(order.total) - alreadyRefunded;
+          const amount = Number(refundAmount ?? remaining);
+
+          if (!Number.isFinite(amount) || amount <= 0) {
+            return Response.json(
+              { error: 'Refund amount must be positive' },
+              { status: 400 },
+            );
+          }
+
+          if (amount > remaining + 0.001) {
+            return Response.json(
+              {
+                error: `Refund amount exceeds the remaining refundable balance (৳${remaining.toFixed(2)})`,
+              },
+              { status: 400 },
+            );
+          }
+
+          const newRefundAmount = alreadyRefunded + amount;
+          const fullyRefunded =
+            newRefundAmount >= Number(order.total) - 0.001;
+
+          // Dispatch per payment method. The gateway is called *before* the
+          // DB transaction so a failure leaves no partial state, and nothing
+          // is marked REFUNDED until the gateway confirms.
+          let bkashRefundTrxID: string | undefined;
+          if (paymentMethod === 'BKASH') {
+            const metadata = (order.metadata ?? {}) as OrderMetadata;
+            const paymentID = metadata.bkashPaymentID;
+            const trxID = metadata.bkashTrxID ?? order.paymentRef ?? undefined;
+
+            if (!paymentID || !trxID) {
+              return Response.json(
+                { error: 'Missing bKash payment reference; refund manually' },
+                { status: 400 },
+              );
+            }
+
+            try {
+              const result = await refundBkashPayment({
+                paymentID,
+                trxID,
+                amount,
+                reason: returnRequest.details || 'Return refund',
+              });
+              bkashRefundTrxID = result?.refundTrxID;
+            } catch (gatewayError) {
+              // biome-ignore lint/suspicious/noConsole: this is fine
+              console.error('bKash return refund failed:', gatewayError);
+              return Response.json(
+                {
+                  error:
+                    'bKash refund failed; no changes were made to the order',
+                },
+                { status: 502 },
+              );
+            }
+          }
+
+          let updated: Awaited<
+            ReturnType<typeof prisma.returnRequest.findUniqueOrThrow>
+          >;
+          try {
+            updated = await prisma.$transaction(async (tx) => {
+              // Claim the return request atomically — prevents re-entry and
+              // concurrent double refunds of the same request.
+              const claimed = await tx.returnRequest.updateMany({
+                where: {
+                  id: returnId,
+                  status: { in: REFUNDABLE_SOURCES as never },
+                },
+                data: {
+                  status: 'REFUNDED',
+                  refundAmount: amount,
+                  adminNote: adminNote ?? null,
+                  reviewedBy: session.user.id,
+                  reviewedAt: new Date(),
+                },
+              });
+
+              if (claimed.count === 0) {
+                throw new ReturnConflictError();
+              }
+
+              // Optimistic guard on the order's running refund total so two
+              // different returns cannot both credit against the same order.
+              const orderClaim = await tx.order.updateMany({
+                where: {
+                  id: order.id,
+                  refundAmount: order.refundAmount,
+                  paymentStatus: { not: 'REFUNDED' },
+                },
+                data: {
+                  refundAmount: newRefundAmount,
+                  refundReason: returnRequest.details || 'Return refund',
+                  refundedAt: new Date(),
+                  paymentStatus: fullyRefunded
+                    ? 'REFUNDED'
+                    : 'PARTIALLY_REFUNDED',
+                  ...(fullyRefunded ? { status: 'REFUNDED' } : {}),
+                  ...(bkashRefundTrxID
+                    ? {
+                        metadata: {
+                          ...((order.metadata as OrderMetadata) ?? {}),
+                          bkashRefundTrxID,
+                        },
+                      }
+                    : {}),
+                },
+              });
+
+              if (orderClaim.count === 0) {
+                throw new ReturnConflictError();
+              }
+
+              if (paymentMethod === 'WALLET') {
                 const wallet = await tx.wallet.upsert({
-                  where: { userId: returnRequest.order.customerId },
+                  where: { userId: order.customerId },
                   create: {
-                    userId: returnRequest.order.customerId,
+                    userId: order.customerId,
                     balance: amount,
                   },
                   update: {
@@ -102,68 +284,61 @@ export const Route = createFileRoute('/api/admin/returns/review')({
                     type: 'CREDIT',
                     amount,
                     reference: 'REFUND',
-                    orderId: returnRequest.orderId,
+                    orderId: order.id,
                     description: `Refund for return ${returnRequest.id}`,
                   },
                 });
+              }
+
+              // Scope item updates to this order to prevent cross-order edits.
+              if (returnRequest.itemIds.length > 0) {
+                await tx.orderItem.updateMany({
+                  where: {
+                    id: { in: returnRequest.itemIds },
+                    orderId: order.id,
+                  },
+                  data: { fulfillmentStatus: 'REFUNDED' },
+                });
+              }
+
+              return tx.returnRequest.findUniqueOrThrow({
+                where: { id: returnId },
               });
-            }
-
-            const newRefundAmount =
-              Number(returnRequest.order.refundAmount ?? 0) + amount;
-            const fullyRefunded =
-              newRefundAmount >= Number(returnRequest.order.total);
-
-            await prisma.order.update({
-              where: { id: returnRequest.orderId },
-              data: {
-                refundAmount: newRefundAmount,
-                refundReason: returnRequest.details || 'Return refund',
-                refundedAt: new Date(),
-                paymentStatus: fullyRefunded
-                  ? 'REFUNDED'
-                  : 'PARTIALLY_REFUNDED',
-                ...(fullyRefunded ? { status: 'REFUNDED' } : {}),
-              },
             });
-
-            // Mark order items as refunded
-            if (returnRequest.itemIds.length > 0) {
-              await prisma.orderItem.updateMany({
-                where: { id: { in: returnRequest.itemIds } },
-                data: { fulfillmentStatus: 'REFUNDED' },
-              });
-            }
-
-            updateData.refundAmount = amount;
-
-            sendEmail({
-              to: returnRequest.order.shippingEmail,
-              subject: `Refund Processed — #${returnRequest.order.orderNumber}`,
-              meta: {
-                description: '',
-                link: '',
-                callToActionText: '',
-              },
-              html: orderRefundHtml(
+          } catch (error) {
+            if (error instanceof ReturnConflictError) {
+              return Response.json(
                 {
-                  orderNumber: returnRequest.order.orderNumber,
-                  customerName: returnRequest.order.shippingName,
+                  error:
+                    'Return request was modified by another request. Refresh and try again.',
                 },
-                amount,
-                returnRequest.details || 'Return refund',
-                returnRequest.order.paymentMethod || 'CASH_ON_DELIVERY',
-              ),
-            }).catch((err) =>
-              // biome-ignore lint/suspicious/noConsole: this is fine
-              console.error('Failed to send return refund email:', err),
-            );
+                { status: 409 },
+              );
+            }
+            throw error;
           }
 
-          const updated = await prisma.returnRequest.update({
-            where: { id: returnId },
-            data: updateData,
-          });
+          sendEmail({
+            to: order.shippingEmail,
+            subject: `Refund Processed — #${order.orderNumber}`,
+            meta: {
+              description: '',
+              link: '',
+              callToActionText: '',
+            },
+            html: orderRefundHtml(
+              {
+                orderNumber: order.orderNumber,
+                customerName: order.shippingName,
+              },
+              amount,
+              returnRequest.details || 'Return refund',
+              paymentMethod || 'CASH_ON_DELIVERY',
+            ),
+          }).catch((err) =>
+            // biome-ignore lint/suspicious/noConsole: this is fine
+            console.error('Failed to send return refund email:', err),
+          );
 
           return Response.json({ return: updated });
         } catch (_error) {
