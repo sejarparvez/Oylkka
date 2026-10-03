@@ -392,7 +392,7 @@ export const Route = createFileRoute('/api/product/create')({
                             dimensionHeight: variant.dimensionHeight ?? null,
                             dimensionUnit: variant.dimensionUnit ?? 'cm',
                             freeShipping: variant.freeShipping ?? false,
-                            reservedStock: variant.reservedStock ?? 0,
+
                             lowStockAlert: variant.lowStockAlert ?? null,
                             availableAt: variant.availableAt ?? null,
                             slug: variant.slug ?? null,

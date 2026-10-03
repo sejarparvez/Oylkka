@@ -35,7 +35,7 @@ export const Route = createFileRoute('/api/product/public-reviews')({
                 vendorRepliedAt: true,
                 createdAt: true,
                 user: {
-                  select: { id: true, name: true, image: true },
+                  select: { id: true, name: true, imageUrl: true },
                 },
                 images: {
                   orderBy: { order: 'asc' },

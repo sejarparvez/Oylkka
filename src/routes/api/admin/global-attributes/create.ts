@@ -3,6 +3,7 @@ import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { generateColorFromHex } from '@/lib/color-utils';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { GlobalAttributeSchema } from '@/schemas/global-attribute-schema';
 
@@ -16,6 +17,9 @@ export const Route = createFileRoute('/api/admin/global-attributes/create')({
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
           const session = authResult.session;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body = await request.json();
           const parsed = GlobalAttributeSchema.safeParse(body);

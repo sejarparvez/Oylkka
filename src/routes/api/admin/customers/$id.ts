@@ -1,10 +1,45 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '#/lib/auth';
+import { z } from 'zod';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
+import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { USER_ROLES } from '@/lib/roles';
+
+const roleSchema = z.enum([
+  USER_ROLES.ADMIN,
+  USER_ROLES.MANAGER,
+  USER_ROLES.VENDOR,
+  USER_ROLES.CUSTOMER_SERVICE,
+  USER_ROLES.USER,
+]);
+
+const banExpiresSchema = z
+  .union([z.string().trim().min(1), z.literal('')])
+  .nullable()
+  .optional()
+  .refine(
+    (value) =>
+      value === null || value === undefined || !Number.isNaN(Date.parse(value)),
+    { message: 'Invalid ban expiry date' },
+  )
+  .transform((value) => {
+    if (value === null || value === undefined || value === '') return null;
+    return new Date(value);
+  });
+
+const updateCustomerSchema = z
+  .object({
+    banned: z.boolean().optional(),
+    banReason: z.string().trim().max(500).nullable().optional(),
+    banExpires: banExpiresSchema,
+    role: roleSchema.optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, {
+    message: 'No fields to update',
+  });
 
 export const Route = createFileRoute('/api/admin/customers/$id')({
   server: {
@@ -74,16 +109,45 @@ export const Route = createFileRoute('/api/admin/customers/$id')({
       PUT: async ({ request, params }) => {
         try {
           const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const session = authResult.session;
+
+          const roleResponse = requireAdminOrManager(session);
+          if (roleResponse) return roleResponse;
+
+          // Narrowed to ADMIN | MANAGER by requireAdminOrManager above.
+          const actorRole = session.user.role as string;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
+
+          const parsed = updateCustomerSchema.safeParse(await request.json());
+          if (!parsed.success) {
+            return Response.json(
+              {
+                error: 'Invalid request body',
+                details: parsed.error.flatten(),
+              },
+              { status: 400 },
+            );
+          }
+
+          const { banned, banReason, banExpires, role } = parsed.data;
+
+          if (role !== undefined && session.user.role !== USER_ROLES.ADMIN) {
+            return Response.json(
+              { error: 'Only administrators can change user roles' },
+              { status: 403 },
+            );
+          }
+
+          if (role !== undefined && params.id === session.user.id) {
+            return Response.json(
+              { error: 'You cannot change your own role' },
+              { status: 400 },
+            );
+          }
 
           const existing = await prisma.user.findUnique({
             where: { id: params.id },
@@ -95,46 +159,63 @@ export const Route = createFileRoute('/api/admin/customers/$id')({
             );
           }
 
-          const body = await request.json();
-          const { banned, banReason, banExpires, role } = body;
+          const roleChanged = role !== undefined && role !== existing.role;
 
-          if (banned !== undefined && banned) {
+          if (roleChanged && existing.role === USER_ROLES.ADMIN) {
+            const adminCount = await prisma.user.count({
+              where: { role: USER_ROLES.ADMIN },
+            });
+            if (adminCount <= 1) {
+              return Response.json(
+                { error: 'Cannot demote the last remaining administrator' },
+                { status: 400 },
+              );
+            }
+          }
+
+          const user = await prisma.$transaction(async (tx) => {
+            const updated = await tx.user.update({
+              where: { id: params.id },
+              data: {
+                ...(banned !== undefined && { banned }),
+                ...(banReason !== undefined && { banReason: banReason || null }),
+                ...(banExpires !== undefined && { banExpires }),
+                ...(role !== undefined && { role }),
+              },
+            });
+
+            if (banned === true && !existing.banned) {
+              await tx.session.deleteMany({ where: { userId: params.id } });
+            }
+
+            return updated;
+          });
+
+          const ipAddress = getClientIp(headers) ?? undefined;
+
+          if (banned === true && !existing.banned) {
             await createAuditLog({
               actorId: session.user.id,
-              actorRole: session.user.role,
+              actorRole,
               action: 'USER_BANNED',
               entity: 'User',
               entityId: params.id,
               details: { reason: banReason, name: existing.name },
-              ipAddress: headers.get('x-forwarded-for') || undefined,
+              ipAddress,
             });
           }
 
-          if (role && role !== existing.role) {
+          if (roleChanged) {
             await createAuditLog({
               actorId: session.user.id,
-              actorRole: session.user.role,
+              actorRole,
               action: 'USER_ROLE_CHANGED',
               entity: 'User',
               entityId: params.id,
               details: { from: existing.role, to: role, name: existing.name },
-              ipAddress: headers.get('x-forwarded-for') || undefined,
+              ipAddress,
             });
           }
-
-          const user = await prisma.user.update({
-            where: { id: params.id },
-            data: {
-              ...(banned !== undefined && { banned }),
-              ...(banReason !== undefined && {
-                banReason: banReason || null,
-              }),
-              ...(banExpires !== undefined && {
-                banExpires: banExpires ? new Date(banExpires) : null,
-              }),
-              ...(role !== undefined && { role }),
-            },
-          });
 
           return Response.json({ customer: user });
         } catch (_error) {

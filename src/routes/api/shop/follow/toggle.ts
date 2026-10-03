@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/shop/follow/toggle')({
@@ -13,6 +14,8 @@ export const Route = createFileRoute('/api/shop/follow/toggle')({
           if (!session?.user) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
           const { shopId } = await request.json();
           if (!shopId) {
             return Response.json({ error: 'shopId required' }, { status: 400 });

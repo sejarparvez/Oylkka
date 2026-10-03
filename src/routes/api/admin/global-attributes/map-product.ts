@@ -2,6 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
+import { getClientIp } from '@/lib/client-ip';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute(
@@ -16,6 +18,9 @@ export const Route = createFileRoute(
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
           const session = authResult.session;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body = await request.json();
           const { productId, globalAttributeId, localValueId, globalValueId } =
@@ -118,7 +123,7 @@ export const Route = createFileRoute(
               globalValue: mapping.globalValue.value,
               globalValueSlug: mapping.globalValue.slug,
             },
-            ipAddress: getRequestHeaders().get('x-forwarded-for') || undefined,
+            ipAddress: getClientIp(getRequestHeaders()) ?? undefined,
           });
 
           return Response.json({ mapping }, { status: 200 });
@@ -142,6 +147,9 @@ export const Route = createFileRoute(
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
           const session = authResult.session;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body = await request.json();
           const { productId, globalAttributeId, localValueId } = body;
@@ -184,7 +192,7 @@ export const Route = createFileRoute(
             entity: 'ProductGlobalAttributeValue',
             entityId: mapping.id,
             details: { productId, globalAttributeId, localValueId },
-            ipAddress: getRequestHeaders().get('x-forwarded-for') || undefined,
+            ipAddress: getClientIp(getRequestHeaders()) ?? undefined,
           });
 
           return Response.json({ message: 'Mapping removed' });

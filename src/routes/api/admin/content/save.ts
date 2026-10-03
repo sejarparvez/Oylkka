@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/content/save')({
@@ -11,6 +12,10 @@ export const Route = createFileRoute('/api/admin/content/save')({
           if (authResult.response) return authResult.response;
           const roleResponse = requireAdmin(authResult.session);
           if (roleResponse) return roleResponse;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
+
           const { slug, title, content, published } = await request.json();
           if (!slug || !title || !content) {
             return Response.json(

@@ -1,14 +1,18 @@
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getTrustedOrigins } from '@/lib/trusted-origins';
 
-function isTrusted(url: string | null, trustedOrigin: string): boolean {
-  if (!url) return false;
+function csrfFailure(): Response {
+  return Response.json({ error: 'CSRF validation failed' }, { status: 403 });
+}
+
+function isTrusted(value: string | null, trustedOrigins: string[]): boolean {
+  if (!value) return false;
   try {
-    const parsed = new URL(url);
-    return parsed.origin === trustedOrigin;
+    return trustedOrigins.includes(new URL(value).origin);
   } catch (error) {
     // biome-ignore lint/suspicious/noConsole: this is fine
     console.error('CSRF validation error:', error);
-    return url === trustedOrigin || url.startsWith(`${trustedOrigin}/`);
+    return false;
   }
 }
 
@@ -19,25 +23,26 @@ export function validateCsrf(): Response | null {
   } catch (error) {
     // biome-ignore lint/suspicious/noConsole: this is fine
     console.error('CSRF header parse error:', error);
-    headers = null;
+    return csrfFailure();
   }
 
-  if (!headers) return null;
+  if (!headers) return csrfFailure();
+
   const origin = headers.get('origin');
   const referer = headers.get('referer');
 
-  if (!origin && !referer) {
-    return null;
+  // Fail closed: a state-changing request must carry at least one of these.
+  // Previously a missing pair was treated as "no cross-site context" and allowed.
+  if (!origin && !referer) return csrfFailure();
+
+  const trustedOrigins = getTrustedOrigins();
+
+  if (origin && !isTrusted(origin, trustedOrigins)) {
+    return csrfFailure();
   }
 
-  const trustedOrigin = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
-
-  if (origin && !isTrusted(origin, trustedOrigin)) {
-    return Response.json({ error: 'CSRF validation failed' }, { status: 403 });
-  }
-
-  if (referer && !isTrusted(referer, trustedOrigin)) {
-    return Response.json({ error: 'CSRF validation failed' }, { status: 403 });
+  if (referer && !isTrusted(referer, trustedOrigins)) {
+    return csrfFailure();
   }
 
   return null;

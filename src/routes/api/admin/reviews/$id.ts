@@ -3,6 +3,8 @@ import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
 import { auth } from '@/lib/auth';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
+import { getClientIp } from '@/lib/client-ip';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/reviews/$id')({
@@ -55,6 +57,9 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
 
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
+
           const existing = await prisma.review.findUnique({
             where: { id: params.id },
           });
@@ -84,7 +89,7 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
             entity: 'Review',
             entityId: params.id,
             details: { changes: body },
-            ipAddress: headers.get('x-forwarded-for') || undefined,
+            ipAddress: getClientIp(headers) ?? undefined,
           });
 
           return Response.json({ review });
@@ -106,6 +111,9 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
           ) {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
           }
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const existing = await prisma.review.findUnique({
             where: { id: params.id },
@@ -132,7 +140,7 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
             entity: 'Review',
             entityId: params.id,
             details: { action: 'deleted' },
-            ipAddress: headers.get('x-forwarded-for') || undefined,
+            ipAddress: getClientIp(headers) ?? undefined,
           });
 
           return Response.json({ success: true });

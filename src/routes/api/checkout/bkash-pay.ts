@@ -18,7 +18,10 @@ export const Route = createFileRoute('/api/checkout/bkash-pay')({
           return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const rateLimitResponse = await checkRateLimit(checkoutLimiter);
+        const rateLimitResponse = await checkRateLimit(
+          checkoutLimiter,
+          `user:${session.user.id}`,
+        );
         if (rateLimitResponse) return rateLimitResponse;
 
         const csrfResponse = validateCsrf();

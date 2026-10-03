@@ -2,6 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
+import { getClientIp } from '@/lib/client-ip';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/global-attributes/$id')({
@@ -50,6 +52,9 @@ export const Route = createFileRoute('/api/admin/global-attributes/$id')({
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
           const session = authResult.session;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const existing = await prisma.globalAttribute.findUnique({
             where: { id: params.id },
@@ -138,7 +143,7 @@ export const Route = createFileRoute('/api/admin/global-attributes/$id')({
               valueCount: attribute.values.length,
               removedValueCount: removedValueIds?.length || 0,
             },
-            ipAddress: getRequestHeaders().get('x-forwarded-for') || undefined,
+            ipAddress: getClientIp(getRequestHeaders()) ?? undefined,
           });
 
           return Response.json({ attribute });
@@ -163,6 +168,9 @@ export const Route = createFileRoute('/api/admin/global-attributes/$id')({
           if (roleResponse) return roleResponse;
           const session = authResult.session;
 
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
+
           const existing = await prisma.globalAttribute.findUnique({
             where: { id: params.id },
           });
@@ -185,7 +193,7 @@ export const Route = createFileRoute('/api/admin/global-attributes/$id')({
             entity: 'GlobalAttribute',
             entityId: params.id,
             details: { name: existing.name, slug: existing.slug },
-            ipAddress: getRequestHeaders().get('x-forwarded-for') || undefined,
+            ipAddress: getClientIp(getRequestHeaders()) ?? undefined,
           });
 
           return Response.json({ message: 'Global attribute deleted' });

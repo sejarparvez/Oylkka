@@ -20,7 +20,10 @@ export const Route = createFileRoute('/api/vouchers/collect')({
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
-          const rateLimitResponse = await checkRateLimit(couponLimiter);
+          const rateLimitResponse = await checkRateLimit(
+            couponLimiter,
+            `user:${session.user.id}`,
+          );
           if (rateLimitResponse) return rateLimitResponse;
 
           const body: { couponId: string } = await request.json();

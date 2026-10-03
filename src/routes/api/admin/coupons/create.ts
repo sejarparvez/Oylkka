@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
+import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/admin/coupons/create')({
@@ -14,6 +15,9 @@ export const Route = createFileRoute('/api/admin/coupons/create')({
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
           const session = authResult.session;
+
+          const csrfResponse = validateCsrf();
+          if (csrfResponse) return csrfResponse;
 
           const body = await request.json();
           const {

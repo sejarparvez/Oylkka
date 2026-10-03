@@ -12,6 +12,20 @@ async function getVariantStatus(
   });
 }
 
+import type { prisma } from '@/lib/db';
+
+type PrismaTx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
+
+async function getVariantStatus(
+  tx: PrismaTx,
+  variantId: string,
+): Promise<{ status: string; reservedStock: number; stock: number } | null> {
+  return tx.productVariant.findUnique({
+    where: { id: variantId },
+    select: { status: true, reservedStock: true, stock: true },
+  });
+}
+
 export async function reserveStock(
   tx: PrismaTx,
   variantId: string,
@@ -36,7 +50,7 @@ export async function reserveStock(
   }
 
   const { count } = await tx.productVariant.updateMany({
-    where: { id: variantId, stock: { gte: variant.reservedStock + quantity } },
+    where: { id: variantId, reservedStock: variant.reservedStock },
     data: { reservedStock: { increment: quantity } },
   });
 
@@ -50,10 +64,11 @@ export async function releaseReservedStock(
   variantId: string,
   quantity: number,
 ): Promise<void> {
-  await tx.productVariant.update({
-    where: { id: variantId },
+  const { count } = await tx.productVariant.updateMany({
+    where: { id: variantId, reservedStock: { gte: quantity } },
     data: { reservedStock: { decrement: quantity } },
   });
+  if (count === 0) return;
 }
 
 export async function decrementStock(

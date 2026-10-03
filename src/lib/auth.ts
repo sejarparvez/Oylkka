@@ -5,6 +5,7 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { DeleteImage } from '@/cloudinary';
 import { existingAccountHtml, welcomeHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
+import { getTrustedOrigins } from '@/lib/trusted-origins';
 import { prisma } from './db';
 
 export const auth = betterAuth({
@@ -35,9 +36,7 @@ export const auth = betterAuth({
     },
   },
 
-  trustedOrigins: [
-    process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_API_URL || '',
-  ],
+  trustedOrigins: getTrustedOrigins(),
 
   databaseHooks: {
     user: {
