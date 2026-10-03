@@ -7,7 +7,7 @@ import { finalizeBkashOrder } from '@/lib/bkash-finalize';
 import { prisma } from '@/lib/db';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
-import { releaseReservedStock } from '@/lib/stock';
+import { releaseReservedStock, incrementStock } from '@/lib/stock';
 import type { OrderMetadata } from '@/types/orders';
 
 export const Route = createFileRoute('/api/checkout/bkash-callback')({
@@ -65,6 +65,12 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
                         await releaseReservedStock(
                           tx,
                           item.variantId,
+                          item.quantity,
+                        ).catch(() => {});
+                      } else {
+                        await incrementStock(
+                          tx,
+                          item.productId,
                           item.quantity,
                         ).catch(() => {});
                       }
@@ -159,6 +165,8 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
             for (const item of order.items) {
               if (item.variantId) {
                 await releaseReservedStock(tx, item.variantId, item.quantity);
+              } else {
+                await incrementStock(tx, item.productId, item.quantity);
               }
             }
           });

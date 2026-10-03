@@ -308,6 +308,7 @@ function RouteComponent() {
           shippingComment: values.comment || undefined,
           paymentMethod,
           voucherIds: [...selectedVoucherIds],
+          couponCode: appliedCoupon?.code,
         }),
       });
 

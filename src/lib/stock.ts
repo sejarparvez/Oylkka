@@ -2,6 +2,13 @@ import type { prisma } from '@/lib/db';
 
 type PrismaTx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
 
+export class StockError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'StockError';
+  }
+}
+
 async function getVariantStatus(
   tx: PrismaTx,
   variantId: string,
@@ -20,17 +27,17 @@ export async function reserveStock(
 ): Promise<void> {
   const variant = await getVariantStatus(tx, variantId);
   if (!variant) {
-    throw new Error(`Variant "${variantName}" not found`);
+    throw new StockError(`Variant "${variantName}" not found`);
   }
   if (variant.status === 'DISABLED' || variant.status === 'DISCONTINUED') {
-    throw new Error(
+    throw new StockError(
       `Variant "${variantName}" is ${variant.status.toLowerCase()}`,
     );
   }
 
   const available = variant.stock - variant.reservedStock;
   if (available < quantity) {
-    throw new Error(
+    throw new StockError(
       `"${variantName}" has insufficient stock (${available} available)`,
     );
   }
@@ -41,7 +48,7 @@ export async function reserveStock(
   });
 
   if (count === 0) {
-    throw new Error(`"${variantName}" is out of stock`);
+    throw new StockError(`"${variantName}" is out of stock`);
   }
 }
 
@@ -69,7 +76,7 @@ export async function decrementStock(
   });
 
   if (count === 0) {
-    throw new Error(`"${productName}" is out of stock`);
+    throw new StockError(`"${productName}" is out of stock`);
   }
 }
 
@@ -85,7 +92,7 @@ export async function decrementVariantStock(
   });
 
   if (count === 0) {
-    throw new Error(`"${variantName}" is out of stock`);
+    throw new StockError(`"${variantName}" is out of stock`);
   }
 }
 

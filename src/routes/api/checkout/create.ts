@@ -11,9 +11,12 @@ import { checkRateLimit } from '@/lib/rate-limit-guard';
 import {
   decrementStock,
   decrementVariantStock,
+  incrementStock,
   releaseReservedStock,
   reserveStock,
+  StockError,
 } from '@/lib/stock';
+import { checkCouponEligibility } from '@/services/checkout/coupon-validator';
 import type {
   CartWithItems,
   VoucherWithCoupon,
@@ -24,6 +27,16 @@ import {
   sumVoucherTotals,
 } from '@/services/checkout/voucher-processor';
 import type { OrderMetadata } from '@/types/orders';
+
+class CheckoutError extends Error {
+  status: number;
+
+  constructor(message: string, status = 400) {
+    super(message);
+    this.name = 'CheckoutError';
+    this.status = status;
+  }
+}
 
 function generateOrderNumber(): string {
   const ts = Date.now().toString(36).toUpperCase();
@@ -49,6 +62,7 @@ const checkoutSchema = z.object({
   shippingComment: z.string().optional(),
   paymentMethod: z.enum(['BKASH', 'CASH_ON_DELIVERY', 'WALLET']),
   voucherIds: z.array(z.string()).optional(),
+  couponCode: z.string().trim().max(64).optional(),
 });
 
 export const Route = createFileRoute('/api/checkout/create')({
@@ -131,11 +145,38 @@ export const Route = createFileRoute('/api/checkout/create')({
             return Response.json({ error: 'Cart is empty' }, { status: 400 });
           }
 
-          // --- For bKash: reserve stock before proceeding ---
+          // --- For bKash: reserve stock before proceeding (MONEY-22) ---
+          // Variants reserve via ProductVariant.reservedStock. Simple
+          // (non-variant) products reserve by directly decrementing
+          // Product.stock, mirroring the COD/WALLET fulfilment path.
           const reservedVariants: Array<{
             variantId: string;
             quantity: number;
           }> = [];
+          const reservedProducts: Array<{
+            productId: string;
+            quantity: number;
+          }> = [];
+
+          const restoreReservations = async () => {
+            for (const r of reservedVariants) {
+              await releaseReservedStock(
+                prisma as unknown as Parameters<
+                  typeof releaseReservedStock
+                >[0],
+                r.variantId,
+                r.quantity,
+              ).catch(() => {});
+            }
+            for (const r of reservedProducts) {
+              await incrementStock(
+                prisma as unknown as Parameters<typeof incrementStock>[0],
+                r.productId,
+                r.quantity,
+              ).catch(() => {});
+            }
+          };
+
           if (parsed.data.paymentMethod === 'BKASH') {
             try {
               for (const item of cart.items) {
@@ -150,19 +191,22 @@ export const Route = createFileRoute('/api/checkout/create')({
                     variantId: item.variant.id,
                     quantity: item.quantity,
                   });
+                } else {
+                  await decrementStock(
+                    prisma as unknown as Parameters<typeof decrementStock>[0],
+                    item.product.id,
+                    item.quantity,
+                    item.product.productName,
+                  );
+                  reservedProducts.push({
+                    productId: item.product.id,
+                    quantity: item.quantity,
+                  });
                 }
               }
             } catch (error) {
               // Release any successfully reserved stock before bailing
-              for (const r of reservedVariants) {
-                await releaseReservedStock(
-                  prisma as unknown as Parameters<
-                    typeof releaseReservedStock
-                  >[0],
-                  r.variantId,
-                  r.quantity,
-                ).catch(() => {});
-              }
+              await restoreReservations();
               return Response.json(
                 {
                   error:
@@ -195,15 +239,7 @@ export const Route = createFileRoute('/api/checkout/create')({
           if (priceChangedItems.length > 0) {
             // Release reserved stock for bKash
             if (parsed.data.paymentMethod === 'BKASH') {
-              for (const r of reservedVariants) {
-                await releaseReservedStock(
-                  prisma as unknown as Parameters<
-                    typeof releaseReservedStock
-                  >[0],
-                  r.variantId,
-                  r.quantity,
-                ).catch(() => {});
-              }
+              await restoreReservations();
             }
             return Response.json(
               {
@@ -319,11 +355,95 @@ export const Route = createFileRoute('/api/checkout/create')({
 
           const now = new Date();
 
-          const selectedVouchers = parsed.data.voucherIds?.length
+          // --- Resolve an explicit coupon code into a user voucher (MONEY-13) ---
+          // The checkout page validates the code and shows a discount, but
+          // previously never sent it to the server. Resolve it into the same
+          // voucher pipeline so the charged total matches what was displayed.
+          const voucherIdSet = new Set(parsed.data.voucherIds ?? []);
+          let resolvedCouponId: string | null = null;
+
+          if (parsed.data.couponCode) {
+            const code = parsed.data.couponCode.trim().toUpperCase();
+            const coupon = await prisma.coupon.findUnique({
+              where: { code },
+            });
+
+            if (!coupon) {
+              await restoreReservations();
+              return Response.json(
+                { error: 'Invalid coupon code' },
+                { status: 400 },
+              );
+            }
+
+            const totalQty = cart.items.reduce(
+              (sum, item) => sum + item.quantity,
+              0,
+            );
+
+            const eligibilityError = checkCouponEligibility(
+              {
+                ...coupon,
+                minOrderAmount: coupon.minOrderAmount
+                  ? Number(coupon.minOrderAmount)
+                  : null,
+              } as unknown as Parameters<typeof checkCouponEligibility>[0],
+              {
+                now,
+                subtotal,
+                totalQty,
+                cartItems: cart.items.map((item) => ({
+                  productId: item.product.id,
+                  quantity: item.quantity,
+                  shopId: item.product.shop?.id,
+                })),
+                paymentMethod: parsed.data.paymentMethod,
+                userAgent: headers.get('user-agent') || undefined,
+                customerOrderCount,
+              },
+            );
+
+            if (eligibilityError) {
+              await restoreReservations();
+              return Response.json(
+                { error: eligibilityError },
+                { status: 400 },
+              );
+            }
+
+            const userVoucher = await prisma.userVoucher.upsert({
+              where: {
+                userId_couponId: {
+                  userId: session.user.id,
+                  couponId: coupon.id,
+                },
+              },
+              update: {},
+              create: {
+                userId: session.user.id,
+                couponId: coupon.id,
+              },
+            });
+
+            if (userVoucher.usedAt) {
+              await restoreReservations();
+              return Response.json(
+                { error: 'This coupon has already been used' },
+                { status: 400 },
+              );
+            }
+
+            resolvedCouponId = coupon.id;
+            voucherIdSet.add(userVoucher.id);
+          }
+
+          const voucherIds = [...voucherIdSet];
+
+          const selectedVouchers = voucherIds.length
             ? processVouchers(
                 (await prisma.userVoucher.findMany({
                   where: {
-                    id: { in: parsed.data.voucherIds },
+                    id: { in: voucherIds },
                     userId: session.user.id,
                     usedAt: null,
                   },
@@ -342,6 +462,22 @@ export const Route = createFileRoute('/api/checkout/create')({
                 },
               )
             : [];
+
+          // A resolved coupon code must actually survive processing, otherwise
+          // the customer would again be charged without their shown discount.
+          if (
+            resolvedCouponId &&
+            !selectedVouchers.some((v) => v.couponId === resolvedCouponId)
+          ) {
+            await restoreReservations();
+            return Response.json(
+              {
+                error:
+                  'This coupon cannot be combined with your current cart or vouchers',
+              },
+              { status: 400 },
+            );
+          }
 
           // --- Apply shipping discounts ---
           const finalShipping = applyShippingDiscounts(
@@ -488,8 +624,9 @@ export const Route = createFileRoute('/api/checkout/create')({
                       where: { userId: session.user.id },
                     });
                     const balance = wallet?.balance ?? 0;
-                    throw new Error(
+                    throw new CheckoutError(
                       `Insufficient wallet balance. Your balance: ৳${Number(balance).toFixed(2)}, required: ৳${Number(total).toFixed(2)}`,
+                      400,
                     );
                   }
 
@@ -497,7 +634,11 @@ export const Route = createFileRoute('/api/checkout/create')({
                     where: { userId: session.user.id },
                   });
 
-                  if (!wallet) throw new Error('Wallet not found after debit');
+                  if (!wallet)
+                    throw new CheckoutError(
+                      'Wallet not found after debit',
+                      500,
+                    );
 
                   await tx.walletTransaction.create({
                     data: {
@@ -556,8 +697,13 @@ export const Route = createFileRoute('/api/checkout/create')({
                   });
                 }
 
-                // Handle cashback
-                if (totalCashback > 0) {
+                // Handle cashback. Only credit it once the order is actually
+                // paid; crediting at creation for COD is a repeatable
+                // cashback-farming vector (MONEY-23). WALLET is paid here.
+                if (
+                  parsed.data.paymentMethod === 'WALLET' &&
+                  totalCashback > 0
+                ) {
                   let wallet = await tx.wallet.findUnique({
                     where: { userId: session.user.id },
                   });
@@ -628,19 +774,26 @@ export const Route = createFileRoute('/api/checkout/create')({
               },
               { status: 200 },
             );
-          } catch (_error) {
+          } catch (error) {
             // On failure, release reserved stock for bKash
             if (parsed.data.paymentMethod === 'BKASH') {
-              for (const r of reservedVariants) {
-                await releaseReservedStock(
-                  prisma as unknown as Parameters<
-                    typeof releaseReservedStock
-                  >[0],
-                  r.variantId,
-                  r.quantity,
-                ).catch(() => {});
-              }
+              await restoreReservations();
             }
+
+            if (error instanceof CheckoutError) {
+              return Response.json(
+                { error: error.message },
+                { status: error.status },
+              );
+            }
+
+            if (error instanceof StockError) {
+              return Response.json(
+                { error: error.message },
+                { status: 400 },
+              );
+            }
+
             return Response.json(
               { error: 'Failed to place order. Please try again.' },
               { status: 500 },

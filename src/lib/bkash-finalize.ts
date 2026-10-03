@@ -98,14 +98,13 @@ export async function finalizeBkashOrder(params: {
     await prisma.$transaction(async (tx) => {
       // Atomic stock decrement + reserved stock release (race-condition-safe)
       for (const item of order.items) {
-        await decrementStock(
-          tx,
-          item.productId,
-          item.quantity,
-          item.productName,
-        );
-
         if (item.variantId) {
+          await decrementStock(
+            tx,
+            item.productId,
+            item.quantity,
+            item.productName,
+          );
           await decrementVariantStock(
             tx,
             item.variantId,
@@ -114,6 +113,8 @@ export async function finalizeBkashOrder(params: {
           );
           await releaseReservedStock(tx, item.variantId, item.quantity);
         }
+        // Non-variant products were already decremented at checkout
+        // reservation time (MONEY-22); decrementing again would double-count.
       }
 
       await tx.cartItem.deleteMany({
