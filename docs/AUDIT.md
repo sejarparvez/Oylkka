@@ -70,7 +70,7 @@ Severity: **CRIT** / **MAJ** / **MIN**
 
 ---
 
-## Phase 0 — Ship blockers
+## Phase 0 — Ship blockers — DONE (30/30 closed)
 
 Money leaks, checkout is broken, or an unauthenticated actor can mutate orders. Nothing else matters until these close.
 
