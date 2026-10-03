@@ -104,8 +104,14 @@ export function ReviewForm({
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error ?? 'Failed to submit review');
+        let message = 'Failed to submit review';
+        try {
+          const err = await res.json();
+          message = err.error ?? message;
+        } catch {
+          // Non-JSON error body (e.g. a gateway HTML error page).
+        }
+        throw new Error(message);
       }
 
       toast.success('Review submitted successfully!');

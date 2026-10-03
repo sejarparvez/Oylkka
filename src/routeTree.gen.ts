@@ -100,6 +100,7 @@ import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/pro
 import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/get-single'
 import { Route as ApiProductEditRouteImport } from './routes/api/product/edit'
 import { Route as ApiProductDeleteRouteImport } from './routes/api/product/delete'
+import { Route as ApiProductCreateReviewRouteImport } from './routes/api/product/create-review'
 import { Route as ApiProductCreateRouteImport } from './routes/api/product/create'
 import { Route as ApiProductCheckSkuRouteImport } from './routes/api/product/check-sku'
 import { Route as ApiProductAnswerQuestionRouteImport } from './routes/api/product/answer-question'
@@ -705,6 +706,11 @@ const ApiProductEditRoute = ApiProductEditRouteImport.update({
 const ApiProductDeleteRoute = ApiProductDeleteRouteImport.update({
   id: '/api/product/delete',
   path: '/api/product/delete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductCreateReviewRoute = ApiProductCreateReviewRouteImport.update({
+  id: '/api/product/create-review',
+  path: '/api/product/create-review',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiProductCreateRoute = ApiProductCreateRouteImport.update({
@@ -1592,6 +1598,7 @@ export interface FileRoutesByFullPath {
   '/api/product/answer-question': typeof ApiProductAnswerQuestionRoute
   '/api/product/check-sku': typeof ApiProductCheckSkuRoute
   '/api/product/create': typeof ApiProductCreateRoute
+  '/api/product/create-review': typeof ApiProductCreateReviewRoute
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
@@ -1822,6 +1829,7 @@ export interface FileRoutesByTo {
   '/api/product/answer-question': typeof ApiProductAnswerQuestionRoute
   '/api/product/check-sku': typeof ApiProductCheckSkuRoute
   '/api/product/create': typeof ApiProductCreateRoute
+  '/api/product/create-review': typeof ApiProductCreateReviewRoute
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
@@ -2060,6 +2068,7 @@ export interface FileRoutesById {
   '/api/product/answer-question': typeof ApiProductAnswerQuestionRoute
   '/api/product/check-sku': typeof ApiProductCheckSkuRoute
   '/api/product/create': typeof ApiProductCreateRoute
+  '/api/product/create-review': typeof ApiProductCreateReviewRoute
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
@@ -2299,6 +2308,7 @@ export interface FileRouteTypes {
     | '/api/product/answer-question'
     | '/api/product/check-sku'
     | '/api/product/create'
+    | '/api/product/create-review'
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
@@ -2529,6 +2539,7 @@ export interface FileRouteTypes {
     | '/api/product/answer-question'
     | '/api/product/check-sku'
     | '/api/product/create'
+    | '/api/product/create-review'
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
@@ -2766,6 +2777,7 @@ export interface FileRouteTypes {
     | '/api/product/answer-question'
     | '/api/product/check-sku'
     | '/api/product/create'
+    | '/api/product/create-review'
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
@@ -2987,6 +2999,7 @@ export interface RootRouteChildren {
   ApiProductAnswerQuestionRoute: typeof ApiProductAnswerQuestionRoute
   ApiProductCheckSkuRoute: typeof ApiProductCheckSkuRoute
   ApiProductCreateRoute: typeof ApiProductCreateRoute
+  ApiProductCreateReviewRoute: typeof ApiProductCreateReviewRoute
   ApiProductDeleteRoute: typeof ApiProductDeleteRoute
   ApiProductEditRoute: typeof ApiProductEditRoute
   ApiProductGetSingleRoute: typeof ApiProductGetSingleRoute
@@ -3712,6 +3725,13 @@ declare module '@tanstack/react-router' {
       path: '/api/product/delete'
       fullPath: '/api/product/delete'
       preLoaderRoute: typeof ApiProductDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/create-review': {
+      id: '/api/product/create-review'
+      path: '/api/product/create-review'
+      fullPath: '/api/product/create-review'
+      preLoaderRoute: typeof ApiProductCreateReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/product/create': {
@@ -5089,6 +5109,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductAnswerQuestionRoute: ApiProductAnswerQuestionRoute,
   ApiProductCheckSkuRoute: ApiProductCheckSkuRoute,
   ApiProductCreateRoute: ApiProductCreateRoute,
+  ApiProductCreateReviewRoute: ApiProductCreateReviewRoute,
   ApiProductDeleteRoute: ApiProductDeleteRoute,
   ApiProductEditRoute: ApiProductEditRoute,
   ApiProductGetSingleRoute: ApiProductGetSingleRoute,
