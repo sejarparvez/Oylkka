@@ -79,7 +79,12 @@ function RouteComponent() {
               <Separator className='mb-4' />
               <div className='space-y-4'>
                 {items.map((item) => {
-                  const price = item.savedPrice ?? item.product.price;
+    const price =
+      item.savedPrice ??
+      item.variant?.discountPrice ??
+      item.variant?.price ??
+      item.product.discountPrice ??
+      item.product.price;
                   const imageUrl =
                     item.variant?.imageUrl ?? item.product.images[0]?.imageUrl;
 

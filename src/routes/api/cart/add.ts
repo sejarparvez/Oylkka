@@ -22,9 +22,14 @@ export const Route = createFileRoute('/api/cart/add')({
           const body = await request.json();
           const { productId, variantId, quantity } = body;
 
-          if (!productId || !quantity || quantity < 1) {
+          const qty = Number(quantity);
+
+          if (!productId || !Number.isInteger(qty) || qty < 1) {
             return Response.json(
-              { error: 'Product ID and valid quantity are required' },
+              {
+                error:
+                  'Product ID and a whole-number quantity of at least 1 are required',
+              },
               { status: 400 },
             );
           }
@@ -47,19 +52,20 @@ export const Route = createFileRoute('/api/cart/add')({
             );
           }
 
-          if (product.stock < 1) {
-            return Response.json(
-              { error: 'Product is out of stock' },
-              { status: 400 },
-            );
-          }
-
           if (product.hasVariants && !variantId) {
             return Response.json(
               { error: 'Variant selection is required for this product' },
               { status: 400 },
             );
           }
+
+          // Availability and effective unit price. Simple products use parent
+          // stock; variant products use variant stock net of bKash holds. The
+          // parent-stock check must not run for variant products, otherwise a
+          // product whose variants carry the real inventory (parent stock 0)
+          // can never be added to the cart (MONEY-28, MONEY-29).
+          let available: number;
+          let savedPrice = product.discountPrice ?? product.price;
 
           if (variantId) {
             const variant = await prisma.productVariant.findUnique({
@@ -91,16 +97,19 @@ export const Route = createFileRoute('/api/cart/add')({
               );
             }
 
-            const available = variant.stock - variant.reservedStock;
-            if (available < 1) {
-              return Response.json(
-                { error: 'Variant is out of stock' },
-                { status: 400 },
-              );
-            }
+            available = variant.stock - variant.reservedStock;
+            savedPrice =
+              variant.discountPrice ?? variant.price ?? savedPrice;
+          } else {
+            available = product.stock;
           }
 
-          const savedPrice = product.discountPrice ?? product.price;
+          if (available < 1) {
+            return Response.json(
+              { error: 'Item is out of stock' },
+              { status: 400 },
+            );
+          }
 
           let cart = await prisma.cart.findUnique({
             where: { userId: session.user.id },
@@ -112,42 +121,39 @@ export const Route = createFileRoute('/api/cart/add')({
             });
           }
 
-          if (variantId) {
-            const existingItem = await prisma.cartItem.findFirst({
-              where: { cartId: cart.id, productId, variantId },
-            });
+          const existingItem = await prisma.cartItem.findFirst({
+            where: { cartId: cart.id, productId, variantId: variantId ?? null },
+          });
 
-            if (existingItem) {
-              await prisma.cartItem.update({
-                where: { id: existingItem.id },
-                data: { quantity: existingItem.quantity + quantity },
-              });
-            } else {
-              await prisma.cartItem.create({
-                data: {
-                  cartId: cart.id,
-                  productId,
-                  variantId,
-                  quantity,
-                  savedPrice,
-                },
-              });
-            }
+          const requestedTotal = (existingItem?.quantity ?? 0) + qty;
+          if (requestedTotal > available) {
+            return Response.json(
+              {
+                error: `Only ${available} available${
+                  existingItem
+                    ? ` (${existingItem.quantity} already in cart)`
+                    : ''
+                }`,
+              },
+              { status: 400 },
+            );
+          }
+
+          if (existingItem) {
+            await prisma.cartItem.update({
+              where: { id: existingItem.id },
+              data: { quantity: requestedTotal },
+            });
           } else {
-            const existingItem = await prisma.cartItem.findFirst({
-              where: { cartId: cart.id, productId, variantId: null },
+            await prisma.cartItem.create({
+              data: {
+                cartId: cart.id,
+                productId,
+                variantId: variantId ?? null,
+                quantity: qty,
+                savedPrice,
+              },
             });
-
-            if (existingItem) {
-              await prisma.cartItem.update({
-                where: { id: existingItem.id },
-                data: { quantity: existingItem.quantity + quantity },
-              });
-            } else {
-              await prisma.cartItem.create({
-                data: { cartId: cart.id, productId, quantity, savedPrice },
-              });
-            }
           }
 
           const updatedCart = await prisma.cart.findUnique({
