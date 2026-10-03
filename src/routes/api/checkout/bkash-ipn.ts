@@ -1,18 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import {
-  type BkashExecutePaymentResult,
-  executeBkashPayment,
-  queryBkashPayment,
-} from '@/lib/bkash';
+import { executeBkashPayment, queryBkashPayment } from '@/lib/bkash';
+import { finalizeBkashOrder } from '@/lib/bkash-finalize';
 import { prisma } from '@/lib/db';
-import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
-import {
-  decrementStock,
-  decrementVariantStock,
-  releaseReservedStock,
-} from '@/lib/stock';
 
 export const Route = createFileRoute('/api/checkout/bkash-ipn')({
   server: {
@@ -46,7 +37,6 @@ export const Route = createFileRoute('/api/checkout/bkash-ipn')({
                   equals: paymentID,
                 },
               },
-              include: { items: true },
             });
 
             if (!order) {
@@ -57,7 +47,7 @@ export const Route = createFileRoute('/api/checkout/bkash-ipn')({
             }
 
             // Execute payment confirmation
-            let executeResult: BkashExecutePaymentResult | null = null;
+            let executeResult: Awaited<ReturnType<typeof executeBkashPayment>>;
             try {
               executeResult = await executeBkashPayment(paymentID);
             } catch {
@@ -74,124 +64,27 @@ export const Route = createFileRoute('/api/checkout/bkash-ipn')({
               );
             }
 
-            // Process the order in a transaction
-            const metadata = order.metadata as Record<string, unknown> | null;
-            const appliedVouchers =
-              (metadata?.appliedVouchers as Array<{
-                userVoucherId: string;
-                couponId: string;
-              }>) || [];
-            const cashbackAmount = (metadata?.cashbackAmount as number) || 0;
-
-            await prisma.$transaction(async (tx) => {
-              // Atomic guard: re-read order inside tx to prevent double-processing
-              const currentOrder = await tx.order.findUnique({
-                where: { id: order.id },
-                select: { paymentStatus: true },
-              });
-              if (currentOrder?.paymentStatus !== 'PENDING') {
-                throw new Error('Payment already processed');
-              }
-
-              await tx.order.update({
-                where: { id: order.id },
-                data: {
-                  paymentStatus: 'PAID',
-                  status: 'CONFIRMED',
-                  paidAt: new Date(),
-                  confirmedAt: new Date(),
-                  paymentRef: executeResult.trxID,
-                  metadata: {
-                    ...(metadata || {}),
-                    bkashTrxID: executeResult.trxID,
-                    bkashPaymentStatus: executeResult.transactionStatus,
-                  },
-                },
-              });
-
-              // Atomic stock decrement + reserved stock release (race-condition-safe)
-              for (const item of order.items) {
-                await decrementStock(
-                  tx,
-                  item.productId,
-                  item.quantity,
-                  item.productName,
-                );
-
-                if (item.variantId) {
-                  await decrementVariantStock(
-                    tx,
-                    item.variantId,
-                    item.quantity,
-                    item.variantName || 'variant',
-                  );
-                  // Release the reservation that was made during checkout/create
-                  await releaseReservedStock(tx, item.variantId, item.quantity);
-                }
-              }
-
-              // Clear cart
-              await tx.cartItem.deleteMany({
-                where: { cart: { userId: order.customerId } },
-              });
-
-              // Mark vouchers as used
-              for (const v of appliedVouchers) {
-                await tx.couponUsage.create({
-                  data: {
-                    couponId: v.couponId,
-                    userId: order.customerId,
-                    orderId: order.id,
-                  },
-                });
-
-                await tx.coupon.update({
-                  where: { id: v.couponId },
-                  data: { usedCount: { increment: 1 } },
-                });
-
-                if (v.userVoucherId) {
-                  await tx.userVoucher.update({
-                    where: { id: v.userVoucherId },
-                    data: { usedAt: new Date(), orderId: order.id },
-                  });
-                }
-              }
-
-              // Credit cashback to wallet
-              if (cashbackAmount > 0) {
-                let wallet = await tx.wallet.findUnique({
-                  where: { userId: order.customerId },
-                });
-
-                if (!wallet) {
-                  wallet = await tx.wallet.create({
-                    data: { userId: order.customerId },
-                  });
-                }
-
-                await tx.wallet.update({
-                  where: { id: wallet.id },
-                  data: { balance: { increment: cashbackAmount } },
-                });
-
-                await tx.walletTransaction.create({
-                  data: {
-                    walletId: wallet.id,
-                    type: 'CREDIT',
-                    amount: cashbackAmount,
-                    reference: 'CASHBACK',
-                    orderId: order.id,
-                    description: 'Cashback from vouchers',
-                  },
-                });
-              }
+            // Idempotent finalization: the amount is verified against the
+            // order total and concurrent IPNs/callbacks can only win once.
+            const finalized = await finalizeBkashOrder({
+              orderId: order.id,
+              trxID: executeResult.trxID,
+              capturedAmount: Number(executeResult.amount),
             });
 
-            enqueueInvoiceGeneration(order.id).catch((err) =>
-              // biome-ignore lint/suspicious/noConsole: this is fine
-              console.error('Failed to enqueue invoice generation:', err),
-            );
+            if (finalized.status === 'amount_mismatch') {
+              return Response.json(
+                { error: 'Payment amount does not match order total' },
+                { status: 400 },
+              );
+            }
+
+            if (finalized.status === 'not_found') {
+              return Response.json(
+                { error: 'Order not found' },
+                { status: 404 },
+              );
+            }
 
             return Response.json(
               { message: 'Payment processed successfully' },

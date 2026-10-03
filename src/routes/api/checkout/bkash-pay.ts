@@ -6,6 +6,7 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
+import type { OrderMetadata } from '@/types/orders';
 
 export const Route = createFileRoute('/api/checkout/bkash-pay')({
   server: {
@@ -65,17 +66,21 @@ export const Route = createFileRoute('/api/checkout/bkash-pay')({
           );
         }
 
-        // Allow retry for failed payments: reset to PENDING
+        // Allow retry for failed payments: reset to PENDING. Strip the stale
+        // checkout URL (and error) so the idempotency check below mints a
+        // fresh bKash session instead of returning an expired URL (LIFE-13).
         if (order.paymentStatus === 'FAILED') {
-          const metadata = order.metadata as Record<string, unknown> | null;
+          const metadata = {
+            ...((order.metadata ?? {}) as Record<string, unknown>),
+          };
+          delete metadata.bkashCheckoutURL;
+          delete metadata.bkashError;
+
           await prisma.order.update({
             where: { id: order.id },
             data: {
               paymentStatus: 'PENDING',
-              metadata: {
-                ...(metadata || {}),
-                bkashError: undefined,
-              },
+              metadata: metadata as unknown as OrderMetadata,
             },
           });
           // Re-fetch to get updated metadata

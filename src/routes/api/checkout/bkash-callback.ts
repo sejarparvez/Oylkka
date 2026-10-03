@@ -1,15 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 import { sendOrderConfirmation } from '@/actions/send-order-email';
+import { auth } from '@/lib/auth';
 import { executeBkashPayment } from '@/lib/bkash';
+import { finalizeBkashOrder } from '@/lib/bkash-finalize';
 import { prisma } from '@/lib/db';
-import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
-import {
-  decrementStock,
-  decrementVariantStock,
-  releaseReservedStock,
-} from '@/lib/stock';
+import { releaseReservedStock } from '@/lib/stock';
+import type { OrderMetadata } from '@/types/orders';
 
 export const Route = createFileRoute('/api/checkout/bkash-callback')({
   server: {
@@ -29,31 +28,52 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
 
           if (status === 'cancel' || status === 'failure') {
             if (orderIdParam) {
-              // Release reserved stock before marking failed
               const order = await prisma.order.findUnique({
                 where: { id: orderIdParam },
                 include: { items: true },
               });
+
               if (order) {
-                for (const item of order.items) {
-                  if (item.variantId) {
-                    await releaseReservedStock(
-                      prisma as unknown as Parameters<
-                        typeof releaseReservedStock
-                      >[0],
-                      item.variantId,
-                      item.quantity,
-                    ).catch(() => {});
-                  }
+                // Ownership: either the signed-in customer owns the order, or
+                // the callback carries the unguessable bKash paymentID we
+                // stored when the payment was created. Without one of these
+                // an attacker cannot fail an arbitrary order (MONEY-01).
+                let sessionOwns = false;
+                try {
+                  const headers = getRequestHeaders();
+                  const session = await auth.api.getSession({ headers });
+                  sessionOwns = session?.user?.id === order.customerId;
+                } catch {
+                  sessionOwns = false;
+                }
+                const meta = (order.metadata ?? {}) as OrderMetadata;
+                const paymentIdMatches =
+                  !!paymentID && meta.bkashPaymentID === paymentID;
+
+                if (sessionOwns || paymentIdMatches) {
+                  await prisma.$transaction(async (tx) => {
+                    // Conditional transition: only a still-PENDING order may
+                    // be failed. A PAID order is never touched.
+                    const claim = await tx.order.updateMany({
+                      where: { id: order.id, paymentStatus: 'PENDING' },
+                      data: { paymentStatus: 'FAILED' },
+                    });
+                    if (claim.count === 0) return;
+
+                    for (const item of order.items) {
+                      if (item.variantId) {
+                        await releaseReservedStock(
+                          tx,
+                          item.variantId,
+                          item.quantity,
+                        ).catch(() => {});
+                      }
+                    }
+                  });
                 }
               }
-              await prisma.order
-                .update({
-                  where: { id: orderIdParam },
-                  data: { paymentStatus: 'FAILED' },
-                })
-                .catch(() => {});
             }
+
             const redirectUrl = orderIdParam
               ? `${baseUrl}/checkout/confirmation?orderId=${orderIdParam}&error=payment-cancelled`
               : `${baseUrl}/checkout?error=payment-cancelled`;
@@ -95,149 +115,52 @@ export const Route = createFileRoute('/api/checkout/bkash-callback')({
           }
 
           if (result.transactionStatus === 'Completed') {
-            // Payment confirmed — finalize order with destructive side effects
-            const metadata = order.metadata as Record<string, unknown> | null;
-            const appliedVouchers =
-              (metadata?.appliedVouchers as Array<{
-                userVoucherId: string;
-                couponId: string;
-              }>) || [];
-            const cashbackAmount = (metadata?.cashbackAmount as number) || 0;
-
-            await prisma.$transaction(async (tx) => {
-              // Atomic guard: re-read order inside tx to prevent double-processing
-              const currentOrder = await tx.order.findUnique({
-                where: { id: order.id },
-                select: { paymentStatus: true },
-              });
-              if (currentOrder?.paymentStatus !== 'PENDING') {
-                throw new Error('Payment already processed');
-              }
-
-              // Update order to PAID/CONFIRMED
-              await tx.order.update({
-                where: { id: order.id },
-                data: {
-                  paymentStatus: 'PAID',
-                  status: 'CONFIRMED',
-                  paidAt: new Date(),
-                  confirmedAt: new Date(),
-                  paymentRef: result.trxID,
-                  metadata: {
-                    ...(metadata || {}),
-                    bkashTrxID: result.trxID,
-                    bkashPaymentStatus: result.transactionStatus,
-                  },
-                },
-              });
-
-              // Atomic stock decrement + reserved stock release (race-condition-safe)
-              for (const item of order.items) {
-                await decrementStock(
-                  tx,
-                  item.productId,
-                  item.quantity,
-                  item.productName,
-                );
-
-                if (item.variantId) {
-                  await decrementVariantStock(
-                    tx,
-                    item.variantId,
-                    item.quantity,
-                    item.variantName || 'variant',
-                  );
-                  // Release the reservation that was made during checkout/create
-                  await releaseReservedStock(tx, item.variantId, item.quantity);
-                }
-              }
-
-              // Clear cart
-              await tx.cartItem.deleteMany({
-                where: { cart: { userId: order.customerId } },
-              });
-
-              // Mark vouchers as used
-              for (const v of appliedVouchers) {
-                await tx.couponUsage.create({
-                  data: {
-                    couponId: v.couponId,
-                    userId: order.customerId,
-                    orderId: order.id,
-                  },
-                });
-
-                await tx.coupon.update({
-                  where: { id: v.couponId },
-                  data: { usedCount: { increment: 1 } },
-                });
-
-                if (v.userVoucherId) {
-                  await tx.userVoucher.update({
-                    where: { id: v.userVoucherId },
-                    data: { usedAt: new Date(), orderId: order.id },
-                  });
-                }
-              }
-
-              // Credit cashback to wallet
-              if (cashbackAmount > 0) {
-                let wallet = await tx.wallet.findUnique({
-                  where: { userId: order.customerId },
-                });
-
-                if (!wallet) {
-                  wallet = await tx.wallet.create({
-                    data: { userId: order.customerId },
-                  });
-                }
-
-                await tx.wallet.update({
-                  where: { id: wallet.id },
-                  data: { balance: { increment: cashbackAmount } },
-                });
-
-                await tx.walletTransaction.create({
-                  data: {
-                    walletId: wallet.id,
-                    type: 'CREDIT',
-                    amount: cashbackAmount,
-                    reference: 'CASHBACK',
-                    orderId: order.id,
-                    description: 'Cashback from vouchers',
-                  },
-                });
-              }
+            const finalized = await finalizeBkashOrder({
+              orderId: order.id,
+              trxID: result.trxID,
+              capturedAmount: Number(result.amount),
             });
 
-            // Fire-and-forget: send order confirmation email + generate invoice
-            sendOrderConfirmation(order.id).catch((e) => {
-              // biome-ignore lint/suspicious/noConsole: this is fine
-              console.error('Failed to send order confirmation:', e);
-            });
-            enqueueInvoiceGeneration(order.id).catch((e) => {
-              // biome-ignore lint/suspicious/noConsole: this is fine
-              console.error('Failed to enqueue invoice generation:', e);
-            });
+            if (finalized.status === 'amount_mismatch') {
+              return Response.redirect(
+                `${baseUrl}/checkout/confirmation?orderId=${order.id}&error=payment-amount-mismatch`,
+              );
+            }
+
+            if (finalized.status === 'not_found') {
+              return Response.redirect(
+                `${baseUrl}/checkout?error=order-not-found`,
+              );
+            }
+
+            // Only send the confirmation when this callback performed the
+            // finalization; a replay must not email the customer again.
+            if (finalized.status === 'finalized') {
+              sendOrderConfirmation(order.id).catch((e) => {
+                // biome-ignore lint/suspicious/noConsole: this is fine
+                console.error('Failed to send order confirmation:', e);
+              });
+            }
 
             return Response.redirect(
               `${baseUrl}/checkout/confirmation?orderId=${order.id}`,
             );
           }
 
-          // Payment failed — mark order as FAILED and release reserved stock
+          // Payment failed — only a PENDING order may transition to FAILED,
+          // and only then is the reservation released.
           await prisma.$transaction(async (tx) => {
-            if (order) {
-              for (const item of order.items) {
-                if (item.variantId) {
-                  await releaseReservedStock(tx, item.variantId, item.quantity);
-                }
-              }
-            }
-            await tx.order.update({
-              where: { id: order.id },
+            const claim = await tx.order.updateMany({
+              where: { id: order.id, paymentStatus: 'PENDING' },
               data: { paymentStatus: 'FAILED' },
             });
+            if (claim.count === 0) return;
+
+            for (const item of order.items) {
+              if (item.variantId) {
+                await releaseReservedStock(tx, item.variantId, item.quantity);
+              }
+            }
           });
 
           return Response.redirect(
