@@ -7,7 +7,7 @@ import {
   Copy,
   Wallet as WalletIcon,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +23,30 @@ function WalletPage() {
   const { data: wallet, isLoading } = useWallet();
   const topUpMutation = useTopUpMutation();
   const [topUpAmount, setTopUpAmount] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const result = params.get('topup');
+    if (!result) return;
+
+    if (result === 'success') {
+      toast.success('Wallet topped up successfully!');
+    } else if (result === 'cancelled') {
+      toast.error('Top-up cancelled');
+    } else if (result === 'failed') {
+      toast.error('Top-up payment failed');
+    } else {
+      toast.error('Top-up could not be completed');
+    }
+
+    params.delete('topup');
+    const query = params.toString();
+    window.history.replaceState(
+      {},
+      '',
+      `${window.location.pathname}${query ? `?${query}` : ''}`,
+    );
+  }, []);
 
   const balance = wallet?.balance ?? 0;
   const transactions = wallet?.transactions ?? [];

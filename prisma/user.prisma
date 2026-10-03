@@ -26,6 +26,7 @@ model User {
   orders             Order[]
   vouchers           UserVoucher[]
   wallet             Wallet?
+  walletTopUps       WalletTopUp[]
   returnRequests     ReturnRequest[]
   shopFollows        ShopFollow[]
   addresses          UserAddress[]

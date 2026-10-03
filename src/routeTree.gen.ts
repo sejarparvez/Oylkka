@@ -66,7 +66,9 @@ import { Route as DashboardBecomeVendorApplyRouteImport } from './routes/dashboa
 import { Route as ApiWishlistRemoveRouteImport } from './routes/api/wishlist/remove'
 import { Route as ApiWishlistListRouteImport } from './routes/api/wishlist/list'
 import { Route as ApiWishlistAddRouteImport } from './routes/api/wishlist/add'
+import { Route as ApiWalletTopUpRouteImport } from './routes/api/wallet/top-up'
 import { Route as ApiWalletGetRouteImport } from './routes/api/wallet/get'
+import { Route as ApiWalletBkashCallbackRouteImport } from './routes/api/wallet/bkash-callback'
 import { Route as ApiVouchersProductVouchersRouteImport } from './routes/api/vouchers/product-vouchers'
 import { Route as ApiVouchersMyRouteImport } from './routes/api/vouchers/my'
 import { Route as ApiVouchersCollectRouteImport } from './routes/api/vouchers/collect'
@@ -531,9 +533,19 @@ const ApiWishlistAddRoute = ApiWishlistAddRouteImport.update({
   path: '/api/wishlist/add',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWalletTopUpRoute = ApiWalletTopUpRouteImport.update({
+  id: '/api/wallet/top-up',
+  path: '/api/wallet/top-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiWalletGetRoute = ApiWalletGetRouteImport.update({
   id: '/api/wallet/get',
   path: '/api/wallet/get',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWalletBkashCallbackRoute = ApiWalletBkashCallbackRouteImport.update({
+  id: '/api/wallet/bkash-callback',
+  path: '/api/wallet/bkash-callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiVouchersProductVouchersRoute =
@@ -1611,7 +1623,9 @@ export interface FileRoutesByFullPath {
   '/api/vouchers/collect': typeof ApiVouchersCollectRoute
   '/api/vouchers/my': typeof ApiVouchersMyRoute
   '/api/vouchers/product-vouchers': typeof ApiVouchersProductVouchersRoute
+  '/api/wallet/bkash-callback': typeof ApiWalletBkashCallbackRoute
   '/api/wallet/get': typeof ApiWalletGetRoute
+  '/api/wallet/top-up': typeof ApiWalletTopUpRoute
   '/api/wishlist/add': typeof ApiWishlistAddRoute
   '/api/wishlist/list': typeof ApiWishlistListRoute
   '/api/wishlist/remove': typeof ApiWishlistRemoveRoute
@@ -1839,7 +1853,9 @@ export interface FileRoutesByTo {
   '/api/vouchers/collect': typeof ApiVouchersCollectRoute
   '/api/vouchers/my': typeof ApiVouchersMyRoute
   '/api/vouchers/product-vouchers': typeof ApiVouchersProductVouchersRoute
+  '/api/wallet/bkash-callback': typeof ApiWalletBkashCallbackRoute
   '/api/wallet/get': typeof ApiWalletGetRoute
+  '/api/wallet/top-up': typeof ApiWalletTopUpRoute
   '/api/wishlist/add': typeof ApiWishlistAddRoute
   '/api/wishlist/list': typeof ApiWishlistListRoute
   '/api/wishlist/remove': typeof ApiWishlistRemoveRoute
@@ -2075,7 +2091,9 @@ export interface FileRoutesById {
   '/api/vouchers/collect': typeof ApiVouchersCollectRoute
   '/api/vouchers/my': typeof ApiVouchersMyRoute
   '/api/vouchers/product-vouchers': typeof ApiVouchersProductVouchersRoute
+  '/api/wallet/bkash-callback': typeof ApiWalletBkashCallbackRoute
   '/api/wallet/get': typeof ApiWalletGetRoute
+  '/api/wallet/top-up': typeof ApiWalletTopUpRoute
   '/api/wishlist/add': typeof ApiWishlistAddRoute
   '/api/wishlist/list': typeof ApiWishlistListRoute
   '/api/wishlist/remove': typeof ApiWishlistRemoveRoute
@@ -2312,7 +2330,9 @@ export interface FileRouteTypes {
     | '/api/vouchers/collect'
     | '/api/vouchers/my'
     | '/api/vouchers/product-vouchers'
+    | '/api/wallet/bkash-callback'
     | '/api/wallet/get'
+    | '/api/wallet/top-up'
     | '/api/wishlist/add'
     | '/api/wishlist/list'
     | '/api/wishlist/remove'
@@ -2540,7 +2560,9 @@ export interface FileRouteTypes {
     | '/api/vouchers/collect'
     | '/api/vouchers/my'
     | '/api/vouchers/product-vouchers'
+    | '/api/wallet/bkash-callback'
     | '/api/wallet/get'
+    | '/api/wallet/top-up'
     | '/api/wishlist/add'
     | '/api/wishlist/list'
     | '/api/wishlist/remove'
@@ -2775,7 +2797,9 @@ export interface FileRouteTypes {
     | '/api/vouchers/collect'
     | '/api/vouchers/my'
     | '/api/vouchers/product-vouchers'
+    | '/api/wallet/bkash-callback'
     | '/api/wallet/get'
+    | '/api/wallet/top-up'
     | '/api/wishlist/add'
     | '/api/wishlist/list'
     | '/api/wishlist/remove'
@@ -2994,7 +3018,9 @@ export interface RootRouteChildren {
   ApiVouchersCollectRoute: typeof ApiVouchersCollectRoute
   ApiVouchersMyRoute: typeof ApiVouchersMyRoute
   ApiVouchersProductVouchersRoute: typeof ApiVouchersProductVouchersRoute
+  ApiWalletBkashCallbackRoute: typeof ApiWalletBkashCallbackRoute
   ApiWalletGetRoute: typeof ApiWalletGetRoute
+  ApiWalletTopUpRoute: typeof ApiWalletTopUpRoute
   ApiWishlistAddRoute: typeof ApiWishlistAddRoute
   ApiWishlistListRoute: typeof ApiWishlistListRoute
   ApiWishlistRemoveRoute: typeof ApiWishlistRemoveRoute
@@ -3450,11 +3476,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWishlistAddRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/wallet/top-up': {
+      id: '/api/wallet/top-up'
+      path: '/api/wallet/top-up'
+      fullPath: '/api/wallet/top-up'
+      preLoaderRoute: typeof ApiWalletTopUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/wallet/get': {
       id: '/api/wallet/get'
       path: '/api/wallet/get'
       fullPath: '/api/wallet/get'
       preLoaderRoute: typeof ApiWalletGetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wallet/bkash-callback': {
+      id: '/api/wallet/bkash-callback'
+      path: '/api/wallet/bkash-callback'
+      fullPath: '/api/wallet/bkash-callback'
+      preLoaderRoute: typeof ApiWalletBkashCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/vouchers/product-vouchers': {
@@ -5080,7 +5120,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiVouchersCollectRoute: ApiVouchersCollectRoute,
   ApiVouchersMyRoute: ApiVouchersMyRoute,
   ApiVouchersProductVouchersRoute: ApiVouchersProductVouchersRoute,
+  ApiWalletBkashCallbackRoute: ApiWalletBkashCallbackRoute,
   ApiWalletGetRoute: ApiWalletGetRoute,
+  ApiWalletTopUpRoute: ApiWalletTopUpRoute,
   ApiWishlistAddRoute: ApiWishlistAddRoute,
   ApiWishlistListRoute: ApiWishlistListRoute,
   ApiWishlistRemoveRoute: ApiWishlistRemoveRoute,
@@ -5141,12 +5183,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

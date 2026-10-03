@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 import type { TransactionType } from '@/generated/prisma/enums';
@@ -35,19 +35,20 @@ export function useWallet() {
 }
 
 export function useTopUpMutation() {
-  const queryClient = useQueryClient();
-
-  return useMutation<void, Error, number>({
+  return useMutation<{ checkoutURL: string }, Error, number>({
     mutationFn: async (amount) => {
-      const response = await apiClient.post('/api/wallet/top-up', { amount });
+      const response = await apiClient.post<{ checkoutURL: string }>(
+        '/api/wallet/top-up',
+        { amount },
+      );
       return response.data;
     },
     onMutate: () => {
-      toast.loading('Processing top-up...', { id: 'wallet-topup' });
+      toast.loading('Starting top-up...', { id: 'wallet-topup' });
     },
-    onSuccess: () => {
-      toast.success('Wallet topped up successfully!', { id: 'wallet-topup' });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.WALLET] });
+    onSuccess: (data) => {
+      toast.success('Redirecting to bKash...', { id: 'wallet-topup' });
+      window.location.href = data.checkoutURL;
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)

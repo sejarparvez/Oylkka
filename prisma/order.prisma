@@ -227,6 +227,23 @@ model WalletTransaction {
   @@map("wallet_transaction")
 }
 
+model WalletTopUp {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount         Decimal       @db.Decimal(10, 2)
+  status         PaymentStatus @default(PENDING)
+  bkashPaymentID String?
+  bkashTrxID     String?
+  checkoutURL    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("wallet_top_up")
+}
+
 model CouponUsage {
   id       String   @id @default(cuid())
   couponId String
