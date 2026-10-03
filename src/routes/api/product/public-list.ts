@@ -102,6 +102,7 @@ export const Route = createFileRoute('/api/product/public-list')({
 
           const where: Record<string, unknown> = {
             status: 'PUBLISHED' as const,
+            shop: { status: { in: ['APPROVED', 'ACTIVE'] } },
             ...(categoryId ? { categoryId } : {}),
             ...(hasDiscount ? { discountPrice: { not: null } } : {}),
             ...searchFilter,

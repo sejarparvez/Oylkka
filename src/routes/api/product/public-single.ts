@@ -16,8 +16,12 @@ export const Route = createFileRoute('/api/product/public-single')({
             );
           }
 
-          const product = await prisma.product.findUnique({
-            where: { slug, status: 'PUBLISHED' },
+          const product = await prisma.product.findFirst({
+            where: {
+              slug,
+              status: 'PUBLISHED',
+              shop: { status: { in: ['APPROVED', 'ACTIVE'] } },
+            },
             include: {
               category: { select: { id: true, name: true, slug: true } },
               images: { orderBy: { order: 'asc' } },

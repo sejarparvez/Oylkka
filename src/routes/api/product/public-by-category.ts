@@ -32,6 +32,7 @@ export const Route = createFileRoute('/api/product/public-by-category')({
             where: {
               categoryId: category.id,
               status: 'PUBLISHED',
+              shop: { status: { in: ['APPROVED', 'ACTIVE'] } },
             },
             select: {
               id: true,

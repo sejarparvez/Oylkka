@@ -14,7 +14,11 @@ export const Route = createFileRoute('/api/product/public-compare')({
           const ids = idsParam.split(',').filter(Boolean);
 
           const products = await prisma.product.findMany({
-            where: { id: { in: ids }, status: 'PUBLISHED' },
+            where: {
+              id: { in: ids },
+              status: 'PUBLISHED',
+              shop: { status: { in: ['APPROVED', 'ACTIVE'] } },
+            },
             select: {
               id: true,
               productName: true,

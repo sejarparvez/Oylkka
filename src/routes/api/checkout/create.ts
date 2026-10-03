@@ -120,6 +120,7 @@ export const Route = createFileRoute('/api/checkout/create')({
                         select: {
                           id: true,
                           name: true,
+                          status: true,
                           commissionRate: true,
                           shippingCost: true,
                         },
@@ -143,6 +144,23 @@ export const Route = createFileRoute('/api/checkout/create')({
 
           if (!cart || cart.items.length === 0) {
             return Response.json({ error: 'Cart is empty' }, { status: 400 });
+          }
+
+          // A suspended or unapproved vendor's products must not be
+          // purchasable, even if they are still PUBLISHED (MONEY-21).
+          const blockedItem = cart.items.find(
+            (item) =>
+              !item.product.shop ||
+              !['APPROVED', 'ACTIVE'].includes(item.product.shop.status),
+          );
+          if (blockedItem) {
+            return Response.json(
+              {
+                error:
+                  'One or more items are no longer available from this seller',
+              },
+              { status: 400 },
+            );
           }
 
           // --- For bKash: reserve stock before proceeding (MONEY-22) ---
