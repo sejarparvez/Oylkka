@@ -4,6 +4,7 @@ import { refundBkashPayment } from '@/lib/bkash';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderRefundHtml } from '@/lib/email-templates';
+import { flagPayoutReversals } from '@/lib/payout-clawback';
 import { sendEmail } from '@/lib/send-email';
 import type { OrderMetadata } from '@/types/orders';
 
@@ -298,6 +299,11 @@ export const Route = createFileRoute('/api/admin/returns/review')({
                     orderId: order.id,
                   },
                   data: { fulfillmentStatus: 'REFUNDED' },
+                });
+
+                await flagPayoutReversals(tx, {
+                  orderItemIds: returnRequest.itemIds,
+                  reason: returnRequest.details || 'Return refund',
                 });
               }
 

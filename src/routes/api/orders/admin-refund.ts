@@ -6,6 +6,7 @@ import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderRefundHtml } from '@/lib/email-templates';
+import { flagPayoutReversals } from '@/lib/payout-clawback';
 import { sendEmail } from '@/lib/send-email';
 import type { OrderMetadata } from '@/types/orders';
 
@@ -219,6 +220,11 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
                   orderId: body.orderId,
                 },
                 data: { fulfillmentStatus: 'REFUNDED' },
+              });
+
+              await flagPayoutReversals(tx, {
+                orderItemIds: itemsToRefund.map((i) => i.id),
+                reason: body.reason,
               });
             }
 

@@ -32,8 +32,33 @@ export const Route = createFileRoute('/api/admin/payouts/list')({
             prisma.payout.count(),
           ]);
 
+          // How much of each payout has been reversed by refunds and is
+          // recoverable from the vendor (MONEY-10, flag-only).
+          const payoutIds = payouts.map((payout) => payout.id);
+          const reversalSums =
+            payoutIds.length > 0
+              ? await prisma.payoutItem.groupBy({
+                  by: ['payoutId'],
+                  where: {
+                    payoutId: { in: payoutIds },
+                    reversedAmount: { gt: 0 },
+                  },
+                  _sum: { reversedAmount: true },
+                })
+              : [];
+
+          const recoverableByPayout = new Map(
+            reversalSums.map((row) => [
+              row.payoutId,
+              Number(row._sum.reversedAmount ?? 0),
+            ]),
+          );
+
           return Response.json({
-            payouts,
+            payouts: payouts.map((payout) => ({
+              ...payout,
+              recoverableAmount: recoverableByPayout.get(payout.id) ?? 0,
+            })),
             total,
             page,
             totalPages: Math.ceil(total / limit),

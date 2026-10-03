@@ -95,6 +95,13 @@ model PayoutItem {
   amount     Decimal @db.Decimal(10, 2)
   commission Decimal @db.Decimal(10, 2)
 
+  // Clawback flag: how much of this payout has been reversed because the
+  // underlying order item was refunded (MONEY-10). Money movement is out of
+  // scope; this only records what is recoverable from the vendor.
+  reversedAmount Decimal @default(0) @db.Decimal(10, 2)
+  disputedAt     DateTime?
+  disputeReason  String?
+
   @@index([payoutId])
   @@map("payout_item")
 }
