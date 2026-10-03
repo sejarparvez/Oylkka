@@ -2,11 +2,19 @@ import { createFileRoute } from '@tanstack/react-router';
 import { createAuditLog } from '@/lib/audit-log';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { refundBkashPayment } from '@/lib/bkash';
+import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderRefundHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
 import type { OrderMetadata } from '@/types/orders';
+
+class RefundConflictError extends Error {
+  constructor() {
+    super('Refund was modified by another request');
+    this.name = 'RefundConflictError';
+  }
+}
 
 export const Route = createFileRoute('/api/orders/admin-refund')({
   server: {
@@ -66,6 +74,17 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             );
           }
 
+          if (body.itemIds && body.itemIds.length > 0) {
+            const orderItemIds = new Set(order.items.map((i) => i.id));
+            const invalid = body.itemIds.filter((id) => !orderItemIds.has(id));
+            if (invalid.length > 0) {
+              return Response.json(
+                { error: 'One or more itemIds do not belong to this order' },
+                { status: 400 },
+              );
+            }
+          }
+
           const alreadyRefunded = Number(order.refundAmount ?? 0);
           const totalRefunded = alreadyRefunded + body.amount;
 
@@ -83,10 +102,17 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             ? 'PARTIALLY_REFUNDED'
             : 'REFUNDED';
 
+          // Only orders that actually captured money may trigger a
+          // monetary refund. PENDING / FAILED / CANCELLED must never mint
+          // wallet balance or call the gateway.
+          const wasPaid =
+            order.paymentStatus === 'PAID' ||
+            order.paymentStatus === 'PARTIALLY_REFUNDED';
+
           // Update the order and items in a transaction
           // For bKash orders, capture payment info before transaction
           const bkashRefundInfo =
-            order.paymentMethod === 'BKASH' && order.paymentStatus === 'PAID'
+            order.paymentMethod === 'BKASH' && wasPaid
               ? {
                   metadata: order.metadata as OrderMetadata | null,
                   paymentRef: order.paymentRef,
@@ -94,8 +120,32 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
               : null;
 
           const updated = await prisma.$transaction(async (tx) => {
+            // Optimistic concurrency guard: only one concurrent refund may
+            // claim the order at a time. If another request already moved
+            // `refundAmount`, `count` is 0 and we abort without side effects.
+            const claimed = await tx.order.updateMany({
+              where: {
+                id: body.orderId,
+                refundAmount: order.refundAmount,
+                paymentStatus: { not: 'REFUNDED' },
+              },
+              data: {
+                paymentStatus: newPaymentStatus,
+                refundAmount: totalRefunded,
+                refundReason: body.reason,
+                refundedAt: new Date(),
+                ...(totalRefunded >= Number(order.total)
+                  ? { status: 'REFUNDED' }
+                  : {}),
+              },
+            });
+
+            if (claimed.count === 0) {
+              throw new RefundConflictError();
+            }
+
             // Wallet refund: credit inside transaction (atomic with order update)
-            if (order.paymentMethod === 'WALLET') {
+            if (order.paymentMethod === 'WALLET' && wasPaid) {
               let wallet = await tx.wallet.findUnique({
                 where: { userId: order.customerId },
               });
@@ -122,31 +172,33 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
                 },
               });
             }
-            const updatedOrder = await tx.order.update({
-              where: { id: body.orderId },
-              data: {
-                paymentStatus: newPaymentStatus,
-                refundAmount: totalRefunded,
-                refundReason: body.reason,
-                refundedAt: new Date(),
-                ...(totalRefunded >= Number(order.total)
-                  ? { status: 'REFUNDED' }
-                  : {}),
-              },
-              include: {
-                items: {
-                  include: { shop: { select: { name: true } } },
-                },
-              },
-            });
 
-            // Restore stock for refunded items
-            const itemsToRestore =
-              body.itemIds && body.itemIds.length > 0
-                ? order.items.filter((i) => body.itemIds?.includes(i.id))
-                : order.items;
+            // Only ever touch items that belong to this order and have not
+            // already been refunded — prevents cross-order edits (MONEY-08)
+            // and double restocking on repeated partial refunds (MONEY-09).
+            const refundedIds = new Set(
+              order.items
+                .filter((i) => i.fulfillmentStatus === 'REFUNDED')
+                .map((i) => i.id),
+            );
 
-            for (const item of itemsToRestore) {
+            let itemsToRefund: typeof order.items;
+            if (body.itemIds && body.itemIds.length > 0) {
+              const requested = new Set(body.itemIds);
+              itemsToRefund = order.items.filter(
+                (i) => requested.has(i.id) && !refundedIds.has(i.id),
+              );
+            } else if (totalRefunded >= Number(order.total)) {
+              itemsToRefund = order.items.filter(
+                (i) => !refundedIds.has(i.id),
+              );
+            } else {
+              // Partial refund with no item scope: no safe way to know which
+              // items were refunded, so restore nothing.
+              itemsToRefund = [];
+            }
+
+            for (const item of itemsToRefund) {
               await tx.product.update({
                 where: { id: item.productId },
                 data: { stock: { increment: item.quantity } },
@@ -160,21 +212,24 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
               }
             }
 
-            // Mark specific items as refunded
-            if (body.itemIds && body.itemIds.length > 0) {
+            if (itemsToRefund.length > 0) {
               await tx.orderItem.updateMany({
-                where: { id: { in: body.itemIds } },
-                data: { fulfillmentStatus: 'REFUNDED' },
-              });
-            } else if (totalRefunded >= Number(order.total)) {
-              // Full refund — mark all items as refunded
-              await tx.orderItem.updateMany({
-                where: { orderId: body.orderId },
+                where: {
+                  id: { in: itemsToRefund.map((i) => i.id) },
+                  orderId: body.orderId,
+                },
                 data: { fulfillmentStatus: 'REFUNDED' },
               });
             }
 
-            return updatedOrder;
+            return tx.order.findUniqueOrThrow({
+              where: { id: body.orderId },
+              include: {
+                items: {
+                  include: { shop: { select: { name: true } } },
+                },
+              },
+            });
           });
 
           // bKash refund: process AFTER transaction succeeds (avoids charging card without DB update)
@@ -202,6 +257,7 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             action: 'ORDER_REFUNDED',
             entity: 'Order',
             entityId: body.orderId,
+            ipAddress: getClientIp(request.headers) ?? undefined,
             details: {
               amount: body.amount,
               reason: body.reason,
@@ -289,7 +345,16 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
             },
             { status: 200 },
           );
-        } catch (_error) {
+        } catch (error) {
+          if (error instanceof RefundConflictError) {
+            return Response.json(
+              {
+                error:
+                  'Order was refunded by another request. Refresh and try again.',
+              },
+              { status: 409 },
+            );
+          }
           return Response.json(
             { error: 'Internal Server Error' },
             { status: 500 },
