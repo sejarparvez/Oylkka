@@ -13,6 +13,7 @@ type CartItemProduct = {
   stock: number;
   hasVariants: boolean;
   freeShipping: boolean;
+  categoryId: string | null;
   images: { imageUrl: string }[];
   shop: { id: string; name: string; slug: string; shippingCost: number } | null;
 };

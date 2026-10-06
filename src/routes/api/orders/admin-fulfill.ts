@@ -4,6 +4,7 @@ import { createAuditLog } from '@/lib/audit-log';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { incrementStock, incrementVariantStock } from '@/lib/stock';
 
 const FULFILLMENT_TRANSITIONS: Record<string, string[]> = {
   PENDING: ['PROCESSING', 'CANCELLED'],
@@ -101,15 +102,18 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
                 select: { productId: true, variantId: true, quantity: true },
               });
               if (orderItem) {
-                await tx.product.update({
-                  where: { id: orderItem.productId },
-                  data: { stock: { increment: orderItem.quantity } },
-                });
+                // Shared helpers, one stock path for the whole app (MONEY-45).
+                await incrementStock(
+                  tx,
+                  orderItem.productId,
+                  orderItem.quantity,
+                );
                 if (orderItem.variantId) {
-                  await tx.productVariant.update({
-                    where: { id: orderItem.variantId },
-                    data: { stock: { increment: orderItem.quantity } },
-                  });
+                  await incrementVariantStock(
+                    tx,
+                    orderItem.variantId,
+                    orderItem.quantity,
+                  );
                 }
               }
             }

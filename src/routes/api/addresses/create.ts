@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { AddressFormSchema } from '@/lib/address-validation';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -16,26 +17,27 @@ export const Route = createFileRoute('/api/addresses/create')({
           }
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
-          const body = await request.json();
-          const {
-            label,
-            name,
-            phone,
-            address,
-            upzila,
-            district,
-            postalCode,
-            isDefault,
-          } = body;
 
-          if (!name || !phone || !address || !upzila || !district) {
+          const body = await request.json();
+          const parsed = AddressFormSchema.safeParse(body);
+          if (!parsed.success) {
             return Response.json(
-              { error: 'Required fields missing' },
+              { error: 'Invalid address data' },
               { status: 400 },
             );
           }
+          const { label, name, phone, address, upzila, district, postalCode, isDefault } =
+            parsed.data;
 
-          if (isDefault) {
+          const existingCount = await prisma.userAddress.count({
+            where: { userId: session.user.id },
+          });
+
+          // First address on the account becomes the default so the account
+          // never has zero defaults (MONEY-57).
+          const makeDefault = isDefault === true || existingCount === 0;
+
+          if (makeDefault) {
             await prisma.userAddress.updateMany({
               where: { userId: session.user.id },
               data: { isDefault: false },
@@ -45,14 +47,14 @@ export const Route = createFileRoute('/api/addresses/create')({
           const addr = await prisma.userAddress.create({
             data: {
               userId: session.user.id,
-              label: label || 'Home',
-              name,
-              phone,
-              address,
-              upzila,
+              label: label?.trim() || 'Home',
+              name: name.trim(),
+              phone: phone.trim(),
+              address: address.trim(),
+              upzila: upzila.trim(),
               district,
               postalCode: postalCode || null,
-              isDefault: !!isDefault,
+              isDefault: makeDefault,
             },
           });
           return Response.json({ address: addr }, { status: 201 });

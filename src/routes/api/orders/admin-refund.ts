@@ -8,6 +8,7 @@ import { prisma } from '@/lib/db';
 import { orderRefundHtml } from '@/lib/email-templates';
 import { flagPayoutReversals } from '@/lib/payout-clawback';
 import { sendEmail } from '@/lib/send-email';
+import { incrementStock, incrementVariantStock } from '@/lib/stock';
 import type { OrderMetadata } from '@/types/orders';
 
 class RefundConflictError extends Error {
@@ -190,26 +191,20 @@ export const Route = createFileRoute('/api/orders/admin-refund')({
                 (i) => requested.has(i.id) && !refundedIds.has(i.id),
               );
             } else if (totalRefunded >= Number(order.total)) {
-              itemsToRefund = order.items.filter(
-                (i) => !refundedIds.has(i.id),
-              );
+              itemsToRefund = order.items.filter((i) => !refundedIds.has(i.id));
             } else {
               // Partial refund with no item scope: no safe way to know which
               // items were refunded, so restore nothing.
               itemsToRefund = [];
             }
 
+            // Routed through the helpers so every stock movement in the app shares one
+            // implementation and one set of guards (MONEY-45).
             for (const item of itemsToRefund) {
-              await tx.product.update({
-                where: { id: item.productId },
-                data: { stock: { increment: item.quantity } },
-              });
+              await incrementStock(tx, item.productId, item.quantity);
 
               if (item.variantId) {
-                await tx.productVariant.update({
-                  where: { id: item.variantId },
-                  data: { stock: { increment: item.quantity } },
-                });
+                await incrementVariantStock(tx, item.variantId, item.quantity);
               }
             }
 

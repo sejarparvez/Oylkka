@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { refundBkashPayment } from '@/lib/bkash';
 import { validateCsrf } from '@/lib/csrf';
@@ -6,7 +7,30 @@ import { prisma } from '@/lib/db';
 import { orderRefundHtml } from '@/lib/email-templates';
 import { flagPayoutReversals } from '@/lib/payout-clawback';
 import { sendEmail } from '@/lib/send-email';
+import { incrementStock, incrementVariantStock } from '@/lib/stock';
 import type { OrderMetadata } from '@/types/orders';
+
+// The return's own free-text `details` is the *vendor/customer* narrative. It
+// must never replace the order's admin-facing refund trail, so entries are
+// appended and the tail is capped to stop unbounded growth (MONEY-62).
+const MAX_REFUND_REASON_LENGTH = 2000;
+
+function appendRefundReason(
+  previous: string | null | undefined,
+  entry: string,
+): string {
+  const combined = previous ? `${previous}\n---\n${entry}` : entry;
+  return combined.length > MAX_REFUND_REASON_LENGTH
+    ? combined.slice(-MAX_REFUND_REASON_LENGTH)
+    : combined;
+}
+
+const ReviewReturnSchema = z.object({
+  returnId: z.string().min(1, 'returnId is required'),
+  status: z.enum(['APPROVED', 'REJECTED', 'REFUNDED']),
+  refundAmount: z.number().positive().optional(),
+  adminNote: z.string().max(1000).nullish(),
+});
 
 class ReturnConflictError extends Error {
   constructor() {
@@ -39,20 +63,25 @@ export const Route = createFileRoute('/api/admin/returns/review')({
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
 
-          const body = await request.json();
-          const { returnId, status: newStatus, refundAmount, adminNote } = body;
-
-          if (!returnId || !newStatus) {
+          const parsedBody = ReviewReturnSchema.safeParse(
+            await request.json().catch(() => null),
+          );
+          if (!parsedBody.success) {
             return Response.json(
-              { error: 'returnId and status are required' },
+              {
+                error: 'Invalid request body',
+                details: parsedBody.error.flatten(),
+              },
               { status: 400 },
             );
           }
 
-          const VALID_STATUSES = ['APPROVED', 'REJECTED', 'REFUNDED'];
-          if (!VALID_STATUSES.includes(newStatus)) {
-            return Response.json({ error: 'Invalid status' }, { status: 400 });
-          }
+          const {
+            returnId,
+            status: newStatus,
+            refundAmount,
+            adminNote,
+          } = parsedBody.data;
 
           const returnRequest = await prisma.returnRequest.findUnique({
             where: { id: returnId },
@@ -64,6 +93,7 @@ export const Route = createFileRoute('/api/admin/returns/review')({
                   customerId: true,
                   total: true,
                   refundAmount: true,
+                  refundReason: true,
                   paymentMethod: true,
                   paymentStatus: true,
                   shippingName: true,
@@ -171,8 +201,7 @@ export const Route = createFileRoute('/api/admin/returns/review')({
           }
 
           const newRefundAmount = alreadyRefunded + amount;
-          const fullyRefunded =
-            newRefundAmount >= Number(order.total) - 0.001;
+          const fullyRefunded = newRefundAmount >= Number(order.total) - 0.001;
 
           // Dispatch per payment method. The gateway is called *before* the
           // DB transaction so a failure leaves no partial state, and nothing
@@ -246,7 +275,10 @@ export const Route = createFileRoute('/api/admin/returns/review')({
                 },
                 data: {
                   refundAmount: newRefundAmount,
-                  refundReason: returnRequest.details || 'Return refund',
+                  refundReason: appendRefundReason(
+                    order.refundReason,
+                    returnRequest.details || 'Return refund',
+                  ),
                   refundedAt: new Date(),
                   paymentStatus: fullyRefunded
                     ? 'REFUNDED'
@@ -293,18 +325,48 @@ export const Route = createFileRoute('/api/admin/returns/review')({
 
               // Scope item updates to this order to prevent cross-order edits.
               if (returnRequest.itemIds.length > 0) {
-                await tx.orderItem.updateMany({
+                // Read first so only lines that are genuinely being reversed are
+                // restocked — a re-submitted request must not return the same
+                // units twice.
+                const refundedItems = await tx.orderItem.findMany({
                   where: {
                     id: { in: returnRequest.itemIds },
                     orderId: order.id,
+                    fulfillmentStatus: { not: 'REFUNDED' },
                   },
-                  data: { fulfillmentStatus: 'REFUNDED' },
+                  select: {
+                    id: true,
+                    productId: true,
+                    variantId: true,
+                    quantity: true,
+                  },
                 });
 
-                await flagPayoutReversals(tx, {
-                  orderItemIds: returnRequest.itemIds,
-                  reason: returnRequest.details || 'Return refund',
-                });
+                if (refundedItems.length > 0) {
+                  await tx.orderItem.updateMany({
+                    where: { id: { in: refundedItems.map((i) => i.id) } },
+                    data: { fulfillmentStatus: 'REFUNDED' },
+                  });
+
+                  // Physical stock returns to sale. Without this the two refund
+                  // paths diverge: orders/admin-refund.ts restocks, this one
+                  // silently did not (MONEY-62).
+                  for (const item of refundedItems) {
+                    await incrementStock(tx, item.productId, item.quantity);
+                    if (item.variantId) {
+                      await incrementVariantStock(
+                        tx,
+                        item.variantId,
+                        item.quantity,
+                      );
+                    }
+                  }
+
+                  await flagPayoutReversals(tx, {
+                    orderItemIds: refundedItems.map((i) => i.id),
+                    reason: returnRequest.details || 'Return refund',
+                  });
+                }
               }
 
               return tx.returnRequest.findUniqueOrThrow({

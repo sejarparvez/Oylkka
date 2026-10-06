@@ -27,6 +27,13 @@ export const Route = createFileRoute('/api/vendor/orders/list')({
           const status = url.searchParams.get('status') || undefined;
           const search = url.searchParams.get('search') || undefined;
 
+          // Bounded offset pagination (MONEY-52); flat-array shape preserved.
+          const limit = Math.min(
+            Math.max(Number(url.searchParams.get('limit')) || 50, 1),
+            100,
+          );
+          const page = Math.max(Number(url.searchParams.get('page')) || 1, 1);
+
           const where: Record<string, unknown> = {
             shopId: shop.id,
           };
@@ -46,21 +53,26 @@ export const Route = createFileRoute('/api/vendor/orders/list')({
             ];
           }
 
-          const items = await prisma.orderItem.findMany({
-            where,
-            include: {
-              order: {
-                select: {
-                  id: true,
-                  orderNumber: true,
-                  createdAt: true,
-                  shippingName: true,
-                  shippingPhone: true,
+          const [items, total] = await Promise.all([
+            prisma.orderItem.findMany({
+              where,
+              include: {
+                order: {
+                  select: {
+                    id: true,
+                    orderNumber: true,
+                    createdAt: true,
+                    shippingName: true,
+                    shippingPhone: true,
+                  },
                 },
               },
-            },
-            orderBy: { createdAt: 'desc' },
-          });
+              orderBy: { createdAt: 'desc' },
+              skip: (page - 1) * limit,
+              take: limit,
+            }),
+            prisma.orderItem.count({ where }),
+          ]);
 
           const data = items.map((item) => ({
             id: item.id,
@@ -86,7 +98,10 @@ export const Route = createFileRoute('/api/vendor/orders/list')({
             deliveredAt: item.deliveredAt?.toISOString() ?? null,
           }));
 
-          return Response.json(data, { status: 200 });
+          return Response.json(data, {
+            status: 200,
+            headers: { 'X-Total-Count': String(total) },
+          });
         } catch (error) {
           return Response.json(
             {

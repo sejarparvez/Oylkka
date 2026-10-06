@@ -1,11 +1,30 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { z } from 'zod';
 import { createAuditLog } from '@/lib/audit-log';
 import { auth } from '@/lib/auth';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+
+const ModerationStatusEnum = z.enum(['APPROVED', 'REJECTED', 'HIDDEN']);
+
+const ModerationPayloadSchema = z
+  .object({
+    verified: z.boolean().optional(),
+    reported: z.boolean().optional(),
+    reviewedByAdmin: z.boolean().optional(),
+    moderationStatus: ModerationStatusEnum.optional(),
+  })
+  .refine((v) => Object.keys(v).length > 0, {
+    message: 'No moderation fields provided',
+  });
+
+function appendHistory(existing: unknown, entry: unknown): unknown[] {
+  const base = Array.isArray(existing) ? existing : [];
+  return [...base, entry];
+}
 
 export const Route = createFileRoute('/api/admin/reviews/$id')({
   server: {
@@ -71,7 +90,22 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
           }
 
           const body = await request.json();
-          const { verified, reported, reviewedByAdmin } = body;
+          const parsed = ModerationPayloadSchema.safeParse(body);
+          if (!parsed.success) {
+            return Response.json(
+              { error: 'Invalid moderation payload' },
+              { status: 400 },
+            );
+          }
+          const { verified, reported, reviewedByAdmin, moderationStatus } =
+            parsed.data;
+
+          const historyEntry = {
+            at: new Date().toISOString(),
+            actorId: session.user.id,
+            role: session.user.role,
+            ...parsed.data,
+          };
 
           const review = await prisma.review.update({
             where: { id: params.id },
@@ -79,6 +113,11 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
               ...(verified !== undefined && { verified }),
               ...(reported !== undefined && { reported }),
               ...(reviewedByAdmin !== undefined && { reviewedByAdmin }),
+              ...(moderationStatus !== undefined && { moderationStatus }),
+              moderationHistory: appendHistory(
+                existing.moderationHistory,
+                historyEntry,
+              ),
             },
           });
 
@@ -88,7 +127,7 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
             action: 'REVIEW_MODERATED',
             entity: 'Review',
             entityId: params.id,
-            details: { changes: body },
+            details: { changes: parsed.data },
             ipAddress: getClientIp(headers) ?? undefined,
           });
 
@@ -125,13 +164,27 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
             );
           }
 
-          await prisma.reviewImage.deleteMany({
-            where: { reviewId: params.id },
+          // Soft delete so a wrongly-removed review can be reinstated, and
+          // remove its payload atomically (MONEY-48).
+          await prisma.$transaction(async (tx) => {
+            await tx.reviewImage.deleteMany({ where: { reviewId: params.id } });
+            await tx.reviewHelpfulVote.deleteMany({
+              where: { reviewId: params.id },
+            });
+            await tx.review.update({
+              where: { id: params.id },
+              data: {
+                moderationStatus: 'REJECTED',
+                reviewedByAdmin: true,
+                moderationHistory: appendHistory(existing.moderationHistory, {
+                  at: new Date().toISOString(),
+                  actorId: session.user.id,
+                  role: session.user.role,
+                  action: 'deleted',
+                }),
+              },
+            });
           });
-          await prisma.reviewHelpfulVote.deleteMany({
-            where: { reviewId: params.id },
-          });
-          await prisma.review.delete({ where: { id: params.id } });
 
           await createAuditLog({
             actorId: session.user.id,

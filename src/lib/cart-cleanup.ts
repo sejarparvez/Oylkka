@@ -3,6 +3,19 @@ const CLEANUP_INTERVAL = 60 * 60 * 1000;
 import { prisma } from '@/lib/db';
 import { logError } from '@/lib/logger';
 
+/**
+ * How long an untouched cart lives before the reaper deletes it.
+ *
+ * `Cart.expiresAt` was nullable and never written, so `cleanupExpiredCarts`
+ * matched nothing and abandoned carts accumulated forever (MONEY-43). Every
+ * cart creation must stamp this.
+ */
+export const CART_TTL_MS = 24 * 60 * 60 * 1000;
+
+export function cartExpiry(from: Date = new Date()): Date {
+  return new Date(from.getTime() + CART_TTL_MS);
+}
+
 export async function cleanupExpiredCarts(): Promise<void> {
   try {
     const result = await prisma.cart.deleteMany({

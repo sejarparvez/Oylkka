@@ -11,10 +11,12 @@ model AuditLog {
 
   createdAt DateTime @default(now())
 
-  @@unique([actorId, action, entity, entityId])
+  // No unique constraint on (actorId, action, entity, entityId): the audit
+  // trail must be able to hold repeat history, so it is indexed for reads
+  // instead. See migration 20261003100200.
   @@index([actorId])
   @@index([action])
-  @@index([entity, entityId])
+  @@index([entity, entityId, createdAt])
   @@index([createdAt])
   @@map("audit_log")
 }

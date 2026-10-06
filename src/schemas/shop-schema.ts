@@ -1,17 +1,48 @@
 import * as z from 'zod';
 
+const BD_PHONE_PATTERN = /^(\+?8801|01)[3-9]\d{8}$/;
+
+function isValidWebsite(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' || url.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
 const BaseShopSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   description: z.string().optional(),
   email: z.string().email('Invalid email address'),
-  phone: z.string().optional(),
-  website: z.string().optional(),
+  phone: z
+    .string()
+    .refine((v) => !v || BD_PHONE_PATTERN.test(v.trim()), {
+      message: 'Enter a valid Bangladeshi phone number',
+    })
+    .transform((v) => v.trim())
+    .optional()
+    .or(z.literal('')),
+  website: z
+    .string()
+    .refine((v) => !v || isValidWebsite(v), {
+      message: 'Website must be a valid http(s) URL',
+    })
+    .optional()
+    .or(z.literal('')),
   addressLine1: z.string().optional(),
   addressLine2: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   country: z.string().optional(),
-  postalCode: z.string().optional(),
+  postalCode: z
+    .string()
+    .refine((v) => !v || /^\d{4}$/.test(v.trim()), {
+      message: 'Postal code must be a valid 4-digit BD postcode',
+    })
+    .transform((v) => v.trim())
+    .optional()
+    .or(z.literal('')),
 });
 
 const logoImageValidation = z

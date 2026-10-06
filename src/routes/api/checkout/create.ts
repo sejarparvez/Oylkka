@@ -6,13 +6,14 @@ import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
+import { logError } from '@/lib/logger';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
 import {
   decrementStock,
   decrementVariantStock,
   incrementStock,
-  releaseReservedStock,
+  releaseVariantReservation,
   reserveStock,
   StockError,
 } from '@/lib/stock';
@@ -23,9 +24,10 @@ import type {
 } from '@/services/checkout/voucher-processor';
 import {
   applyShippingDiscounts,
-  processVouchers,
-  sumVoucherTotals,
+processVouchers,
+sumVoucherTotals,
 } from '@/services/checkout/voucher-processor';
+import { computeShippingEstimate } from '@/services/checkout/shipping';
 import type { OrderMetadata } from '@/types/orders';
 
 class CheckoutError extends Error {
@@ -111,6 +113,7 @@ export const Route = createFileRoute('/api/checkout/create')({
                       discountPrice: true,
                       stock: true,
                       freeShipping: true,
+                      categoryId: true,
                       images: {
                         take: 1,
                         orderBy: { order: 'asc' },
@@ -176,23 +179,63 @@ export const Route = createFileRoute('/api/checkout/create')({
             quantity: number;
           }> = [];
 
+          // Roll back a partial reservation after the loop failed partway. These writes
+          // are best-effort but must never fail silently: a swallowed error here leaves
+          // reservedStock permanently held against inventory that was never sold, and the
+          // customer has already been told the checkout failed with no trace of why.
+          // Collect and report every failure so it can be reconciled.
           const restoreReservations = async () => {
+            const failures: string[] = [];
+
             for (const r of reservedVariants) {
-              await releaseReservedStock(
-                prisma as unknown as Parameters<
-                  typeof releaseReservedStock
-                >[0],
-                r.variantId,
-                r.quantity,
-              ).catch(() => {});
+              try {
+                const released = await releaseVariantReservation(
+                  prisma as unknown as Parameters<
+                    typeof releaseVariantReservation
+                  >[0],
+                  r.variantId,
+                  r.quantity,
+                );
+                if (!released) {
+                  failures.push(
+                    `variant ${r.variantId} x${r.quantity}: no matching reservation to release`,
+                  );
+                }
+              } catch (error) {
+                failures.push(
+                  `variant ${r.variantId} x${r.quantity}: ${
+                    error instanceof Error ? error.message : String(error)
+                  }`,
+                );
+              }
             }
+
             for (const r of reservedProducts) {
-              await incrementStock(
-                prisma as unknown as Parameters<typeof incrementStock>[0],
-                r.productId,
-                r.quantity,
-              ).catch(() => {});
+              try {
+                await incrementStock(
+                  prisma as unknown as Parameters<typeof incrementStock>[0],
+                  r.productId,
+                  r.quantity,
+                );
+              } catch (error) {
+                failures.push(
+                  `product ${r.productId} x${r.quantity}: ${
+                    error instanceof Error ? error.message : String(error)
+                  }`,
+                );
+              }
             }
+
+            if (failures.length > 0) {
+              logError(
+                'checkout-restore-reservations',
+                new Error(
+                  `Failed to release ${failures.length} reservation(s): ${failures.join('; ')}`,
+                ),
+              );
+            }
+
+            return failures;
           };
 
           if (parsed.data.paymentMethod === 'BKASH') {
@@ -289,82 +332,21 @@ export const Route = createFileRoute('/api/checkout/create')({
             totalDiscount += discount * item.quantity;
           }
 
-          // --- Shipping calculation (zone-aware) ---
-          const shopShippingMap = new Map<
-            string,
-            {
-              cost: number;
-              hasNonFree: boolean;
-              itemQty: number;
-              shopSubtotal: number;
-            }
-          >();
-
-          const shippingDistrict = parsed.data.shippingDistrict;
-
-          for (const item of cart.items) {
-            const shop = item.product.shop;
-            const shopId = shop?.id;
-            if (!shopId) continue;
-
-            const unitPrice = Number(
-              item.variant?.discountPrice ??
-                item.variant?.price ??
-                item.product.discountPrice ??
-                item.product.price,
-            );
-
-            if (!shopShippingMap.has(shopId)) {
-              shopShippingMap.set(shopId, {
-                cost: Number(shop?.shippingCost ?? 0),
-                hasNonFree: false,
-                itemQty: 0,
-                shopSubtotal: 0,
-              });
-            }
-
-            // biome-ignore lint/style/noNonNullAssertion: this is fine
-            const entry = shopShippingMap.get(shopId)!;
-            entry.shopSubtotal += unitPrice * item.quantity;
-
-            if (!item.product.freeShipping) {
-              entry.hasNonFree = true;
-              entry.itemQty += item.quantity;
-            }
-          }
-
-          let baseShipping = 0;
-          for (const [shopId, entry] of shopShippingMap) {
-            if (entry.hasNonFree) {
-              let cost = entry.cost;
-
-              // Look up matching shipping zone for per-item + freeAbove
-              if (shippingDistrict) {
-                const zone = await prisma.shippingZone.findFirst({
-                  where: {
-                    shopId,
-                    isActive: true,
-                    districts: { some: { district: shippingDistrict } },
-                  },
-                  select: { baseCost: true, perItem: true, freeAbove: true },
-                });
-
-                if (zone) {
-                  cost =
-                    Number(zone.baseCost) +
-                    Number(zone.perItem) * entry.itemQty;
-                  if (
-                    zone.freeAbove != null &&
-                    entry.shopSubtotal >= Number(zone.freeAbove)
-                  ) {
-                    cost = 0;
-                  }
-                }
-              }
-
-              baseShipping += cost;
-            }
-          }
+          // --- Shipping calculation (zone-aware, shared with the preview quote) ---
+const baseShipping = await computeShippingEstimate(
+  cart.items.map((item) => ({
+    quantity: item.quantity,
+    freeShipping: item.product.freeShipping,
+    shop: item.product.shop,
+    unitPrice: Number(
+      item.variant?.discountPrice ??
+        item.variant?.price ??
+        item.product.discountPrice ??
+        item.product.price,
+    ),
+  })),
+  parsed.data.shippingDistrict,
+);
 
           // --- Voucher validation & application ---
           const customerOrderCount = await prisma.order.count({
@@ -414,6 +396,7 @@ export const Route = createFileRoute('/api/checkout/create')({
                   productId: item.product.id,
                   quantity: item.quantity,
                   shopId: item.product.shop?.id,
+                  categoryId: item.product.categoryId ?? undefined,
                 })),
                 paymentMethod: parsed.data.paymentMethod,
                 userAgent: headers.get('user-agent') || undefined,
@@ -533,6 +516,7 @@ export const Route = createFileRoute('/api/checkout/create')({
             scopeId: v.scopeId,
             tierUsed: v.tierUsed,
             bogoApplied: v.bogoApplied,
+            maxUses: v.maxUses,
           }));
 
           try {
@@ -600,8 +584,22 @@ export const Route = createFileRoute('/api/checkout/create')({
                         (lineTotal * commissionRate) / 100;
                       const vendorAmount = lineTotal - commissionAmount;
 
+                      // The seller-availability guard above rejects any line with no shop, so this
+                      // cannot fire on the current path. Fail loudly instead of
+                      // substituting '' — an empty shopId either violates the
+                      // non-null FK on OrderItem or attributes the line to a
+                      // shop that does not exist, and both resurface much later
+                      // as an opaque failure in payouts (MONEY-55).
+                      const shopId = item.product.shop?.id;
+                      if (!shopId) {
+                        throw new CheckoutError(
+                          `Product "${item.product.productName}" is not linked to a shop`,
+                          409,
+                        );
+                      }
+
                       return {
-                        shopId: item.product.shop?.id ?? '',
+                        shopId,
                         productId: item.product.id,
                         variantId: item.variant?.id ?? null,
                         productName: item.product.productName,
@@ -704,10 +702,29 @@ export const Route = createFileRoute('/api/checkout/create')({
                     },
                   });
 
-                  await tx.coupon.update({
-                    where: { id: v.couponId },
-                    data: { usedCount: { increment: 1 } },
-                  });
+                  // Enforce the usage cap in the database instead of trusting
+                  // the eligibility read earlier in the request: two concurrent
+                  // checkouts can both pass that check. `maxUses: 0` means
+                  // unlimited. Nothing is charged yet at this point, so failing
+                  // here is safe (MONEY-38).
+                  if (v.maxUses > 0) {
+                    const { count } = await tx.coupon.updateMany({
+                      where: { id: v.couponId, usedCount: { lt: v.maxUses } },
+                      data: { usedCount: { increment: 1 } },
+                    });
+
+                    if (count === 0) {
+                      throw new CheckoutError(
+                        `Coupon ${v.code} has reached its usage limit`,
+                        409,
+                      );
+                    }
+                  } else {
+                    await tx.coupon.update({
+                      where: { id: v.couponId },
+                      data: { usedCount: { increment: 1 } },
+                    });
+                  }
 
                   await tx.userVoucher.update({
                     where: { id: v.id },
@@ -806,10 +823,7 @@ export const Route = createFileRoute('/api/checkout/create')({
             }
 
             if (error instanceof StockError) {
-              return Response.json(
-                { error: error.message },
-                { status: 400 },
-              );
+              return Response.json({ error: error.message }, { status: 400 });
             }
 
             return Response.json(

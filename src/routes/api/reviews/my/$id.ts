@@ -1,8 +1,17 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { z } from 'zod';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+
+const UpdateReviewSchema = z
+  .object({
+    rating: z.number().min(1).max(5).optional(),
+    title: z.string().max(120).trim().min(1).optional(),
+    content: z.string().max(3000).trim().min(1).optional(),
+  })
+  .strip()
 
 export const Route = createFileRoute('/api/reviews/my/$id')({
   server: {
@@ -34,7 +43,15 @@ export const Route = createFileRoute('/api/reviews/my/$id')({
           }
 
           const body = await request.json();
-          const { rating, title, content } = body;
+          const parsed = UpdateReviewSchema.safeParse(body);
+          if (!parsed.success) {
+            return Response.json(
+              { error: 'Invalid review data' },
+              { status: 400 },
+            );
+          }
+
+          const { rating, title, content } = parsed.data;
 
           const review = await prisma.review.update({
             where: { id: params.id },

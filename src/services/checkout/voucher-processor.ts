@@ -45,6 +45,7 @@ export interface CartWithItems {
       price: number;
       discountPrice?: number | null;
       freeShipping?: boolean;
+      categoryId?: string | null;
       shop?: { id: string } | null;
     };
     variant?: { price?: number; discountPrice?: number } | null;
@@ -63,6 +64,8 @@ export interface ProcessedVoucher {
   cashbackAmount: number;
   scope: string;
   scopeId: string | null;
+  /** Carried through so the caller can enforce the cap in the database. */
+  maxUses: number;
   tierUsed: {
     minQuantity: number;
     value: number;
@@ -128,6 +131,7 @@ export function processVouchers(
         productId: i.product.id,
         quantity: i.quantity,
         shopId: i.product.shop?.id,
+        categoryId: i.product.categoryId ?? undefined,
       })),
       paymentMethod: options.paymentMethod,
       userAgent: options.userAgent,
@@ -157,7 +161,8 @@ export function processVouchers(
       (item) =>
         !effectiveScopeId ||
         item.product.id === effectiveScopeId ||
-        item.product.shop?.id === effectiveScopeId,
+        item.product.shop?.id === effectiveScopeId ||
+        item.product.categoryId === effectiveScopeId,
     );
     const scopedSubtotal = scopedItems.reduce(
       (s, item) => s + (item.savedPrice ?? item.product.price) * item.quantity,
@@ -167,7 +172,10 @@ export function processVouchers(
     const discountItems: DiscountCartItem[] = scopedItems.map((item) => ({
       productId: item.product.id,
       shopId: item.product.shop?.id ?? undefined,
-      price: item.product.price,
+      categoryId: item.product.categoryId ?? undefined,
+      // Variants carry their own price; falling back to the parent product
+      // price here mis-prices BOGO free items when a variant overrides it.
+      price: item.variant?.price ?? item.product.price,
       discountPrice:
         item.variant?.discountPrice ?? item.product.discountPrice ?? undefined,
       quantity: item.quantity,
@@ -190,6 +198,7 @@ export function processVouchers(
       cashbackAmount: Math.max(0, result.cashbackAmount),
       scope: coupon.scope,
       scopeId: effectiveScopeId,
+      maxUses: coupon.maxUses,
       tierUsed: result.tierUsed,
       bogoApplied: result.bogoApplied,
     });

@@ -20,7 +20,7 @@ export const Route = createFileRoute('/api/wishlist/remove')({
           if (csrfResponse) return csrfResponse;
 
           const body = await request.json();
-          const { productId, variantId } = body;
+          const { productId } = body;
 
           if (!productId) {
             return Response.json(
@@ -29,11 +29,14 @@ export const Route = createFileRoute('/api/wishlist/remove')({
             );
           }
 
+          // The wishlist is per-product (`@@unique([userId, productId])`), so
+          // `variantId` must not be part of the filter — scoping by it meant
+          // removing a variant other than the stored one silently deleted
+          // nothing and the item reappeared in the UI (MONEY-35).
           await prisma.wishlistItem.deleteMany({
             where: {
               userId: session.user.id,
               productId,
-              variantId: variantId ?? null,
             },
           });
 

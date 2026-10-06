@@ -178,6 +178,7 @@ enum ConversationStatus {
 
 enum EmailStatus {
   PENDING
+  PROCESSING
   SENT
   FAILED
 }
@@ -200,3 +201,10 @@ enum ReturnReason {
   UNWANTED
   OTHER
 }
+
+enum ReviewModerationStatus {
+  APPROVED
+  REJECTED
+  HIDDEN
+}
+

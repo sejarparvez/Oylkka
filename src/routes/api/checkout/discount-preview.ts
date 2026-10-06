@@ -10,6 +10,7 @@ import {
   processVouchers,
   sumVoucherTotals,
 } from '@/services/checkout/voucher-processor';
+import { computeShippingEstimate } from '@/services/checkout/shipping';
 
 export const Route = createFileRoute('/api/checkout/discount-preview')({
   server: {
@@ -27,35 +28,24 @@ export const Route = createFileRoute('/api/checkout/discount-preview')({
             paymentMethod: string;
             cart: CartWithItems;
             subtotal: number;
+            shippingDistrict?: string | null;
           } = await request.json();
 
-          // Compute base shipping estimate (avoids duplicating this logic on the client)
-          const groupedByShop = body.cart.items.reduce<
-            Record<string, { items: typeof body.cart.items }>
-          >((groups, item) => {
-            const shopId = item.product.shop?.id;
-            if (!shopId) return groups;
-            if (!groups[shopId]) groups[shopId] = { items: [] };
-            groups[shopId].items.push(item);
-            return groups;
-          }, {});
-
-          const shippingEstimates = await Promise.all(
-            Object.entries(groupedByShop).map(async ([shopId, { items }]) => {
-              const shop = await prisma.shop.findUnique({
-                where: { id: shopId },
-                select: { shippingCost: true },
-              });
-              if (!shop) return 0;
-              const hasNonFree = items.some(
-                (item) => !item.product.freeShipping,
-              );
-              return hasNonFree ? Number(shop.shippingCost) : 0;
-            }),
-          );
-          const baseShipping = shippingEstimates.reduce(
-            (sum, cost) => sum + cost,
-            0,
+          // Zone-aware shipping estimate, matching the actual charge in
+          // checkout/create.ts (MONEY-30).
+          const baseShipping = await computeShippingEstimate(
+            body.cart.items.map((item) => ({
+              quantity: item.quantity,
+              freeShipping: item.product.freeShipping,
+              shop: item.product.shop,
+              unitPrice: Number(
+                item.variant?.discountPrice ??
+                  item.variant?.price ??
+                  item.product.discountPrice ??
+                  item.product.price,
+              ),
+            })),
+            body.shippingDistrict,
           );
 
           let totalDiscount = 0;
@@ -105,6 +95,9 @@ export const Route = createFileRoute('/api/checkout/discount-preview')({
             totalDiscount,
             totalShippingDiscount,
             freeShipping,
+            // Share the server tax rate so the client summary can show the
+            // same tax it will be charged (MONEY-29b).
+            taxRate: Number(process.env.TAX_RATE ?? 0) / 100,
           });
         } catch (_error) {
           return Response.json(

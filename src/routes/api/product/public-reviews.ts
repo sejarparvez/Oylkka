@@ -23,7 +23,7 @@ export const Route = createFileRoute('/api/product/public-reviews')({
 
           const [reviews, total, reviewAgg] = await Promise.all([
             prisma.review.findMany({
-              where: { productId },
+              where: { productId, moderationStatus: 'APPROVED' },
               select: {
                 id: true,
                 rating: true,
@@ -46,10 +46,10 @@ export const Route = createFileRoute('/api/product/public-reviews')({
               skip: (page - 1) * limit,
               take: limit,
             }),
-            prisma.review.count({ where: { productId } }),
+            prisma.review.count({ where: { productId, moderationStatus: 'APPROVED' } }),
             prisma.review.groupBy({
               by: ['rating'],
-              where: { productId },
+              where: { productId, moderationStatus: 'APPROVED' },
               _count: true,
             }),
           ]);

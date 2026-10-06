@@ -4,6 +4,7 @@ import { sendOrderShippedNotification } from '@/actions/send-order-email';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { logError } from '@/lib/logger';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   PENDING: ['PROCESSING'],
@@ -226,7 +227,9 @@ export const Route = createFileRoute('/api/vendor/orders/$orderId')({
 
           // Fire-and-forget: send shipping notification email
           if (body.fulfillmentStatus === 'SHIPPED') {
-            sendOrderShippedNotification(orderId, body.itemId);
+            sendOrderShippedNotification(orderId, body.itemId).catch((err) =>
+              logError('order-shipped-notification', err),
+            );
           }
 
           return Response.json(

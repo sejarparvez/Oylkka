@@ -60,6 +60,18 @@ const statusBadge = (status: string) => {
   }
 };
 
+const ITEM_STEPS = [
+  { key: 'PENDING', label: 'Placed' },
+  { key: 'PROCESSING', label: 'Processing' },
+  { key: 'SHIPPED', label: 'Shipped' },
+  { key: 'DELIVERED', label: 'Delivered' },
+] as const;
+
+function getItemStepIndex(status: string): number {
+  const idx = ITEM_STEPS.findIndex((s) => s.key === status);
+  return idx >= 0 ? idx : 0;
+}
+
 const ORDER_STEPS = [
   { key: 'PENDING', label: 'Placed' },
   { key: 'CONFIRMED', label: 'Confirmed' },
@@ -162,7 +174,7 @@ function RouteComponent() {
           {order.invoice?.pdfUrl && (
             <Button variant='outline' size='sm' asChild className='gap-2'>
               <a
-                href={order.invoice.pdfUrl}
+                href={`/api/orders/invoice/${order.invoice.id}`}
                 target='_blank'
                 rel='noopener noreferrer'
               >
@@ -240,63 +252,200 @@ function RouteComponent() {
         </div>
       )}
 
-      {/* Order items */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='text-base'>
-            Items ({order.items.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className='space-y-0'>
-          {order.items.map((item) => (
-            <div
-              key={item.id}
-              className='flex items-start gap-4 py-4 border-b border-border last:border-0'
-            >
-              <div className='relative w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0'>
-                {item.imageUrl ? (
-                  <img
-                    src={item.imageUrl}
-                    alt={item.productName}
-                    className='object-cover w-full h-full'
-                  />
-                ) : (
-                  <div className='w-full h-full flex items-center justify-center'>
-                    <Package className='w-5 h-5 text-muted-foreground' />
-                  </div>
-                )}
-              </div>
+      {/* Order items, grouped per shop with per-item fulfilment tracking */}
+      {(() => {
+        const grouped = order.items.reduce<
+            Record<string, typeof order.items>
+          >((acc, item) => {
+            if (!acc[item.shopId]) acc[item.shopId] = [];
+            acc[item.shopId].push(item);
+            return acc;
+          }, {});
 
-              <div className='flex-1 min-w-0'>
-                <p className='text-sm font-semibold line-clamp-1'>
-                  {item.productName}
-                </p>
-                {item.variantName && (
-                  <p className='text-xs text-muted-foreground mt-0.5'>
-                    {item.variantName}
-                  </p>
-                )}
-                <div className='flex items-center justify-between mt-2'>
-                  <span className='text-xs text-muted-foreground'>
-                    Qty: {item.quantity}
-                  </span>
-                  <span className='text-sm font-bold tabular-nums'>
-                    ৳{item.total.toLocaleString('en-BD')}
-                  </span>
-                </div>
-              </div>
-              <div className='shrink-0 self-center ml-2'>
-                <MessageVendorButton
-                  shopId={item.shopId}
-                  productId={item.productId}
-                  productName={item.productName}
-                  orderId={order.id}
-                />
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle className='text-base'>
+                Items ({order.items.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-6'>
+              {Object.entries(grouped).map(([shopId, items]) => {
+                const shopName =
+                  items.find((i) => i.shopId === shopId)?.shopName ?? null;
+                return (
+                  <div key={shopId} className='space-y-4'>
+                    <div className='flex items-center gap-2'>
+                      <p className='text-sm font-semibold'>
+                        {shopName ?? 'Shop'}
+                      </p>
+                    </div>
+                    <div className='space-y-0'>
+                      {items.map((item) => {
+                        const stepIndex = getItemStepIndex(
+                          item.fulfillmentStatus,
+                        );
+                        const fulfilled =
+                          item.fulfillmentStatus === 'DELIVERED';
+                        const cancelled =
+                          item.fulfillmentStatus === 'CANCELLED';
+                        return (
+                          <div
+                            key={item.id}
+                            className='flex items-start gap-4 py-4 border-b border-border last:border-0'
+                          >
+                            <div className='relative w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0'>
+                              {item.imageUrl ? (
+                                <img
+                                  src={item.imageUrl}
+                                  alt={item.productName}
+                                  className='object-cover w-full h-full'
+                                />
+                              ) : (
+                                <div className='w-full h-full flex items-center justify-center'>
+                                  <Package className='w-5 h-5 text-muted-foreground' />
+                                </div>
+                              )}
+                            </div>
+
+                            <div className='flex-1 min-w-0 space-y-2'>
+                              <div className='flex items-start justify-between gap-2'>
+                                <div className='min-w-0'>
+                                  <p className='text-sm font-semibold line-clamp-1'>
+                                    {item.productName}
+                                  </p>
+                                  {item.variantName && (
+                                    <p className='text-xs text-muted-foreground mt-0.5'>
+                                      {item.variantName}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className='flex items-center gap-2 shrink-0'>
+                                  <Badge
+                                    variant={statusBadge(
+                                      item.fulfillmentStatus,
+                                    ).variant}
+                                    className={`text-[10px] uppercase tracking-wider ${statusBadge(item.fulfillmentStatus).className}`}
+                                  >
+                                    {statusBadge(item.fulfillmentStatus).label}
+                                  </Badge>
+                                  <span className='text-sm font-bold tabular-nums'>
+                                    ৳{item.total.toLocaleString('en-BD')}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {item.trackingNumber && (
+                                <div className='flex items-center gap-1.5 text-xs'>
+                                  <span className='text-muted-foreground'>
+                                    Tracking:
+                                  </span>
+                                  <span className='font-mono text-foreground'>
+                                    {item.trackingNumber}
+                                  </span>
+                                  {item.trackingUrl && (
+                                    <a
+                                      href={item.trackingUrl}
+                                      target='_blank'
+                                      rel='noopener noreferrer'
+                                      className='text-primary hover:underline'
+                                    >
+                                      Track
+                                    </a>
+                                  )}
+                                </div>
+                              )}
+
+                              {!cancelled &&
+                                (item.fulfillmentStatus === 'SHIPPED' ||
+                                  fulfilled) && (
+                                  <div className='flex items-center gap-3 text-[10px] font-medium'>
+                                    {ITEM_STEPS.map((step, i) => {
+                                      const isActive =
+                                        stepIndex >= 0 && i <= stepIndex;
+                                      const isCurrent = i === stepIndex;
+                                      return (
+                                        <div
+                                          key={step.key}
+                                          className='flex items-center gap-0'
+                                        >
+                                          <div className='flex flex-col items-center gap-1'>
+                                            <div
+                                              className={`w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold transition-colors ${
+                                                isActive
+                                                  ? 'bg-primary text-primary-foreground'
+                                                  : 'bg-muted text-muted-foreground'
+                                              } ${isCurrent ? 'ring-2 ring-primary/30 ring-offset-1 ring-offset-card' : ''}`}
+                                            >
+                                              {isActive ? '✓' : i + 1}
+                                            </div>
+                                            <span
+                                              className={`whitespace-nowrap ${
+                                                isActive
+                                                  ? 'text-foreground'
+                                                  : 'text-muted-foreground'
+                                              }`}
+                                            >
+                                              {step.label}
+                                            </span>
+                                          </div>
+                                          {i < ITEM_STEPS.length - 1 && (
+                                            <div
+                                              className={`w-4 h-px mb-[-1rem] ${
+                                                i < stepIndex
+                                                  ? 'bg-primary'
+                                                  : 'bg-border'
+                                              }`}
+                                            />
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                    {fulfilled && item.deliveredAt && (
+                                      <span className='text-muted-foreground'>
+                                        on{' '}
+                                        {format(
+                                          new Date(item.deliveredAt),
+                                          'MMM d, yyyy',
+                                        )}
+                                      </span>
+                                    )}
+                                    {item.fulfillmentStatus === 'SHIPPED' &&
+                                      item.shippedAt && (
+                                        <span className='text-muted-foreground'>
+                                          on{' '}
+                                          {format(
+                                            new Date(item.shippedAt),
+                                            'MMM d, yyyy',
+                                          )}
+                                        </span>
+                                      )}
+                                  </div>
+                                )}
+
+                              <div className='flex items-center justify-between'>
+                                <span className='text-xs text-muted-foreground'>
+                                  Qty: {item.quantity}
+                                </span>
+                                <MessageVendorButton
+                                  shopId={item.shopId}
+                                  productId={item.productId}
+                                  productName={item.productName}
+                                  orderId={order.id}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* Shipping info */}
       <Card>

@@ -2,6 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
+import { logError } from '@/lib/logger';
+import { uploadMessageImage } from '@/lib/message-upload';
 import { prisma } from '@/lib/db';
 import { messageLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
@@ -28,9 +30,17 @@ export const Route = createFileRoute('/api/messages/create')({
           const content = formData.get('content') as string;
           const imageFile = formData.get('image') as File | null;
 
-          if (!conversationId || !content?.trim()) {
+          const hasContent =
+            typeof content === 'string' && content.trim().length > 0;
+          const hasImage = imageFile instanceof File && imageFile.size > 0;
+
+          // The composer allows sending an image without text (MONEY-67).
+          if (!conversationId || (!hasContent && !hasImage)) {
             return Response.json(
-              { error: 'conversationId and content are required' },
+              {
+                error:
+                  'conversationId and either content or an image are required',
+              },
               { status: 400 },
             );
           }
@@ -70,18 +80,20 @@ export const Route = createFileRoute('/api/messages/create')({
           let imageUrl: string | null = null;
           let imagePublicId: string | null = null;
 
-          if (imageFile && imageFile.size > 0) {
-            const { UploadImage } = await import('@/cloudinary/upload-image');
-            const result = await UploadImage(imageFile, 'messages');
-            imageUrl = result.secure_url;
-            imagePublicId = result.public_id;
+          if (hasImage) {
+            const result = await uploadMessageImage(imageFile as File);
+            if ('error' in result) {
+              return Response.json({ error: result.error }, { status: 400 });
+            }
+            imageUrl = result.imageUrl;
+            imagePublicId = result.imagePublicId;
           }
 
           const message = await prisma.message.create({
             data: {
               conversationId,
               senderId: session.user.id,
-              content: content.trim(),
+              content: hasContent ? content.trim() : '',
               imageUrl,
               imagePublicId,
             },
@@ -99,8 +111,11 @@ export const Route = createFileRoute('/api/messages/create')({
           sendMessageNotification(
             recipientId,
             session.user.name || 'Someone',
-            content.trim(),
-          ).catch(() => {});
+            hasContent ? content.trim() : 'an image',
+          ).catch((error) => {
+            // Off the response path, but never silently (MONEY-60).
+            logError('message-notification-failed', error);
+          });
 
           return Response.json({ message }, { status: 201 });
         } catch (error) {
@@ -146,7 +161,6 @@ async function sendMessageNotification(
       },
     });
   } catch (error) {
-    // biome-ignore lint/suspicious/noConsole: this is fine
-    console.error('Failed to send new message notification:', error);
+    logError('message-notification-send', error);
   }
 }

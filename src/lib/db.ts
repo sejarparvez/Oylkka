@@ -16,8 +16,13 @@ if (process.env.NODE_ENV !== 'production') {
   globalThis.__prisma = prisma;
 }
 
-// Start the email queue background processor safely on the server
-if (typeof window === 'undefined') {
+// Start the email queue background processor safely on the server.
+// Gated behind an explicit flag (MONEY-42): on serverless or multi-instance
+// deployments this must be a dedicated worker process, not a per-import timer.
+if (
+  typeof window === 'undefined' &&
+  process.env.ENABLE_BACKGROUND_WORKERS === 'true'
+) {
   // Deferring execution by 0ms pushes this to the end of the event loop.
   // This gives Vite time to finish initializing all imported constants first.
   setTimeout(() => {

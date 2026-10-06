@@ -6,7 +6,7 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderCancellationHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
-import { incrementStock, incrementVariantStock } from '@/lib/stock';
+import { unwindUnpaidOrder } from '@/lib/stock';
 
 export const Route = createFileRoute('/api/vendor/orders/cancel')({
   server: {
@@ -79,7 +79,12 @@ export const Route = createFileRoute('/api/vendor/orders/cancel')({
             );
           }
 
-          if (order.paymentStatus === 'PAID' || order.status === 'CONFIRMED') {
+          if (
+            order.paymentStatus === 'PAID' ||
+            order.paymentStatus === 'PARTIALLY_REFUNDED' ||
+            order.paymentStatus === 'REFUNDED' ||
+            order.status === 'CONFIRMED'
+          ) {
             return Response.json(
               {
                 error:
@@ -89,22 +94,32 @@ export const Route = createFileRoute('/api/vendor/orders/cancel')({
             );
           }
 
-          // Only allow cancelling vendor's own items
-          const itemIds = order.items.map((i) => i.id);
+          // Only cancel lines this vendor has not already cancelled. Restocking
+          // the whole set on a repeat call is what inflated inventory without
+          // bound (MONEY-44, MONEY-45, MONEY-46).
+          const activeItems = order.items.filter(
+            (i) => i.fulfillmentStatus !== 'CANCELLED',
+          );
 
-          await prisma.$transaction(async (tx) => {
-            await tx.orderItem.updateMany({
-              where: { id: { in: itemIds } },
-              data: { fulfillmentStatus: 'CANCELLED' },
-            });
+          if (activeItems.length === 0) {
+            return Response.json(
+              {
+                error:
+                  'All items from your shop in this order are already cancelled',
+              },
+              { status: 400 },
+            );
+          }
 
-            // Restore stock
-            for (const item of order.items) {
-              await incrementStock(tx, item.productId, item.quantity);
-              if (item.variantId) {
-                await incrementVariantStock(tx, item.variantId, item.quantity);
-              }
-            }
+          const itemIds = activeItems.map((i) => i.id);
+
+          const transitioned = await prisma.$transaction(async (tx) => {
+            const unwound = await unwindUnpaidOrder(
+              tx,
+              body.orderId,
+              order.paymentMethod,
+              itemIds,
+            );
 
             // Check if all items are now cancelled — mark entire order cancelled
             const remainingActive = await tx.orderItem.count({
@@ -125,7 +140,17 @@ export const Route = createFileRoute('/api/vendor/orders/cancel')({
                 },
               });
             }
+
+            return unwound;
           });
+
+          // Report only the lines this request actually transitioned, so a
+          // race that lost to a concurrent cancel does not tell the customer
+          // about a cancellation that did not happen.
+          const changedIds = new Set(transitioned.map((i) => i.id));
+          const cancelledItems = order.items.filter((i) =>
+            changedIds.has(i.id),
+          );
 
           createAuditLog({
             actorId: session.user.id,
@@ -137,7 +162,7 @@ export const Route = createFileRoute('/api/vendor/orders/cancel')({
               reason: body.reason,
               orderNumber: order.orderNumber,
               shopId: shop.id,
-              itemIds,
+              itemIds: cancelledItems.map((i) => i.id),
             },
           }).catch((e) => {
             // biome-ignore lint/suspicious/noConsole: this is fine
@@ -158,7 +183,7 @@ export const Route = createFileRoute('/api/vendor/orders/cancel')({
                 customerName: order.shippingName,
               },
               body.reason,
-              order.items.map((i) => ({
+              cancelledItems.map((i) => ({
                 productName: i.productName,
                 quantity: i.quantity,
               })),

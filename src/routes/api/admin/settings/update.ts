@@ -1,7 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 import { requireAdmin, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+
+// Allowlisted SiteSetting keys with per-key value validation (MONEY-47).
+const SETTING_VALIDATORS: Record<string, z.ZodType<string>> = {
+  platform_name: z.string().trim().min(1).max(60),
+  support_email: z.email().max(120),
+  min_order_amount: z.string().regex(/^\d+(\.\d+)?$/),
+  default_commission: z
+    .string()
+    .regex(/^\d+(\.\d+)?$/)
+    .refine((v) => Number(v) >= 0 && Number(v) <= 100, {
+      message: 'default_commission must be between 0 and 100',
+    }),
+  max_shipping: z.string().regex(/^\d+(\.\d+)?$/),
+};
 
 export const Route = createFileRoute('/api/admin/settings/update')({
   server: {
@@ -18,7 +33,27 @@ export const Route = createFileRoute('/api/admin/settings/update')({
 
           const { settings }: { settings: Record<string, string> } =
             await request.json();
-          for (const [key, value] of Object.entries(settings)) {
+
+          const clean: Record<string, string> = {};
+          for (const [key, value] of Object.entries(settings ?? {})) {
+            const validator = SETTING_VALIDATORS[key];
+            if (!validator) {
+              return Response.json(
+                { error: `Unknown setting key: ${key}` },
+                { status: 400 },
+              );
+            }
+            const parsed = validator.safeParse(value);
+            if (!parsed.success) {
+              return Response.json(
+                { error: `Invalid value for "${key}"` },
+                { status: 400 },
+              );
+            }
+            clean[key] = parsed.data;
+          }
+
+          for (const [key, value] of Object.entries(clean)) {
             await prisma.siteSetting.upsert({
               where: { key },
               create: { key, value },

@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { UploadImage } from '@/cloudinary';
+import { DeleteImage, UploadImage } from '@/cloudinary';
 import { requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { logError } from '@/lib/logger';
 import { slugify } from '@/lib/slug';
 import { ProductApiCreateSchema } from '@/schemas/product-api-schema';
 import { SkuService } from '@/services/sku-service';
@@ -11,6 +12,12 @@ export const Route = createFileRoute('/api/product/create')({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Cloudinary cannot participate in the Prisma transaction, so uploads
+        // land first. Track them so a failed create deletes them again instead
+        // of leaving paid-for orphans in the bucket (MONEY-50).
+        const uploadedPublicIds: string[] = [];
+        let committed = false;
+
         try {
           const authResult = await requireAuth();
           if (authResult.response) return authResult.response;
@@ -187,52 +194,91 @@ export const Route = createFileRoute('/api/product/create')({
             counter++;
           }
 
-          // Upload main product images
+          // ------------------------------------------------------------------
+          // Images: validate every file before uploading anything, so a bad file
+          // late in the list cannot strand the uploads already done.
+          //
+          // Uploads still have to happen before the database write — Cloudinary
+          // cannot join the Prisma transaction — so every public id is tracked
+          // and the catch block deletes them if the write fails (MONEY-50).
+          // ------------------------------------------------------------------
+          const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+          const MAX_IMAGE_BYTES = 2_097_152;
+
           const productImageFiles = data.productImages as File[] | undefined;
+          const attributes = v.attributes;
+          const variants = v.variants;
+          const variantImages = data.variantImages as
+            | Record<string, File>
+            | undefined;
+
+          const pendingUploads: Array<{ file: File; label: string }> = [];
+          productImageFiles?.forEach((file, i) => {
+            if (file instanceof File && file.size > 0) {
+              pendingUploads.push({ file, label: `Image ${i + 1}` });
+            }
+          });
+          for (const variant of variants) {
+            const file = variantImages?.[variant.id ?? ''];
+            if (file instanceof File && file.size > 0) {
+              pendingUploads.push({
+                file,
+                label: `Image for variant "${variant.name}"`,
+              });
+            }
+          }
+
+          for (const { file, label } of pendingUploads) {
+            if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+              return Response.json(
+                { error: `${label} must be JPEG, PNG, or WEBP` },
+                { status: 400 },
+              );
+            }
+            if (file.size > MAX_IMAGE_BYTES) {
+              return Response.json(
+                { error: `${label} size must not exceed 2MB` },
+                { status: 400 },
+              );
+            }
+          }
+
           const imageData: Array<{
             imageUrl: string;
             imagePublicId: string;
             order: number;
           }> = [];
 
-          if (productImageFiles && productImageFiles.length > 0) {
-            for (let i = 0; i < productImageFiles.length; i++) {
-              const file = productImageFiles[i];
-              if (file instanceof File && file.size > 0) {
-                const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-                if (!allowedTypes.includes(file.type)) {
-                  return Response.json(
-                    { error: `Image ${i + 1} must be JPEG, PNG, or WEBP` },
-                    { status: 400 },
-                  );
-                }
+          for (let i = 0; i < (productImageFiles?.length ?? 0); i++) {
+            const file = productImageFiles?.[i];
+            if (!(file instanceof File) || file.size === 0) continue;
 
-                const maxSize = 2_097_152;
-                if (file.size > maxSize) {
-                  return Response.json(
-                    { error: `Image ${i + 1} size must not exceed 2MB` },
-                    { status: 400 },
-                  );
-                }
-
-                const folder = i === 0 ? 'products' : 'products/gallery';
-                const result = await UploadImage(file, folder);
-                imageData.push({
-                  imageUrl: result.secure_url,
-                  imagePublicId: result.public_id,
-                  order: i,
-                });
-              }
-            }
+            const folder = i === 0 ? 'products' : 'products/gallery';
+            const result = await UploadImage(file, folder);
+            uploadedPublicIds.push(result.public_id);
+            imageData.push({
+              imageUrl: result.secure_url,
+              imagePublicId: result.public_id,
+              order: i,
+            });
           }
 
-          const attributes = v.attributes;
-          const variants = v.variants;
+          const variantImageByKey = new Map<
+            string,
+            { imageUrl: string; imagePublicId: string }
+          >();
+          for (const variant of variants) {
+            const key = variant.id ?? '';
+            const file = variantImages?.[key];
+            if (!(file instanceof File) || file.size === 0) continue;
 
-          // Handle variant images
-          const variantImages = data.variantImages as
-            | Record<string, File>
-            | undefined;
+            const result = await UploadImage(file, 'products/variants');
+            uploadedPublicIds.push(result.public_id);
+            variantImageByKey.set(key, {
+              imageUrl: result.secure_url,
+              imagePublicId: result.public_id,
+            });
+          }
 
           // Detect attribute format (old: Record<string, string|string[]>, new: Record<string, {values,isVariantDefining,displayOrder}>)
           const isNewAttributeFormat =
@@ -285,80 +331,73 @@ export const Route = createFileRoute('/api/product/create')({
               })
             : [];
 
-          const product = await prisma.product.create({
-            data: {
-              productName: textFields.productName as string,
-              slug,
-              description: textFields.description as string,
-              categoryId: textFields.categoryId as string,
-              tags: v.tags,
-              sku: textFields.sku as string,
-              brand: textFields.brand as string | null,
-              price: textFields.price as number,
-              discountPrice: textFields.discountPrice as number | null,
-              stock: textFields.stock as number,
-              hasVariants: !!(variants && variants.length > 0),
-              condition: textFields.condition as
-                | 'NEW'
-                | 'USED'
-                | 'LIKE_NEW'
-                | 'EXCELLENT'
-                | 'GOOD'
-                | 'FAIR'
-                | 'POOR'
-                | 'FOR_PARTS',
-              conditionDescription: textFields.conditionDescription as
-                | string
-                | null,
-              weight: textFields.weight as number | null,
-              weightUnit: textFields.weightUnit as string,
-              freeShipping: textFields.freeShipping as boolean,
-              dimensionLength: textFields.dimensionLength as number | null,
-              dimensionWidth: textFields.dimensionWidth as number | null,
-              dimensionHeight: textFields.dimensionHeight as number | null,
-              dimensionUnit: textFields.dimensionUnit as string,
-              images:
-                imageData.length > 0
+          // ------------------------------------------------------------------
+          // One transaction for the product row, its attribute options and the
+          // variant↔value join rows. These were independent autocommit writes,
+          // so a failure anywhere left a product whose variants pointed at
+          // attribute values that were never created (MONEY-50).
+          // ------------------------------------------------------------------
+          const product = await prisma.$transaction(async (tx) => {
+            const product = await tx.product.create({
+              data: {
+                productName: textFields.productName as string,
+                slug,
+                description: textFields.description as string,
+                categoryId: textFields.categoryId as string,
+                tags: v.tags,
+                sku: textFields.sku as string,
+                brand: textFields.brand as string | null,
+                price: textFields.price as number,
+                discountPrice: textFields.discountPrice as number | null,
+                stock: textFields.stock as number,
+                hasVariants: !!(variants && variants.length > 0),
+                condition: textFields.condition as
+                  | 'NEW'
+                  | 'USED'
+                  | 'LIKE_NEW'
+                  | 'EXCELLENT'
+                  | 'GOOD'
+                  | 'FAIR'
+                  | 'POOR'
+                  | 'FOR_PARTS',
+                conditionDescription: textFields.conditionDescription as
+                  | string
+                  | null,
+                weight: textFields.weight as number | null,
+                weightUnit: textFields.weightUnit as string,
+                freeShipping: textFields.freeShipping as boolean,
+                dimensionLength: textFields.dimensionLength as number | null,
+                dimensionWidth: textFields.dimensionWidth as number | null,
+                dimensionHeight: textFields.dimensionHeight as number | null,
+                dimensionUnit: textFields.dimensionUnit as string,
+                images:
+                  imageData.length > 0
+                    ? {
+                        create: imageData.map((img) => ({
+                          imageUrl: img.imageUrl,
+                          imagePublicId: img.imagePublicId,
+                          order: img.order,
+                        })),
+                      }
+                    : undefined,
+                metaTitle: textFields.metaTitle as string | null,
+                metaDescription: textFields.metaDescription as string | null,
+                status: textFields.status as
+                  | 'DRAFT'
+                  | 'PUBLISHED'
+                  | 'ARCHIVED'
+                  | 'OUT_OF_STOCK',
+                featured: textFields.featured as boolean,
+                shopId: shop.id,
+                createdBy: session.user.id,
+
+                // Create variants
+                ...(variants.length > 0
                   ? {
-                      create: imageData.map((img) => ({
-                        imageUrl: img.imageUrl,
-                        imagePublicId: img.imagePublicId,
-                        order: img.order,
-                      })),
-                    }
-                  : undefined,
-              metaTitle: textFields.metaTitle as string | null,
-              metaDescription: textFields.metaDescription as string | null,
-              status: textFields.status as
-                | 'DRAFT'
-                | 'PUBLISHED'
-                | 'ARCHIVED'
-                | 'OUT_OF_STOCK',
-              featured: textFields.featured as boolean,
-              shopId: shop.id,
-              createdBy: session.user.id,
-
-              // Create variants
-              ...(variants && variants.length > 0
-                ? {
-                    variants: {
-                      create: await Promise.all(
-                        variants.map(async (variant) => {
-                          const attrRecord = variant.attributes;
-
-                          let variantImageUrl: string | null = null;
-                          let variantImagePublicId: string | null = null;
-
-                          const vId = variant.id ?? '';
-                          const vImage = variantImages?.[vId];
-                          if (vImage instanceof File && vImage.size > 0) {
-                            const result = await UploadImage(
-                              vImage,
-                              'products/variants',
-                            );
-                            variantImageUrl = result.secure_url;
-                            variantImagePublicId = result.public_id;
-                          }
+                      variants: {
+                        create: variants.map((variant) => {
+                          const key = variant.id ?? '';
+                          const uploaded = variantImageByKey.get(key);
 
                           return {
                             name: variant.name,
@@ -366,16 +405,16 @@ export const Route = createFileRoute('/api/product/create')({
                             price: variant.price || 0,
                             discountPrice: variant.discountPrice ?? null,
                             stock: variant.stock,
-                            attributes: attrRecord,
-                            imageUrl: variantImageUrl,
-                            imagePublicId: variantImagePublicId,
+                            attributes: variant.attributes,
+                            imageUrl: uploaded?.imageUrl ?? null,
+                            imagePublicId: uploaded?.imagePublicId ?? null,
                             // Phase 4 — Store uploaded image as variant image record
-                            ...(variantImageUrl
+                            ...(uploaded
                               ? {
                                   variantImages: {
                                     create: {
-                                      imageUrl: variantImageUrl,
-                                      imagePublicId: variantImagePublicId ?? '',
+                                      imageUrl: uploaded.imageUrl,
+                                      imagePublicId: uploaded.imagePublicId,
                                       altText: variant.name,
                                       order: 0,
                                     },
@@ -398,76 +437,84 @@ export const Route = createFileRoute('/api/product/create')({
                             slug: variant.slug ?? null,
                           };
                         }),
-                      ),
-                    },
-                  }
-                : {}),
-            },
-            include: {
-              images: { orderBy: { order: 'asc' } },
-              category: true,
-              variants: true,
-              attributeOptions: true,
-            },
-          });
-
-          // Create attribute options with dual-write (separate from product create for clarity)
-          if (normalizedAttributes.length > 0) {
-            for (const attr of normalizedAttributes) {
-              await prisma.productAttributeOption.create({
-                data: {
-                  productId: product.id,
-                  name: attr.name,
-                  values: attr.values,
-                  isVariantDefining: attr.isVariantDefining,
-                  displayOrder: attr.displayOrder,
-                  ...(attr.attributeValues
-                    ? {
-                        attributeValues: {
-                          // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict; the shape is correct
-                          create: attr.attributeValues as any,
-                        },
-                      }
-                    : {}),
-                },
-              });
-            }
-          }
-
-          // Phase 3 — Create ProductVariantAttribute join rows
-          if (
-            variants &&
-            variants.length > 0 &&
-            normalizedAttributes.length > 0
-          ) {
-            const options = await prisma.productAttributeOption.findMany({
-              where: { productId: product.id },
-              include: { attributeValues: true },
+                      },
+                    }
+                  : {}),
+              },
+              include: {
+                images: { orderBy: { order: 'asc' } },
+                category: true,
+                variants: true,
+                attributeOptions: true,
+              },
             });
-            const optionByName = new Map(options.map((o) => [o.name, o]));
 
-            for (const variant of product.variants) {
-              const attrRecord = variant.attributes as Record<string, string>;
-              if (!attrRecord) continue;
-
-              for (const [attrName, attrValue] of Object.entries(attrRecord)) {
-                const option = optionByName.get(attrName);
-                if (!option) continue;
-
-                const attrVal = option.attributeValues.find(
-                  (av) => av.value === attrValue,
-                );
-                if (!attrVal) continue;
-
-                await prisma.productVariantAttribute.create({
+            // Create attribute options with dual-write (separate from product create for clarity)
+            if (normalizedAttributes.length > 0) {
+              for (const attr of normalizedAttributes) {
+                await tx.productAttributeOption.create({
                   data: {
-                    variantId: variant.id,
-                    attributeValueId: attrVal.id,
+                    productId: product.id,
+                    name: attr.name,
+                    values: attr.values,
+                    isVariantDefining: attr.isVariantDefining,
+                    displayOrder: attr.displayOrder,
+                    ...(attr.attributeValues
+                      ? {
+                          attributeValues: {
+                            // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict; the shape is correct
+                            create: attr.attributeValues as any,
+                          },
+                        }
+                      : {}),
                   },
                 });
               }
             }
-          }
+
+            // Phase 3 — Create ProductVariantAttribute join rows
+            if (
+              variants &&
+              variants.length > 0 &&
+              normalizedAttributes.length > 0
+            ) {
+              const options = await tx.productAttributeOption.findMany({
+                where: { productId: product.id },
+                include: { attributeValues: true },
+              });
+              const optionByName = new Map(options.map((o) => [o.name, o]));
+
+              for (const variant of product.variants) {
+                const attrRecord = variant.attributes as Record<string, string>;
+                if (!attrRecord) continue;
+
+                for (const [attrName, attrValue] of Object.entries(
+                  attrRecord,
+                )) {
+                  const option = optionByName.get(attrName);
+                  if (!option) continue;
+
+                  const attrVal = option.attributeValues.find(
+                    (av) => av.value === attrValue,
+                  );
+                  if (!attrVal) continue;
+
+                  await tx.productVariantAttribute.create({
+                    data: {
+                      variantId: variant.id,
+                      attributeValueId: attrVal.id,
+                    },
+                  });
+                }
+              }
+            }
+
+            return product;
+          });
+
+          // Nothing in the database references the uploads yet until the
+          // transaction above commits, so from here on they are keepers.
+          committed = true;
 
           // Re-fetch product with attribute options included
           const productWithOptions = await prisma.product.findUnique({
@@ -508,6 +555,24 @@ export const Route = createFileRoute('/api/product/create')({
             { status: 200 },
           );
         } catch (error) {
+          // No product row exists, so nothing references these uploads.
+          if (!committed && uploadedPublicIds.length > 0) {
+            const results = await Promise.allSettled(
+              uploadedPublicIds.map((id) => DeleteImage(id)),
+            );
+            const failed = results.filter(
+              (r) => r.status === 'rejected',
+            ).length;
+            if (failed > 0) {
+              logError(
+                'product-create-cloudinary-cleanup',
+                new Error(
+                  `Could not delete ${failed}/${uploadedPublicIds.length} orphaned asset(s)`,
+                ),
+              );
+            }
+          }
+
           return Response.json(
             {
               error:

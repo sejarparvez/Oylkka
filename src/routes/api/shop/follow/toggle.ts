@@ -21,6 +21,14 @@ export const Route = createFileRoute('/api/shop/follow/toggle')({
             return Response.json({ error: 'shopId required' }, { status: 400 });
           }
 
+          const shop = await prisma.shop.findUnique({
+            where: { id: shopId },
+            select: { id: true },
+          });
+          if (!shop) {
+            return Response.json({ error: 'Shop not found' }, { status: 404 });
+          }
+
           const existing = await prisma.shopFollow.findUnique({
             where: { userId_shopId: { userId: session.user.id, shopId } },
           });

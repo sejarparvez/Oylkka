@@ -8,6 +8,7 @@ model EmailQueue {
   maxRetries Int         @default(3)
   error      String?
   createdAt  DateTime    @default(now())
+  startedAt  DateTime?
   sentAt     DateTime?
 
   @@index([status, createdAt])

@@ -1,0 +1,89 @@
+import { prisma } from '@/lib/db';
+
+export interface ShippingEstimateItem {
+  quantity: number;
+  freeShipping?: boolean;
+  shop?: { id: string } | null;
+  unitPrice: number;
+}
+
+/**
+ * Zone-aware shipping calculation shared by checkout (`create.ts`) and the
+ * `discount-preview` quote so the customer always sees the amount they will
+ * actually be charged (MONEY-30).
+ *
+ * Zone lookup is deterministic (cheapest active zone wins, MONEY-31); when no
+ * zone covers the district the shop's flat `shippingCost` is used.
+ */
+export async function computeShippingEstimate(
+  items: ShippingEstimateItem[],
+  shippingDistrict?: string | null,
+): Promise<number> {
+  const perShop = new Map<
+    string,
+    { hasNonFree: boolean; itemQty: number; shopSubtotal: number }
+  >();
+
+  for (const item of items) {
+    const shopId = item.shop?.id;
+    if (!shopId) continue;
+
+    let entry = perShop.get(shopId);
+    if (!entry) {
+      entry = { hasNonFree: false, itemQty: 0, shopSubtotal: 0 };
+      perShop.set(shopId, entry);
+    }
+
+    entry.shopSubtotal += item.unitPrice * item.quantity;
+    if (!item.freeShipping) {
+      entry.hasNonFree = true;
+      entry.itemQty += item.quantity;
+    }
+  }
+
+  const shopIds = [...perShop.keys()];
+  if (shopIds.length === 0) return 0;
+
+  const shops = await prisma.shop.findMany({
+    where: { id: { in: shopIds } },
+    select: { id: true, shippingCost: true },
+  });
+  const flatCost = new Map(
+    shops.map((shop) => [shop.id, Number(shop.shippingCost)]),
+  );
+
+  let total = 0;
+
+  for (const [shopId, entry] of perShop) {
+    if (!entry.hasNonFree) continue;
+
+    let cost = flatCost.get(shopId) ?? 0;
+
+    if (shippingDistrict) {
+      const zone = await prisma.shippingZone.findFirst({
+        where: {
+          shopId,
+          isActive: true,
+          districts: { some: { district: shippingDistrict } },
+        },
+        orderBy: { baseCost: 'asc' },
+        select: { baseCost: true, perItem: true, freeAbove: true },
+      });
+
+      if (zone) {
+        cost =
+          Number(zone.baseCost) + Number(zone.perItem) * entry.itemQty;
+        if (
+          zone.freeAbove != null &&
+          entry.shopSubtotal >= Number(zone.freeAbove)
+        ) {
+          cost = 0;
+        }
+      }
+    }
+
+    total += cost;
+  }
+
+  return total;
+}

@@ -33,6 +33,7 @@ export const Route = createFileRoute('/api/orders/$orderId')({
                   total: true,
                   fulfillmentStatus: true,
                   shopId: true,
+                  shop: { select: { id: true, name: true } },
                   trackingNumber: true,
                   trackingUrl: true,
                   shippedAt: true,
@@ -41,6 +42,7 @@ export const Route = createFileRoute('/api/orders/$orderId')({
               },
               invoice: {
                 select: {
+                  id: true,
                   invoiceNumber: true,
                   pdfUrl: true,
                   createdAt: true,
@@ -83,6 +85,7 @@ export const Route = createFileRoute('/api/orders/$orderId')({
             currency: order.currency,
             invoice: order.invoice
               ? {
+                  id: order.invoice.id,
                   invoiceNumber: order.invoice.invoiceNumber,
                   pdfUrl: order.invoice.pdfUrl,
                   createdAt: order.invoice.createdAt.toISOString(),
@@ -100,6 +103,7 @@ export const Route = createFileRoute('/api/orders/$orderId')({
               total: item.total,
               fulfillmentStatus: item.fulfillmentStatus,
               shopId: item.shopId,
+              shopName: item.shop?.name ?? null,
               trackingNumber: item.trackingNumber,
               trackingUrl: item.trackingUrl,
               shippedAt: item.shippedAt?.toISOString() ?? null,

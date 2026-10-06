@@ -1,5 +1,8 @@
 const BATCH_SIZE = 10;
 const POLL_INTERVAL = 30_000;
+// Rows left in PROCESSING after this long are treated as abandoned and reset
+// to PENDING so a crashed worker does not permanently stall the queue.
+const CLAIM_TIMEOUT_MS = 5 * 60 * 1000;
 
 import { prisma } from '@/lib/db';
 import { generateInvoicePdf } from '@/lib/invoice-pdf';
@@ -11,28 +14,52 @@ export async function enqueueInvoiceGeneration(
   const entry = await prisma.invoiceQueue.create({
     data: { orderId },
   });
-  processInvoiceQueue().catch((err) => logError('invoice-queue', err));
 
+  // Deliberately no immediate processing here: it overlapped the interval
+  // worker and caused duplicate generations (MONEY-41). Worker picks it up.
   return entry.id;
+}
+
+/** Atomically claim the next batch so concurrent workers never double-process. */
+async function claimBatch() {
+  const candidates = await prisma.invoiceQueue.findMany({
+    where: { status: 'PENDING' },
+    orderBy: { createdAt: 'asc' },
+    take: BATCH_SIZE,
+    select: { id: true },
+  });
+
+  if (candidates.length === 0) return [];
+
+  const claimed = await prisma.invoiceQueue.updateMany({
+    where: { id: { in: candidates.map((c) => c.id) }, status: 'PENDING' },
+    data: { status: 'PROCESSING', processedAt: new Date() },
+  });
+
+  if (claimed.count === 0) return [];
+
+  return prisma.invoiceQueue.findMany({
+    where: { id: { in: candidates.map((c) => c.id) }, status: 'PROCESSING' },
+    orderBy: { createdAt: 'asc' },
+  });
 }
 
 export async function processInvoiceQueue(): Promise<void> {
   try {
-    const pending = await prisma.invoiceQueue.findMany({
-      where: { status: 'PENDING' },
-      orderBy: { createdAt: 'asc' },
-      take: BATCH_SIZE,
+    // Recover jobs abandoned by a crashed worker.
+    await prisma.invoiceQueue.updateMany({
+      where: {
+        status: 'PROCESSING',
+        processedAt: { lt: new Date(Date.now() - CLAIM_TIMEOUT_MS) },
+      },
+      data: { status: 'PENDING', processedAt: null },
     });
 
-    if (pending.length === 0) return;
+    const claimed = await claimBatch();
+    if (claimed.length === 0) return;
 
-    for (const job of pending) {
+    for (const job of claimed) {
       try {
-        await prisma.invoiceQueue.update({
-          where: { id: job.id },
-          data: { status: 'PROCESSING' },
-        });
-
         const pdfUrl = await generateInvoicePdf(job.orderId);
 
         await prisma.invoiceQueue.update({
@@ -53,14 +80,14 @@ export async function processInvoiceQueue(): Promise<void> {
           data: {
             status: newStatus,
             retryCount: newRetryCount,
+            processedAt: null,
             error: err instanceof Error ? err.message : 'Unknown error',
           },
         });
       }
     }
   } catch (error) {
-    // biome-ignore lint/suspicious/noConsole: this is fine
-    console.error('Failed to process invoice queue item:', error);
+    logError('invoice-queue', error);
   }
 }
 

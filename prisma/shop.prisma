@@ -32,7 +32,11 @@ model Shop {
   bankAccountName   String?
   bankAccountNumber String?
   commissionRate    Decimal @default(10) @db.Decimal(5, 2)
-  shippingCost      Decimal @default(0) @db.Decimal(10, 2)
+  // Flat-country default when no shipping zone covers the district. Kept
+  // non-zero so a shop that never configures zones does not silently ship
+  // nationwide for free (MONEY-31). Free shipping is still possible by
+  // explicitly setting this to 0 or via a zone's freeAbove.
+  shippingCost Decimal @default(60) @db.Decimal(10, 2)
 
   policies Json?
 

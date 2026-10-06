@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { generalLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
+import { uploadMessageImage } from '@/lib/message-upload';
 
 export const Route = createFileRoute('/api/upload/message')({
   server: {
@@ -32,33 +33,12 @@ export const Route = createFileRoute('/api/upload/message')({
             );
           }
 
-          const allowedTypes = [
-            'image/jpeg',
-            'image/png',
-            'image/webp',
-            'image/gif',
-          ];
-          if (!allowedTypes.includes(file.type)) {
-            return Response.json(
-              { error: 'Only JPEG, PNG, WebP, and GIF images are allowed' },
-              { status: 400 },
-            );
+          const result = await uploadMessageImage(file);
+          if ('error' in result) {
+            return Response.json({ error: result.error }, { status: 400 });
           }
 
-          if (file.size > 5 * 1024 * 1024) {
-            return Response.json(
-              { error: 'Image must be under 5MB' },
-              { status: 400 },
-            );
-          }
-
-          const { UploadImage } = await import('@/cloudinary/upload-image');
-          const result = await UploadImage(file, 'messages');
-
-          return Response.json({
-            imageUrl: result.secure_url,
-            imagePublicId: result.public_id,
-          });
+          return Response.json(result, { status: 200 });
         } catch (error) {
           return Response.json(
             {

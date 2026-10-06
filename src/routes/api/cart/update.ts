@@ -18,7 +18,7 @@ export const Route = createFileRoute('/api/cart/update')({
           const body = await request.json();
           const { itemId, quantity } = body;
 
-          if (!itemId || !quantity || quantity < 1) {
+          if (!itemId || !Number.isInteger(quantity) || quantity < 1) {
             return Response.json(
               { error: 'Item ID and valid quantity are required' },
               { status: 400 },
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/api/cart/update')({
             include: {
               cart: { select: { userId: true } },
               product: { select: { stock: true } },
-              variant: { select: { stock: true } },
+              variant: { select: { stock: true, reservedStock: true } },
             },
           });
 
@@ -45,9 +45,22 @@ export const Route = createFileRoute('/api/cart/update')({
             return Response.json({ error: 'Unauthorized' }, { status: 403 });
           }
 
+          // Availability must exclude units held by an in-flight bKash
+          // checkout. Checking raw variant.stock let a line be set above what
+          // is actually purchasable (MONEY-36). A variantId pointing at a
+          // deleted variant has no stock to offer.
           const maxStock = item.variantId
-            ? (item.variant?.stock ?? 0)
+            ? item.variant
+              ? item.variant.stock - item.variant.reservedStock
+              : 0
             : item.product.stock;
+
+          if (maxStock < 1) {
+            return Response.json(
+              { error: 'Item is out of stock' },
+              { status: 400 },
+            );
+          }
 
           if (quantity > maxStock) {
             return Response.json(

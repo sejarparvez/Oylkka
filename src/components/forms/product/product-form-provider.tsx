@@ -125,6 +125,41 @@ export function ProductFormProvider({
       }
     });
 
+    // ------------------------------------------------------------------
+    // Tell the server what happened to the persisted gallery.
+    //
+    // Without this the request carries no image intent at all: the server cannot
+    // tell "saved without touching images" from "removed every image", so it
+    // either wipes the gallery on an unrelated edit or silently ignores the
+    // removal the vendor just made in the UI (MONEY-33).
+    //
+    // Newly picked files get a temp id (`img_<ts>_<rand>`), so membership in
+    // `initialImages` is what distinguishes a stored image from a fresh upload.
+    // ------------------------------------------------------------------
+    const initialIds = new Set(
+      (initialImages ?? []).map((img) => img.id).filter(Boolean),
+    );
+    const currentIds = productImages.map((img) => img.id).filter(Boolean);
+
+    const removedGalleryIds = [...initialIds].filter(
+      (id) => !currentIds.includes(id),
+    );
+    if (removedGalleryIds.length > 0) {
+      formData.append('removedGalleryIds', JSON.stringify(removedGalleryIds));
+    }
+
+    const retainsExisting = currentIds.some((id) => initialIds.has(id));
+    const hasNewFiles = productImages.some((img) => img.file);
+
+    // `false` means "replace the gallery wholesale" and is only correct when new
+    // files are arriving and no stored image survives. Omitting the field lets
+    // the server default to keeping, which is the safe direction.
+    if (retainsExisting || !hasNewFiles) {
+      formData.append('keepExistingImage', 'true');
+    } else {
+      formData.append('keepExistingImage', 'false');
+    }
+
     if (cleaned.variants && Array.isArray(cleaned.variants)) {
       cleaned.variants.forEach((variant, index) => {
         if (variant.image instanceof File) {

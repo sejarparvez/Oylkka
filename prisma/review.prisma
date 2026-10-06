@@ -24,6 +24,11 @@ model Review {
   reportReason    String?
   reviewedByAdmin Boolean @default(false)
 
+  // Soft-delete / moderation lifecycle (MONEY-48): a rejected review keeps its
+  // row so it can be reinstated, and every moderation action is recorded here.
+  moderationStatus   ReviewModerationStatus @default(APPROVED)
+  moderationHistory  Json?
+
   vendorReply     String?
   vendorRepliedAt DateTime?
 

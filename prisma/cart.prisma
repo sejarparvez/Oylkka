@@ -42,12 +42,21 @@ model CartItem {
   variantId String?
   variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
+  /// Non-null surrogate for variantId. Postgres treats NULLs as distinct in a
+  /// unique index, so a plain unique on (cartId, productId, variantId) would
+  /// still allow duplicate simple products. Prisma cannot express the partial
+  /// unique indexes that would otherwise be needed. Application code must set
+  /// this to variantId when creating or updating a line.
+  /// See migration 20261003100100.
+  variantKey String @default("")
+
   quantity   Int     @default(1)
   savedPrice Decimal? @db.Decimal(10, 2)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([cartId, productId, variantKey])
   @@index([cartId])
   @@index([productId])
   @@map("cart_item")

@@ -144,12 +144,15 @@ function RouteComponent() {
       return sum + (price ?? 0) * item.quantity;
     }, 0) ?? 0;
 
+  const shippingDistrict = formValues.district || null;
+
   const { data: discountPreview } = useQuery({
     queryKey: [
       'discount-preview',
       [...selectedVoucherIds].sort().join(','),
       paymentMethod,
       subtotal,
+      shippingDistrict,
     ],
     queryFn: async () => {
       if (!cart) throw new Error('Cart not loaded');
@@ -159,11 +162,13 @@ function RouteComponent() {
             totalDiscount: number;
             totalShippingDiscount: number;
             freeShipping: boolean;
+            taxRate: number;
           }
         | { error: string }
       >('/api/checkout/discount-preview', {
         voucherIds: [...selectedVoucherIds],
         paymentMethod,
+        shippingDistrict,
         cart: {
           id: cart.id,
           items: cart.items.map((item) => ({
@@ -172,6 +177,7 @@ function RouteComponent() {
               price: item.product.price,
               discountPrice: item.product.discountPrice,
               freeShipping: item.product.freeShipping,
+              categoryId: item.product.categoryId,
               shop: item.product.shop
                 ? { id: item.product.shop.id }
                 : undefined,
@@ -233,7 +239,11 @@ function RouteComponent() {
     ? 0
     : Math.max(0, baseShipping - shippingDiscount);
 
-  const total = subtotal + finalShipping - totalDiscount;
+  const taxBase = Math.max(0, subtotal - totalDiscount);
+  const taxRate = discountPreview?.taxRate ?? 0;
+  const tax = Math.round(taxBase * taxRate * 100) / 100;
+
+  const total = subtotal + finalShipping + tax - totalDiscount;
 
   function toggleVoucher(voucherId: string) {
     setSelectedVoucherIds((prev) => {
@@ -482,6 +492,15 @@ function RouteComponent() {
                         <span>Shipping Discount</span>
                         <span className='font-medium'>
                           -৳{shippingDiscount.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+
+                    {tax > 0 && (
+                      <div className='flex justify-between'>
+                        <span className='text-muted-foreground'>Tax</span>
+                        <span className='font-medium'>
+                          ৳{tax.toLocaleString()}
                         </span>
                       </div>
                     )}

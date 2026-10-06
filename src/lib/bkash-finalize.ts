@@ -1,10 +1,7 @@
 import { prisma } from '@/lib/db';
 import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
-import {
-  decrementStock,
-  decrementVariantStock,
-  releaseReservedStock,
-} from '@/lib/stock';
+import { logError } from '@/lib/logger';
+import { commitVariantReservation, decrementStock } from '@/lib/stock';
 import type { OrderMetadata } from '@/types/orders';
 
 const AMOUNT_TOLERANCE = 0.01;
@@ -12,6 +9,8 @@ const AMOUNT_TOLERANCE = 0.01;
 type AppliedVoucherEntry = {
   userVoucherId?: string;
   couponId: string;
+  /** 0 means unlimited; lets the consumer enforce the cap in the DB. */
+  maxUses?: number;
 };
 
 type FinalizeMetadata = OrderMetadata & {
@@ -96,25 +95,26 @@ export async function finalizeBkashOrder(params: {
   // 2. Post-payment side effects in their own transaction.
   try {
     await prisma.$transaction(async (tx) => {
-      // Atomic stock decrement + reserved stock release (race-condition-safe)
+      // Sell the stock this order was holding. Non-variant products were
+      // already decremented at checkout reservation time (MONEY-22);
+      // decrementing them again here would double-count.
       for (const item of order.items) {
-        if (item.variantId) {
-          await decrementStock(
-            tx,
-            item.productId,
-            item.quantity,
-            item.productName,
-          );
-          await decrementVariantStock(
-            tx,
-            item.variantId,
-            item.quantity,
-            item.variantName || 'variant',
-          );
-          await releaseReservedStock(tx, item.variantId, item.quantity);
-        }
-        // Non-variant products were already decremented at checkout
-        // reservation time (MONEY-22); decrementing again would double-count.
+        if (!item.variantId) continue;
+
+        await decrementStock(
+          tx,
+          item.productId,
+          item.quantity,
+          item.productName,
+        );
+        // One statement for stock and reservedStock, so the reservation can
+        // never be half-consumed if the variant commit fails (MONEY-44).
+        await commitVariantReservation(
+          tx,
+          item.variantId,
+          item.quantity,
+          item.variantName || 'variant',
+        );
       }
 
       await tx.cartItem.deleteMany({
@@ -130,10 +130,30 @@ export async function finalizeBkashOrder(params: {
           },
         });
 
-        await tx.coupon.update({
-          where: { id: v.couponId },
-          data: { usedCount: { increment: 1 } },
-        });
+        // Enforce the usage cap with a conditional write (MONEY-38).
+        // The payment is already captured here, so hitting the cap must not
+        // throw and roll back the order — under-counting a coupon is far less
+        // costly than a paid customer with a dead order.
+        if (v.maxUses > 0) {
+          const { count } = await tx.coupon.updateMany({
+            where: { id: v.couponId, usedCount: { lt: v.maxUses } },
+            data: { usedCount: { increment: 1 } },
+          });
+
+          if (count === 0) {
+            logError(
+              'coupon-cap-exceeded',
+              new Error(
+                `Coupon ${v.couponId} hit its usage cap on order ${order.id}; usage not counted`,
+              ),
+            );
+          }
+        } else {
+          await tx.coupon.update({
+            where: { id: v.couponId },
+            data: { usedCount: { increment: 1 } },
+          });
+        }
 
         if (v.userVoucherId) {
           await tx.userVoucher.update({

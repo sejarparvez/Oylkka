@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import { z } from 'zod';
 import { UploadImage } from '@/cloudinary';
 import type { ReturnReason } from '@/generated/prisma/enums';
 import { auth } from '@/lib/auth';
@@ -7,6 +8,8 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { generalLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
+
+const ResolutionEnum = z.enum(['REFUND', 'REPLACEMENT']);
 
 export const Route = createFileRoute('/api/returns/create')({
   server: {
@@ -30,7 +33,9 @@ export const Route = createFileRoute('/api/returns/create')({
           const orderId = formData.get('orderId') as string;
           const reason = formData.get('reason') as string;
           const details = (formData.get('details') as string) || null;
-          const resolution = (formData.get('resolution') as string) || 'REFUND';
+          const resolution = ResolutionEnum.catch('REFUND').parse(
+            (formData.get('resolution') as string) || 'REFUND',
+          );
           const rawItemIds = formData.get('itemIds') as string;
 
           if (!orderId || !reason) {

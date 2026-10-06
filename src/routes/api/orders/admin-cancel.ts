@@ -5,7 +5,7 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { orderCancellationHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
-import { incrementStock, incrementVariantStock } from '@/lib/stock';
+import { unwindUnpaidOrder } from '@/lib/stock';
 
 export const Route = createFileRoute('/api/orders/admin-cancel')({
   server: {
@@ -58,8 +58,16 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
             );
           }
 
-          // Prevent cancelling paid orders without refund — use refund endpoint instead
-          if (order.paymentStatus === 'PAID' || order.status === 'CONFIRMED') {
+          // Any state where money moved must go through the refund path. Cancelling
+          // here would return stock for units the customer still holds, and the
+          // PARTIALLY_REFUNDED case additionally left the order cancellable
+          // after money had already been returned (MONEY-46).
+          if (
+            order.paymentStatus === 'PAID' ||
+            order.paymentStatus === 'PARTIALLY_REFUNDED' ||
+            order.paymentStatus === 'REFUNDED' ||
+            order.status === 'CONFIRMED'
+          ) {
             return Response.json(
               {
                 error:
@@ -69,7 +77,25 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
             );
           }
 
+          const activeItems = order.items.filter(
+            (i) => i.fulfillmentStatus !== 'CANCELLED',
+          );
+
+          if (activeItems.length === 0) {
+            return Response.json(
+              { error: 'All items in this order are already cancelled' },
+              { status: 400 },
+            );
+          }
+
           await prisma.$transaction(async (tx) => {
+            await unwindUnpaidOrder(
+              tx,
+              body.orderId,
+              order.paymentMethod,
+              activeItems.map((i) => i.id),
+            );
+
             await tx.order.update({
               where: { id: body.orderId },
               data: {
@@ -77,28 +103,8 @@ export const Route = createFileRoute('/api/orders/admin-cancel')({
                 cancelledAt: new Date(),
                 cancelledBy: session.user.id,
                 cancellationReason: body.reason,
-                items: {
-                  updateMany: {
-                    where: { orderId: body.orderId },
-                    data: { fulfillmentStatus: 'CANCELLED' },
-                  },
-                },
               },
             });
-
-            // Restore stock only if it was previously decremented
-            if (order.status !== 'PENDING') {
-              for (const item of order.items) {
-                await incrementStock(tx, item.productId, item.quantity);
-                if (item.variantId) {
-                  await incrementVariantStock(
-                    tx,
-                    item.variantId,
-                    item.quantity,
-                  );
-                }
-              }
-            }
           });
 
           createAuditLog({

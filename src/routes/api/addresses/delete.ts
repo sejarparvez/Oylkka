@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { promoteDefaultAddress } from '@/lib/address-validation';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -30,7 +31,15 @@ export const Route = createFileRoute('/api/addresses/delete')({
               { status: 404 },
             );
           }
+          const wasDefault = existing.isDefault;
           await prisma.userAddress.delete({ where: { id } });
+
+          // Deleting the default address must not leave the account with zero
+          // defaults (MONEY-57).
+          if (wasDefault) {
+            await promoteDefaultAddress(session.user.id);
+          }
+
           return Response.json({ message: 'Address deleted' });
         } catch (error) {
           return Response.json(

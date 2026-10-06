@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { cartExpiry } from '@/lib/cart-cleanup';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/cart/get')({
@@ -30,6 +31,7 @@ export const Route = createFileRoute('/api/cart/get')({
                       stock: true,
                       hasVariants: true,
                       freeShipping: true,
+                      categoryId: true,
                       images: {
                         take: 1,
                         orderBy: { order: 'asc' },
@@ -63,7 +65,7 @@ export const Route = createFileRoute('/api/cart/get')({
 
           if (!cart) {
             const newCart = await prisma.cart.create({
-              data: { userId: session.user.id },
+              data: { userId: session.user.id, expiresAt: cartExpiry() },
             });
             return Response.json({ ...newCart, items: [] }, { status: 200 });
           }

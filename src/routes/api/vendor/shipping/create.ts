@@ -5,6 +5,11 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { generalLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
+import {
+  findOverlappingZone,
+  isFiniteNonNegative,
+  normalizeZoneDistricts,
+} from '@/lib/shipping-zone';
 
 export const Route = createFileRoute('/api/vendor/shipping/create')({
   server: {
@@ -32,41 +37,83 @@ export const Route = createFileRoute('/api/vendor/shipping/create')({
             return Response.json({ error: 'No shop found' }, { status: 404 });
           }
 
+          if (shop.status !== 'ACTIVE') {
+            return Response.json(
+              { error: 'Your shop must be active to manage shipping zones' },
+              { status: 403 },
+            );
+          }
+
           const body = await request.json();
           const { name, districts, baseCost, perItem, freeAbove, estDays } =
             body;
 
-          if (!name || typeof name !== 'string') {
+          if (typeof name !== 'string' || name.trim().length === 0) {
             return Response.json(
               { error: 'Name is required' },
               { status: 400 },
             );
           }
 
-          if (!Array.isArray(districts) || districts.length === 0) {
+          const normalizedDistricts = normalizeZoneDistricts(districts);
+          if (!normalizedDistricts) {
             return Response.json(
-              { error: 'At least one district is required' },
+              { error: 'Provide at least one valid Bangladesh district' },
               { status: 400 },
             );
           }
 
-          if (typeof baseCost !== 'number' || baseCost < 0) {
+          if (!isFiniteNonNegative(baseCost)) {
             return Response.json(
               { error: 'Base cost must be a non-negative number' },
               { status: 400 },
             );
           }
 
+          if (perItem != null && !isFiniteNonNegative(perItem)) {
+            return Response.json(
+              { error: 'Per-item cost must be a non-negative number' },
+              { status: 400 },
+            );
+          }
+
+          if (
+            freeAbove != null &&
+            freeAbove !== '' &&
+            !isFiniteNonNegative(freeAbove)
+          ) {
+            return Response.json(
+              { error: 'Free-above threshold must be a non-negative number' },
+              { status: 400 },
+            );
+          }
+
+          const overlapping = await findOverlappingZone(
+            shop.id,
+            normalizedDistricts,
+          );
+          if (overlapping) {
+            return Response.json(
+              {
+                error: `District already covered by zone "${overlapping.name}": ${overlapping.districts.join(', ')}`,
+              },
+              { status: 409 },
+            );
+          }
+
           const zone = await prisma.shippingZone.create({
             data: {
               shopId: shop.id,
-              name,
+              name: name.trim(),
               baseCost,
-              perItem: typeof perItem === 'number' ? perItem : 0,
-              freeAbove: typeof freeAbove === 'number' ? freeAbove : null,
+              perItem: isFiniteNonNegative(perItem) ? perItem : 0,
+              freeAbove:
+                typeof freeAbove === 'number' ? freeAbove : null,
               estDays: typeof estDays === 'string' ? estDays : null,
               districts: {
-                create: districts.map((d: string) => ({ district: d })),
+                create: normalizedDistricts.map((district) => ({
+                  district,
+                })),
               },
             },
             include: { districts: { select: { district: true } } },

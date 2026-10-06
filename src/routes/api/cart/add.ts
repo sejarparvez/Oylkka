@@ -1,8 +1,30 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
+import { cartExpiry } from '@/lib/cart-cleanup';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+
+/** Raised when an add would push the merged line past what is purchasable. */
+class StockUnavailableError extends Error {
+  constructor(
+    readonly available: number,
+    readonly existingQuantity: number,
+  ) {
+    super('Requested quantity exceeds available stock');
+    this.name = 'StockUnavailableError';
+  }
+}
+
+/** Prisma's unique-constraint failure, which now means a concurrent add won. */
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'P2002'
+  );
+}
 
 export const Route = createFileRoute('/api/cart/add')({
   server: {
@@ -98,8 +120,7 @@ export const Route = createFileRoute('/api/cart/add')({
             }
 
             available = variant.stock - variant.reservedStock;
-            savedPrice =
-              variant.discountPrice ?? variant.price ?? savedPrice;
+            savedPrice = variant.discountPrice ?? variant.price ?? savedPrice;
           } else {
             available = product.stock;
           }
@@ -117,43 +138,72 @@ export const Route = createFileRoute('/api/cart/add')({
 
           if (!cart) {
             cart = await prisma.cart.create({
-              data: { userId: session.user.id },
+              data: { userId: session.user.id, expiresAt: cartExpiry() },
             });
           }
 
-          const existingItem = await prisma.cartItem.findFirst({
-            where: { cartId: cart.id, productId, variantId: variantId ?? null },
-          });
+          try {
+            // Upsert rather than findFirst + create: that pair is
+            // check-then-act, so two concurrent adds both saw "no existing
+            // line" and each inserted one, duplicating the cart line
+            // (MONEY-37). The unique (cartId, productId, variantKey) index
+            // makes the merge atomic.
+            //
+            // Availability is verified *after* the write and throws to roll the
+            // whole transaction back, so the check cannot be lost to the same
+            // race we just removed.
+            await prisma.$transaction(async (tx) => {
+              const row = await tx.cartItem.upsert({
+                where: {
+                  cartId_productId_variantKey: {
+                    cartId: cart.id,
+                    productId,
+                    variantKey: variantId ?? '',
+                  },
+                },
+                create: {
+                  cartId: cart.id,
+                  productId,
+                  variantId: variantId ?? null,
+                  variantKey: variantId ?? '',
+                  quantity: qty,
+                  savedPrice,
+                },
+                update: { quantity: { increment: qty }, savedPrice },
+                select: { quantity: true },
+              });
 
-          const requestedTotal = (existingItem?.quantity ?? 0) + qty;
-          if (requestedTotal > available) {
-            return Response.json(
-              {
-                error: `Only ${available} available${
-                  existingItem
-                    ? ` (${existingItem.quantity} already in cart)`
-                    : ''
-                }`,
-              },
-              { status: 400 },
-            );
-          }
+              if (row.quantity > available) {
+                throw new StockUnavailableError(available, row.quantity - qty);
+              }
 
-          if (existingItem) {
-            await prisma.cartItem.update({
-              where: { id: existingItem.id },
-              data: { quantity: requestedTotal },
+              return row.quantity;
             });
-          } else {
-            await prisma.cartItem.create({
-              data: {
-                cartId: cart.id,
-                productId,
-                variantId: variantId ?? null,
-                quantity: qty,
-                savedPrice,
-              },
-            });
+          } catch (error) {
+            if (error instanceof StockUnavailableError) {
+              return Response.json(
+                {
+                  error: `Only ${error.available} available${
+                    error.existingQuantity > 0
+                      ? ` (${error.existingQuantity} already in cart)`
+                      : ''
+                  }`,
+                },
+                { status: 400 },
+              );
+            }
+
+            if (isUniqueViolation(error)) {
+              return Response.json(
+                {
+                  error:
+                    'Cart changed while adding this item. Please try again.',
+                },
+                { status: 409 },
+              );
+            }
+
+            throw error;
           }
 
           const updatedCart = await prisma.cart.findUnique({

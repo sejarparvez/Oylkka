@@ -1,5 +1,9 @@
 import { prisma } from '@/lib/db';
 
+// Hard deadline for bKash API calls so a hung integration never stalls
+// checkout or refund flows (MONEY-59).
+const BKASH_TIMEOUT_MS = 15_000;
+
 type BkashConfig = {
   baseUrl: string;
   appKey: string;
@@ -42,6 +46,7 @@ async function getGrantToken(): Promise<string> {
     `${config.baseUrl}/tokenized/checkout/token/grant`,
     {
       method: 'POST',
+      signal: AbortSignal.timeout(BKASH_TIMEOUT_MS),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -101,6 +106,7 @@ export async function createBkashPayment(params: {
 
   const response = await fetch(`${config.baseUrl}/tokenized/checkout/create`, {
     method: 'POST',
+    signal: AbortSignal.timeout(BKASH_TIMEOUT_MS),
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -147,6 +153,7 @@ export async function executeBkashPayment(
 
   const response = await fetch(`${config.baseUrl}/tokenized/checkout/execute`, {
     method: 'POST',
+    signal: AbortSignal.timeout(BKASH_TIMEOUT_MS),
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -191,6 +198,7 @@ export async function refundBkashPayment(params: {
     `${config.baseUrl}/tokenized/checkout/payment/refund`,
     {
       method: 'POST',
+      signal: AbortSignal.timeout(BKASH_TIMEOUT_MS),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -228,6 +236,7 @@ export async function queryBkashPayment(
     `${config.baseUrl}/tokenized/checkout/payment/status`,
     {
       method: 'POST',
+      signal: AbortSignal.timeout(BKASH_TIMEOUT_MS),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

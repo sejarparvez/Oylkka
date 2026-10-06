@@ -88,7 +88,7 @@ export const Route = createFileRoute('/api/shop/public-single')({
           }
 
           const recentReviews = await prisma.review.findMany({
-            where: { product: { shopId: shop.id } },
+            where: { product: { shopId: shop.id }, moderationStatus: 'APPROVED' },
             select: {
               id: true,
               rating: true,

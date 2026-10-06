@@ -39,6 +39,10 @@ model Order {
   refundAmount Decimal? @db.Decimal(10, 2)
   refundReason String?
   refundedAt   DateTime?
+  /// Append-only record of every refund event. The scalar fields above only
+  /// describe the most recent refund, so a second partial refund silently
+  /// discarded the first. Entries are { amount, reason, at, by, paymentRef }.
+  refundHistory Json?
 
   giftMessage String?
   notes       String?

@@ -1,6 +1,7 @@
 export interface DiscountCartItem {
   productId: string;
   shopId?: string;
+  categoryId?: string;
   price: number;
   discountPrice?: number;
   quantity: number;
@@ -92,7 +93,8 @@ export function calculateDiscount(
       ? items.filter(
           (item) =>
             item.productId === effectiveScopeId ||
-            item.shopId === effectiveScopeId,
+            item.shopId === effectiveScopeId ||
+            item.categoryId === effectiveScopeId,
         )
       : items;
 

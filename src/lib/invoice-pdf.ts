@@ -257,6 +257,12 @@ export async function generateInvoicePdf(
           ? fmtCurrency(Number(order.shippingCost))
           : 'Free',
     });
+    if (Number(order.tax) > 0) {
+      totalItems.push({
+        label: 'Tax',
+        value: fmtCurrency(Number(order.tax)),
+      });
+    }
     totalItems.push({
       label: 'Total',
       value: fmtCurrency(Number(order.total)),

@@ -37,6 +37,7 @@ type OrderItemDetail = {
   total: number;
   fulfillmentStatus: FulfillmentStatus;
   shopId: string;
+  shopName: string | null;
   trackingNumber: string | null;
   trackingUrl: string | null;
   shippedAt: string | null;
@@ -64,6 +65,7 @@ type OrderDetail = {
   shippingPostalCode: string | null;
   shippingComment: string | null;
   invoice: {
+    id: string;
     invoiceNumber: string;
     pdfUrl: string | null;
     createdAt: string;

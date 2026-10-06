@@ -4,6 +4,21 @@ import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
+/**
+ * `WishlistItem` is unique on `(userId, productId)` — the wishlist is
+ * per-product, not per-variant. The duplicate lookup below must therefore omit
+ * `variantId`, otherwise checking a second variant of an already-saved product
+ * finds nothing and the insert then violates the constraint (MONEY-35).
+ */
+function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'P2002'
+  );
+}
+
 export const Route = createFileRoute('/api/wishlist/add')({
   server: {
     handlers: {
@@ -41,12 +56,8 @@ export const Route = createFileRoute('/api/wishlist/add')({
             );
           }
 
-          const existing = await prisma.wishlistItem.findFirst({
-            where: {
-              userId: session.user.id,
-              productId,
-              variantId: variantId ?? null,
-            },
+          const existing = await prisma.wishlistItem.findUnique({
+            where: { userId_productId: { userId: session.user.id, productId } },
           });
 
           if (existing) {
@@ -66,6 +77,17 @@ export const Route = createFileRoute('/api/wishlist/add')({
 
           return Response.json({ item }, { status: 201 });
         } catch (error) {
+          // The constraint is on (userId, productId), so the wishlist is
+          // per-product. Two concurrent adds race on it and the loser gets
+          // P2002 — report the already-exists outcome rather than a 500
+          // (MONEY-35).
+          if (isUniqueViolation(error)) {
+            return Response.json(
+              { message: 'Already in wishlist' },
+              { status: 200 },
+            );
+          }
+
           return Response.json(
             {
               error:
