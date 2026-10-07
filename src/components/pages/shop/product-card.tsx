@@ -1,18 +1,35 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { Heart, Package, ShoppingCart, Star } from 'lucide-react';
 import { motion } from 'motion/react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
+import { Route as RootRoute } from '@/routes/__root';
 import { useAddToCartMutation } from '@/services/cart';
 import type { CategoryProduct } from '@/services/product';
+import {
+  useAddToWishlistMutation,
+  useRemoveFromWishlistMutation,
+  useWishlist,
+} from '@/services/wishlist';
 
 type ProductCardProps = {
   product: CategoryProduct;
 };
 
 export function ProductCard({ product }: ProductCardProps) {
+  const navigate = useNavigate();
+  const { user } = RootRoute.useRouteContext();
   const addToCart = useAddToCartMutation();
+  const { data: wishlistData } = useWishlist({ enabled: !!user });
+  const addToWishlist = useAddToWishlistMutation();
+  const removeFromWishlist = useRemoveFromWishlistMutation();
+
+  const isWishlisted =
+    wishlistData?.items.some((item) => item.productId === product.id) ??
+    false;
 
   const discountPct = product.discountPrice
     ? Math.round(
@@ -26,13 +43,36 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const thumbnail = product.images?.[0]?.imageUrl || null;
 
+  const handleToggleWishlist = () => {
+    if (!user) {
+      toast.error('Please sign in to add items to your wishlist');
+      return;
+    }
+    if (isWishlisted) {
+      removeFromWishlist.mutate({ productId: product.id });
+    } else {
+      addToWishlist.mutate({ productId: product.id });
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (product.hasVariants) {
+      navigate({ to: '/product/$slug', params: { slug: product.slug } });
+      return;
+    }
+    addToCart.mutate({
+      productId: product.id,
+      quantity: 1,
+    });
+  };
+
   return (
-    <Link to='/product/$slug' params={{ slug: product.slug }}>
-      <motion.div
-        whileHover={{ y: -3 }}
-        transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-        className='group rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-black/5 transition-shadow duration-300 cursor-pointer'
-      >
+    <motion.div
+      whileHover={{ y: -3 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+      className='group relative rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-black/5 transition-shadow duration-300 cursor-pointer'
+    >
+      <Link to='/product/$slug' params={{ slug: product.slug }}>
         <div className='relative overflow-hidden aspect-square bg-muted'>
           {thumbnail ? (
             <img
@@ -58,20 +98,9 @@ export function ProductCard({ product }: ProductCardProps) {
               </span>
             )}
           </div>
-
-          <button
-            type='button'
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            className='absolute top-2 right-2 w-7 h-7 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-background'
-          >
-            <Heart className='w-3.5 h-3.5 text-muted-foreground hover:text-destructive transition-colors' />
-          </button>
         </div>
 
-        <div className='p-4 flex flex-col gap-2'>
+        <div className='p-4 pb-0 flex flex-col gap-2'>
           {product.shop && (
             <div className='flex items-center gap-1.5'>
               <span className='w-1.5 h-1.5 rounded-full bg-primary' />
@@ -118,27 +147,41 @@ export function ProductCard({ product }: ProductCardProps) {
               Out of stock
             </p>
           )}
-
-          <Button
-            size='sm'
-            className='w-full mt-1 gap-1.5 h-8 text-xs'
-            disabled={product.stock <= 0}
-            onClick={(e) => {
-              if (product.hasVariants) return;
-              e.preventDefault();
-              e.stopPropagation();
-              addToCart.mutate({
-                productId: product.id,
-                quantity: 1,
-              });
-            }}
-          >
-            <ShoppingCart className='w-3.5 h-3.5' />
-            {product.hasVariants ? 'Select Options' : 'Add to Cart'}
-          </Button>
         </div>
-      </motion.div>
-    </Link>
+      </Link>
+
+      <button
+        type='button'
+        aria-pressed={isWishlisted}
+        aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+        onClick={handleToggleWishlist}
+        className={cn(
+          'absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center transition-opacity duration-200 hover:bg-background',
+          isWishlisted ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+        )}
+      >
+        <Heart
+          className={cn(
+            'w-3.5 h-3.5 transition-colors',
+            isWishlisted
+              ? 'text-destructive fill-current'
+              : 'text-muted-foreground hover:text-destructive',
+          )}
+        />
+      </button>
+
+      <div className='px-4 pb-4 pt-2'>
+        <Button
+          size='sm'
+          className='w-full mt-1 gap-1.5 h-8 text-xs'
+          disabled={product.stock <= 0}
+          onClick={handleAddToCart}
+        >
+          <ShoppingCart className='w-3.5 h-3.5' />
+          {product.hasVariants ? 'Select Options' : 'Add to Cart'}
+        </Button>
+      </div>
+    </motion.div>
   );
 }
 

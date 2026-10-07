@@ -72,6 +72,29 @@ import {
   useWishlist,
 } from '@/services/wishlist';
 
+// FE-20 (CONTENT-08): these trust/shipping claims are hardcoded and currently
+// contradict shipping.tsx, returns.tsx and the footer (free-shipping
+// threshold, processing/delivery windows). No public SiteSetting/policy
+// reader exists client-side, so they cannot be derived from a settings source
+// yet — keep them in this single place until one is wired up.
+const trustItems = [
+  { icon: Truck, title: 'Free Shipping', desc: 'On orders over ৳500' },
+  {
+    icon: ShieldCheck,
+    title: 'Secure Payment',
+    desc: 'SSL encrypted checkout',
+  },
+  { icon: MapPin, title: 'Trackable', desc: 'Real-time order tracking' },
+  {
+    icon: RefreshCw,
+    title: 'Easy Returns',
+    desc: `${RETURN_WINDOW_DAYS}-day return policy`,
+  },
+];
+
+const shippingProcessingNote =
+  'Orders are processed within 1-2 business days. Standard shipping takes 5-7 business days. Express shipping is available at checkout for an additional fee.';
+
 export const Route = createFileRoute('/product/$slug')({
   component: RouteComponent,
 });
@@ -123,6 +146,11 @@ function RouteComponent() {
   const { data: product, isLoading, isError } = usePublicProduct(slug);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedVariant]);
+
   const addToCart = useAddToCartMutation();
   const addToWishlist = useAddToWishlistMutation();
   const removeFromWishlist = useRemoveFromWishlistMutation();
@@ -233,22 +261,13 @@ function RouteComponent() {
       : null
     : product.discountPercent;
 
-  const currentStock = selectedVariant?.stock ?? product.stock;
+  const currentStock = selectedVariant
+    ? Math.max(0, selectedVariant.stock - (selectedVariant.reservedStock ?? 0))
+    : product.stock;
 
-  const trustItems = [
-    { icon: Truck, title: 'Free Shipping', desc: 'On orders over ৳500' },
-    {
-      icon: ShieldCheck,
-      title: 'Secure Payment',
-      desc: 'SSL encrypted checkout',
-    },
-    { icon: MapPin, title: 'Trackable', desc: 'Real-time order tracking' },
-    {
-      icon: RefreshCw,
-      title: 'Easy Returns',
-      desc: `${RETURN_WINDOW_DAYS}-day return policy`,
-    },
-  ];
+  const needsVariantSelection = product.hasVariants && !selectedVariant;
+  const variantInactive =
+    selectedVariant?.status != null && selectedVariant.status !== 'ACTIVE';
 
   return (
     <div className='min-h-screen bg-background'>
@@ -400,8 +419,9 @@ function RouteComponent() {
                   size='lg'
                   className='flex-1 gap-2.5 h-12 text-base rounded-xl'
                   disabled={
-                    currentStock <= 0 ||
-                    (product.hasVariants && !selectedVariant)
+                    needsVariantSelection ||
+                    variantInactive ||
+                    currentStock <= 0
                   }
                   onClick={() =>
                     addToCart.mutate({
@@ -412,11 +432,13 @@ function RouteComponent() {
                   }
                 >
                   <ShoppingCart className='w-5 h-5' />
-                  {currentStock <= 0
-                    ? 'Out of Stock'
-                    : product.hasVariants && !selectedVariant
+                  {variantInactive
+                    ? 'Unavailable'
+                    : needsVariantSelection
                       ? 'Select Options'
-                      : 'Add to Cart'}
+                      : currentStock <= 0
+                        ? 'Out of Stock'
+                        : 'Add to Cart'}
                 </Button>
                 <Button
                   variant='outline'
@@ -436,6 +458,13 @@ function RouteComponent() {
                   />
                 </Button>
               </div>
+
+              {variantInactive && (
+                <p className='text-xs text-red-500'>
+                  This option is currently unavailable and cannot be added to
+                  the cart.
+                </p>
+              )}
 
               <div className='flex items-center justify-center gap-6 py-2 text-xs text-muted-foreground'>
                 <span className='flex items-center gap-1.5'>
@@ -516,11 +545,7 @@ function RouteComponent() {
                       </div>
                     </div>
                     <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-13'>
-                      <p>
-                        Orders are processed within 1-2 business days. Standard
-                        shipping takes 5-7 business days. Express shipping is
-                        available at checkout for an additional fee.
-                      </p>
+                      <p>{shippingProcessingNote}</p>
                       <ul className='space-y-2'>
                         {product.weight && (
                           <li className='flex items-center gap-2'>

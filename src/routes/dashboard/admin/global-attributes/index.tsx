@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { Loader2, Pencil, Plus, Tag, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
+import { QueryErrorState } from '@/components/query-state';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,7 +30,9 @@ export const Route = createFileRoute('/dashboard/admin/global-attributes/')({
 
 function RouteComponent() {
   const [search, setSearch] = useState('');
-  const { data, isLoading } = useAdminGlobalAttributes({ search });
+  const { data, isLoading, isError, refetch } = useAdminGlobalAttributes({
+    search,
+  });
   const { mutate: deleteAttribute, isPending: isDeleting } =
     useDeleteGlobalAttributeMutation();
 
@@ -70,6 +73,14 @@ function RouteComponent() {
             <Skeleton key={i} className='h-40 rounded-2xl' />
           ))}
         </div>
+      )}
+
+      {/* Error state */}
+      {isError && (
+        <QueryErrorState
+          title='Failed to load attributes'
+          onRetry={() => refetch()}
+        />
       )}
 
       {/* Empty state */}

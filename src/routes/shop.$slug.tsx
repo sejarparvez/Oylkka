@@ -10,7 +10,7 @@ import {
   Store,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import { ProductCard } from '@/components/pages/shop/product-card';
@@ -59,39 +59,63 @@ function RouteComponent() {
     productPage,
   );
 
-  const initialProducts: CategoryProduct[] = (shop?.products ?? []).map(
-    (p) => ({
-      ...p,
-      shop: {
-        id: shop?.id ?? '',
-        name: shop?.name ?? '',
-        slug: shop?.slug ?? '',
-      },
-    }),
+  const initialProducts: CategoryProduct[] = useMemo(
+    () =>
+      (shop?.products ?? []).map((p) => ({
+        ...p,
+        shop: {
+          id: shop?.id ?? '',
+          name: shop?.name ?? '',
+          slug: shop?.slug ?? '',
+        },
+      })),
+    [shop],
   );
 
-  const fetchedProducts: CategoryProduct[] = (moreProducts?.products ?? []).map(
-    (p) => ({
-      ...p,
-      shop: {
-        id: shop?.id ?? '',
-        name: shop?.name ?? '',
-        slug: shop?.slug ?? '',
-      },
-    }),
+  const fetchedProducts: CategoryProduct[] = useMemo(
+    () =>
+      (moreProducts?.products ?? []).map((p) => ({
+        ...p,
+        shop: {
+          id: shop?.id ?? '',
+          name: shop?.name ?? '',
+          slug: shop?.slug ?? '',
+        },
+      })),
+    [moreProducts, shop],
   );
 
-  const accumulatedRef = useRef<CategoryProduct[]>([]);
-  if (productPage === 1) {
-    accumulatedRef.current = initialProducts;
-  } else if (fetchedProducts.length > 0) {
-    const seen = new Set(accumulatedRef.current.map((p) => p.id));
-    accumulatedRef.current = [
-      ...accumulatedRef.current,
-      ...fetchedProducts.filter((p) => !seen.has(p.id)),
-    ];
+  // Accumulation lives in state, seeded synchronously when the shop for the
+  // current slug arrives, and appended to in an effect — never mutated in the
+  // render body (FE-06). Navigating to another shop resets everything, so
+  // page 3 of shop A can never leak into shop B's grid.
+  const [accumulated, setAccumulated] = useState<CategoryProduct[]>([]);
+  const [seededSlug, setSeededSlug] = useState<string | null>(null);
+  const [prevSlug, setPrevSlug] = useState(slug);
+
+  if (prevSlug !== slug) {
+    setPrevSlug(slug);
+    setSeededSlug(null);
+    setProductPage(1);
+    setActiveCategory(null);
   }
-  const allProducts = accumulatedRef.current;
+
+  if (shop && seededSlug !== slug) {
+    setSeededSlug(slug);
+    setAccumulated(initialProducts);
+  }
+
+  useEffect(() => {
+    if (productPage === 1 || fetchedProducts.length === 0) return;
+    setAccumulated((prev) => {
+      const seen = new Set(prev.map((p) => p.id));
+      const additions = fetchedProducts.filter((p) => !seen.has(p.id));
+      return additions.length > 0 ? [...prev, ...additions] : prev;
+    });
+  }, [productPage, fetchedProducts]);
+
+  const allProducts =
+    seededSlug === slug ? accumulated : initialProducts;
 
   const categories = useMemo(() => {
     const cats = new Map<string, string>();

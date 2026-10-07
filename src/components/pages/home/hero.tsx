@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Image } from '@unpic/react';
 import Autoplay from 'embla-carousel-autoplay';
 import { AlertCircle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,10 @@ export default function HeroSection() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
-  const autoplayPlugin = Autoplay({ delay: 8000, stopOnInteraction: true });
+  const autoplayPlugin = useMemo(
+    () => Autoplay({ delay: 8000, stopOnInteraction: true }),
+    [],
+  );
 
   useEffect(() => {
     if (!api) return;

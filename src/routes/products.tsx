@@ -8,13 +8,14 @@ import {
   X,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import {
   ProductCard,
   ProductCardSkeleton,
 } from '@/components/pages/shop/product-card';
+import { QueryErrorState } from '@/components/query-state';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -90,9 +91,15 @@ function RouteComponent() {
     categoryQuery,
   );
 
+  // Re-sync when the URL `category` param changes (back/forward, external links)
+  useEffect(() => {
+    setActiveCategory(categoryQuery);
+    setPage(1);
+  }, [categoryQuery]);
+
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { data: listData, isLoading } = useAllProducts({
+  const { data: listData, isLoading, isError, refetch } = useAllProducts({
     sort,
     page,
     limit: ITEMS_PER_PAGE,
@@ -123,6 +130,8 @@ function RouteComponent() {
 
   const handleClearAll = () => {
     navigate({ to: '/products', search: {} });
+    setActiveCategory(undefined);
+    setPage(1);
   };
 
   const handlePageChange = (p: number) => {
@@ -135,6 +144,15 @@ function RouteComponent() {
 
   const from = (page - 1) * ITEMS_PER_PAGE + 1;
   const to = Math.min(page * ITEMS_PER_PAGE, total);
+
+  // Page-number window: up to 5 pages centered on the current page,
+  // clamped to 1..totalPages so the active page is always visible.
+  const pageWindowStart = Math.max(1, Math.min(page - 2, totalPages - 4));
+  const pageWindowEnd = Math.min(totalPages, pageWindowStart + 4);
+  const pageNumbers = Array.from(
+    { length: Math.max(pageWindowEnd - pageWindowStart + 1, 0) },
+    (_, i) => pageWindowStart + i,
+  );
 
   // ── Sort dropdown (reusable) ──
 
@@ -347,6 +365,11 @@ function RouteComponent() {
               <ProductCardSkeleton key={i} />
             ))}
           </div>
+        ) : isError ? (
+          <QueryErrorState
+            title='Failed to load products'
+            onRetry={() => refetch()}
+          />
         ) : products.length > 0 ? (
           <>
             <motion.div
@@ -383,26 +406,23 @@ function RouteComponent() {
                   </Button>
 
                   <div className='flex items-center gap-1'>
-                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                      const pageNum = i + 1;
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={pageNum === page ? 'default' : 'outline'}
-                          size='sm'
-                          className='w-9 h-9 p-0 tabular-nums'
-                          onClick={() => handlePageChange(pageNum)}
-                        >
-                          {pageNum}
-                        </Button>
-                      );
-                    })}
-                    {totalPages > 5 && (
+                    {pageNumbers.map((pageNum) => (
+                      <Button
+                        key={pageNum}
+                        variant={pageNum === page ? 'default' : 'outline'}
+                        size='sm'
+                        className='w-9 h-9 p-0 tabular-nums'
+                        onClick={() => handlePageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    ))}
+                    {pageWindowEnd < totalPages && (
                       <span className='text-sm text-muted-foreground px-1'>
                         …
                       </span>
                     )}
-                    {totalPages > 5 && (
+                    {pageWindowEnd < totalPages && (
                       <Button
                         variant={page === totalPages ? 'default' : 'outline'}
                         size='sm'

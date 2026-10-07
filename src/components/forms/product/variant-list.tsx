@@ -45,6 +45,14 @@ interface VariantListProps {
     stock: number;
     attributes: Record<string, string>;
     image?: File | string | null;
+    // Existing persisted rows (ProductVariantImage[]), shown in the single
+    // slot until the vendor picks a File (FE-43).
+    variantImages?: Array<{
+      id?: string;
+      imageUrl: string;
+      imagePublicId?: string;
+      order?: number;
+    }> | null;
     status?: string;
     barcode?: string | null;
     weight?: number | null;
@@ -75,7 +83,11 @@ export default function VariantList({
   };
 
   const removeVariantImage = (index: number) => {
-    onUpdate(index, { ...variants[index], image: null });
+    onUpdate(index, {
+      ...variants[index],
+      image: null,
+      variantImages: [],
+    });
   };
 
   const updateVariantField = (index: number, field: string, value: unknown) => {
@@ -241,6 +253,16 @@ export default function VariantList({
               const index = variants.findIndex((v) => v.id === variant.id);
               if (index === -1) return null;
 
+              // Single slot, three sources: a freshly picked File (marked for
+              // upload on submit), a stored URL in `image`, or the first of
+              // the variant's persisted VariantImage rows (FE-43).
+              const imageSrc =
+                variant.image instanceof File
+                  ? URL.createObjectURL(variant.image)
+                  : typeof variant.image === 'string' && variant.image !== ''
+                    ? variant.image
+                    : (variant.variantImages?.[0]?.imageUrl ?? null);
+
               return (
                 <div
                   key={variant.id || index}
@@ -272,7 +294,13 @@ export default function VariantList({
                       <span className='text-muted-foreground text-sm'>
                         SKU:
                       </span>
-                      <Input value={variant.sku} className='mt-1' disabled />
+                      <Input
+                        value={variant.sku}
+                        className='mt-1'
+                        onChange={(e) =>
+                          updateVariantField(index, 'sku', e.target.value)
+                        }
+                      />
                     </div>
                     <div>
                       <span className='text-muted-foreground text-sm'>
@@ -482,14 +510,10 @@ export default function VariantList({
                       Image:
                     </span>
                     <div className='flex items-center gap-4'>
-                      {variant.image ? (
+                      {imageSrc ? (
                         <div className='group relative'>
                           <img
-                            src={
-                              typeof variant.image === 'string'
-                                ? variant.image
-                                : URL.createObjectURL(variant.image)
-                            }
+                            src={imageSrc}
                             alt={`Variant ${variant.name}`}
                             className='h-16 w-16 rounded-md object-cover'
                           />

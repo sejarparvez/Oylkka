@@ -214,7 +214,13 @@ function RouteComponent() {
                 {editingZone ? 'Edit Shipping Zone' : 'Add Shipping Zone'}
               </DialogTitle>
             </DialogHeader>
-            <div className='space-y-4'>
+            <form
+              className='space-y-4'
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+            >
               <div>
                 <Label htmlFor='zoneName'>Zone Name</Label>
                 <Input
@@ -314,16 +320,16 @@ function RouteComponent() {
               </div>
               <div className='flex justify-end gap-2 pt-2'>
                 <DialogClose asChild>
-                  <Button variant='outline'>Cancel</Button>
+                  <Button type='button' variant='outline'>Cancel</Button>
                 </DialogClose>
-                <Button onClick={handleSubmit} disabled={isPending}>
+                <Button type='submit' disabled={isPending}>
                   {isPending && (
                     <Loader2 className='w-4 h-4 mr-2 animate-spin' />
                   )}
                   {editingZone ? 'Update' : 'Create'}
                 </Button>
               </div>
-            </div>
+            </form>
           </DialogContent>
         </Dialog>
       </motion.div>
@@ -439,7 +445,15 @@ function RouteComponent() {
               If no matching zone is found for a customer&apos;s district, the
               shop&apos;s default shipping cost will be used.
             </p>
-            <div className='flex items-end gap-3'>
+            <form
+              className='flex items-end gap-3'
+              onSubmit={(e) => {
+                e.preventDefault();
+                const fd = new FormData();
+                fd.append('shippingCost', defaultCost);
+                updateShopMutation.mutate(fd);
+              }}
+            >
               <div className='space-y-2'>
                 <Label htmlFor='defaultCost'>Default cost (BDT)</Label>
                 <Input
@@ -453,6 +467,7 @@ function RouteComponent() {
                 />
               </div>
               <Button
+                type='submit'
                 variant='outline'
                 disabled={
                   updateShopMutation.isPending ||
@@ -460,18 +475,13 @@ function RouteComponent() {
                   Number(defaultCost) < 0 ||
                   Number(defaultCost) === Number(shop?.shippingCost)
                 }
-                onClick={() => {
-                  const fd = new FormData();
-                  fd.append('shippingCost', defaultCost);
-                  updateShopMutation.mutate(fd);
-                }}
               >
                 {updateShopMutation.isPending && (
                   <Loader2 className='w-3.5 h-3.5 mr-2 animate-spin' />
                 )}
                 Save
               </Button>
-            </div>
+            </form>
           </CardContent>
         </Card>
       </motion.div>

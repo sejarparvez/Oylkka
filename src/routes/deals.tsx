@@ -8,6 +8,7 @@ import {
   ProductCard,
   ProductCardSkeleton,
 } from '@/components/pages/shop/product-card';
+import { QueryErrorState } from '@/components/query-state';
 import { Button } from '@/components/ui/button';
 import { useAllProducts } from '@/services/product';
 
@@ -31,22 +32,22 @@ export const Route = createFileRoute('/deals')({
   component: DealsPage,
 });
 
-const TARGET = new Date();
-TARGET.setHours(TARGET.getHours() + 47);
+// The countdown must render identically on server and first client pass (FE-08).
+// Seed at 0, compute the real deadline only after mount; a real campaign-backed
+// deadline (from a loader) is tracked under CONTENT-07 instead.
+const DEAL_DURATION_MS = 47 * 60 * 60 * 1000;
 
-function useCountdown(target: Date) {
-  const [remaining, setRemaining] = useState(() =>
-    Math.max(0, Math.floor((target.getTime() - Date.now()) / 1000)),
-  );
+function useCountdown(durationMs: number) {
+  const [remaining, setRemaining] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRemaining(
-        Math.max(0, Math.floor((target.getTime() - Date.now()) / 1000)),
-      );
-    }, 1000);
+    const deadline = Date.now() + durationMs;
+    const tick = () =>
+      setRemaining(Math.max(0, Math.floor((deadline - Date.now()) / 1000)));
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [target]);
+  }, [durationMs]);
 
   const hours = Math.floor(remaining / 3600);
   const minutes = Math.floor((remaining % 3600) / 60);
@@ -57,9 +58,9 @@ function useCountdown(target: Date) {
 
 function DealsPage() {
   const [page, setPage] = useState(1);
-  const { hours, minutes, seconds } = useCountdown(TARGET);
+  const { hours, minutes, seconds } = useCountdown(DEAL_DURATION_MS);
 
-  const { data, isLoading } = useAllProducts({
+  const { data, isLoading, isError, refetch } = useAllProducts({
     sort: 'newest',
     page,
     limit: 20,
@@ -173,6 +174,11 @@ function DealsPage() {
               </motion.div>
             ))}
           </motion.div>
+        ) : isError ? (
+          <QueryErrorState
+            title='Failed to load deals'
+            onRetry={() => refetch()}
+          />
         ) : products.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-20 gap-4 text-center'>
             <div className='w-16 h-16 rounded-2xl bg-muted flex items-center justify-center'>

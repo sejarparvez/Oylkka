@@ -23,7 +23,7 @@ export const Route = createFileRoute('/dashboard/followed-shops')({
 });
 
 function RouteComponent() {
-  const { data: follows, isLoading, isError } = useFollowedShops();
+  const { data: follows, isLoading, isError, refetch } = useFollowedShops();
   const toggleMutation = useToggleFollowMutation();
 
   const handleUnfollow = async (shopId: string) => {
@@ -75,7 +75,7 @@ function RouteComponent() {
                 <Button
                   variant='outline'
                   size='sm'
-                  onClick={() => window.location.reload()}
+                  onClick={() => refetch()}
                   className='mt-4'
                 >
                   Try Again

@@ -696,7 +696,13 @@ function RequestReturnDialog({
         <DialogHeader>
           <DialogTitle>Request Return</DialogTitle>
         </DialogHeader>
-        <div className='space-y-4'>
+        <form
+          className='space-y-4'
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           <div>
             <Label>Items to return</Label>
             {returnableItems.length === 0 ? (
@@ -769,20 +775,21 @@ function RequestReturnDialog({
           </div>
           <div className='flex justify-end gap-2 pt-2'>
             <Button
+              type='button'
               variant='outline'
               onClick={() => setOpen(false)}
               disabled={createMutation.isPending}
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={createMutation.isPending}>
+            <Button type='submit' disabled={createMutation.isPending}>
               {createMutation.isPending && (
                 <Loader2 className='w-4 h-4 mr-2 animate-spin' />
               )}
               Submit
             </Button>
           </div>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
@@ -822,7 +829,13 @@ function CancelOrderDialog({ orderId }: { orderId: string }) {
         <DialogHeader>
           <DialogTitle>Cancel Order</DialogTitle>
         </DialogHeader>
-        <div className='space-y-4'>
+        <form
+          className='space-y-4'
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           <p className='text-sm text-muted-foreground'>
             Cancel this order before it starts fulfilment? Reserved stock will
             be released and this cannot be undone.
@@ -839,6 +852,7 @@ function CancelOrderDialog({ orderId }: { orderId: string }) {
           </div>
           <div className='flex justify-end gap-2 pt-2'>
             <Button
+              type='button'
               variant='outline'
               onClick={() => setOpen(false)}
               disabled={cancelMutation.isPending}
@@ -846,8 +860,8 @@ function CancelOrderDialog({ orderId }: { orderId: string }) {
               Keep Order
             </Button>
             <Button
+              type='submit'
               variant='destructive'
-              onClick={handleSubmit}
               disabled={cancelMutation.isPending}
             >
               {cancelMutation.isPending && (
@@ -856,7 +870,7 @@ function CancelOrderDialog({ orderId }: { orderId: string }) {
               Cancel Order
             </Button>
           </div>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

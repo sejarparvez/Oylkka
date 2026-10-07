@@ -1,6 +1,6 @@
-import { ChevronDown, MessageCircle } from 'lucide-react';
+import { ChevronDown, Loader2, MessageCircle } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePublicProductReviews } from '@/services/product';
@@ -21,14 +21,27 @@ export function ProductReviews({
 }: ProductReviewsProps) {
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
   const { data, isLoading, isError, refetch } = usePublicProductReviews(
     productId,
     page,
   );
 
-  const reviews = data?.reviews ?? [];
-  const totalPages = data?.totalPages ?? 0;
-  const hasMore = page < totalPages;
+  useEffect(() => {
+    if (data) setTotalPages(data.totalPages);
+  }, [data]);
+
+  const loadedPages = Array.from({ length: page }, (_, i) => i + 1);
+  const hasReviews = page > 1 || (data?.reviews.length ?? 0) > 0;
+  const hasMore = page < totalPages || (page > 1 && isError);
+
+  const handleLoadMore = () => {
+    if (isError) {
+      refetch();
+    } else {
+      setPage((p) => p + 1);
+    }
+  };
 
   const avgRating =
     totalReviewCount > 0
@@ -57,7 +70,7 @@ export function ProductReviews({
         onSuccess={() => refetch()}
       />
 
-      {isLoading && (
+      {isLoading && page === 1 && (
         <div className='space-y-4'>
           {[0, 1, 2].map((i) => (
             <ReviewSkeleton key={`skel-${i}`} />
@@ -71,7 +84,7 @@ export function ProductReviews({
         </p>
       )}
 
-      {!isLoading && !isError && reviews.length === 0 && (
+      {!isLoading && !isError && !hasReviews && (
         <div className='flex flex-col items-center justify-center py-12 gap-4 text-center'>
           <div className='w-16 h-16 rounded-2xl bg-muted flex items-center justify-center'>
             <MessageCircle className='w-7 h-7 text-muted-foreground' />
@@ -85,7 +98,7 @@ export function ProductReviews({
         </div>
       )}
 
-      {!isLoading && !isError && reviews.length > 0 && (
+      {hasReviews && (
         <motion.div
           initial='hidden'
           animate='show'
@@ -95,10 +108,16 @@ export function ProductReviews({
           }}
           className='space-y-4'
         >
-          {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+          {loadedPages.map((p) => (
+            <ReviewListPage key={p} productId={productId} page={p} />
           ))}
         </motion.div>
+      )}
+
+      {isLoading && page > 1 && (
+        <div className='flex justify-center pt-2'>
+          <Loader2 className='w-4 h-4 animate-spin text-muted-foreground' />
+        </div>
       )}
 
       {hasMore && (
@@ -107,7 +126,7 @@ export function ProductReviews({
             variant='outline'
             size='sm'
             className='gap-2'
-            onClick={() => setPage((p) => p + 1)}
+            onClick={handleLoadMore}
             disabled={isLoading}
           >
             <ChevronDown className='w-4 h-4' />
@@ -116,6 +135,24 @@ export function ProductReviews({
         </div>
       )}
     </div>
+  );
+}
+
+function ReviewListPage({
+  productId,
+  page,
+}: {
+  productId: string;
+  page: number;
+}) {
+  const { data } = usePublicProductReviews(productId, page);
+
+  return (
+    <>
+      {data?.reviews.map((review) => (
+        <ReviewCard key={review.id} review={review} />
+      ))}
+    </>
   );
 }
 

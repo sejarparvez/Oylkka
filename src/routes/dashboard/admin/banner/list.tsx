@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { QueryErrorState } from '@/components/query-state';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,7 +43,7 @@ export const Route = createFileRoute('/dashboard/admin/banner/list')({
 });
 
 function RouteComponent() {
-  const { data: banners, isLoading } = useAdminBanners();
+  const { data: banners, isLoading, isError, refetch } = useAdminBanners();
   const { mutate: deleteBanner, isPending: isDeleting } =
     useDeleteBannerMutation();
 
@@ -72,6 +73,14 @@ function RouteComponent() {
             <BannerCardSkeleton key={i} />
           ))}
         </div>
+      )}
+
+      {/* Error state */}
+      {isError && (
+        <QueryErrorState
+          title='Failed to load banners'
+          onRetry={() => refetch()}
+        />
       )}
 
       {/* Empty state */}

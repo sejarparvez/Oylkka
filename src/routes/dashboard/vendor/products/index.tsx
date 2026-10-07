@@ -2,6 +2,7 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { Loader2, Package, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
+import { QueryErrorState } from '@/components/query-state';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,7 +56,7 @@ function RouteComponent() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data: products, isLoading } = useVendorProducts();
+  const { data: products, isLoading, isError, refetch } = useVendorProducts();
   const { mutate: deleteProduct, isPending: isDeleting } =
     useDeleteProductMutation();
 
@@ -130,7 +131,14 @@ function RouteComponent() {
         </div>
       )}
 
-      {!isLoading && filteredProducts?.length === 0 && (
+      {!isLoading && isError && (
+        <QueryErrorState
+          title='Failed to load products'
+          onRetry={() => refetch()}
+        />
+      )}
+
+      {!isLoading && !isError && filteredProducts?.length === 0 && (
         <div className='flex flex-col items-center justify-center py-20 gap-4 text-center'>
           <div className='w-16 h-16 rounded-2xl bg-muted flex items-center justify-center'>
             <Package className='w-7 h-7 text-muted-foreground' />
@@ -267,9 +275,9 @@ function ProductRow({
           className='w-8 h-8 rounded-lg'
           onClick={() =>
             navigate({
-              to: `/dashboard/vendor/products/edit?productId=${product.id}`,
-              // biome-ignore lint/suspicious/noExplicitAny: navigate type limitations
-            } as any)
+              to: '/dashboard/vendor/products/edit',
+              search: { productId: product.id },
+            })
           }
         >
           <Pencil className='w-3.5 h-3.5' />

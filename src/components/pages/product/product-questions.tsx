@@ -5,7 +5,8 @@ import {
   MessageCircle,
   Send,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { QueryErrorState } from '@/components/query-state';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,12 +23,28 @@ export function ProductQuestions({ productId }: ProductQuestionsProps) {
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
   const [question, setQuestion] = useState('');
-  const { data, isLoading } = useProductQuestions(productId, page);
+  const [totalPages, setTotalPages] = useState(0);
+  const { data, isLoading, isError, refetch } = useProductQuestions(
+    productId,
+    page,
+  );
   const askMutation = useAskQuestionMutation();
 
-  const questions = data?.questions ?? [];
-  const totalPages = data?.totalPages ?? 0;
-  const hasMore = page < totalPages;
+  useEffect(() => {
+    if (data) setTotalPages(data.totalPages);
+  }, [data]);
+
+  const loadedPages = Array.from({ length: page }, (_, i) => i + 1);
+  const hasQuestions = page > 1 || (data?.questions.length ?? 0) > 0;
+  const hasMore = page < totalPages || (page > 1 && isError);
+
+  const handleLoadMore = () => {
+    if (isError) {
+      refetch();
+    } else {
+      setPage((p) => p + 1);
+    }
+  };
 
   const handleSubmit = async () => {
     if (question.length < 10) return;
@@ -55,7 +72,13 @@ export function ProductQuestions({ productId }: ProductQuestionsProps) {
       </Button>
 
       {formOpen && (
-        <div className='space-y-3 p-4 rounded-xl border border-border bg-muted/30'>
+        <form
+          className='space-y-3 p-4 rounded-xl border border-border bg-muted/30'
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           <Textarea
             placeholder='What would you like to know about this product?'
             value={question}
@@ -68,10 +91,10 @@ export function ProductQuestions({ productId }: ProductQuestionsProps) {
               {question.length}/500
             </span>
             <Button
+              type='submit'
               size='sm'
               className='gap-1.5 rounded-lg'
               disabled={question.length < 10 || askMutation.isPending}
-              onClick={handleSubmit}
             >
               {askMutation.isPending ? (
                 <Loader2 className='w-3.5 h-3.5 animate-spin' />
@@ -81,10 +104,10 @@ export function ProductQuestions({ productId }: ProductQuestionsProps) {
               Submit
             </Button>
           </div>
-        </div>
+        </form>
       )}
 
-      {isLoading && (
+      {isLoading && page === 1 && (
         <div className='space-y-3'>
           {[0, 1].map((i) => (
             <div
@@ -95,63 +118,38 @@ export function ProductQuestions({ productId }: ProductQuestionsProps) {
         </div>
       )}
 
-      {!isLoading && questions.length === 0 && !formOpen && (
+      {isError && (
+        <QueryErrorState
+          title='Failed to load questions'
+          onRetry={() => refetch()}
+        />
+      )}
+
+      {!isLoading && !isError && !hasQuestions && !formOpen && (
         <div className='flex flex-col items-center text-center py-6 gap-2'>
           <MessageCircle className='w-5 h-5 text-muted-foreground' />
           <p className='text-xs text-muted-foreground'>No questions yet</p>
         </div>
       )}
 
-      {questions.length > 0 && (
+      {hasQuestions && (
         <div className='space-y-3'>
-          {questions.map((q) => (
-            <div
-              key={q.id}
-              className='rounded-xl border border-border p-4 space-y-3'
-            >
-              <div className='space-y-1'>
-                <div className='flex items-center gap-2'>
-                  <span className='text-xs font-medium'>{q.user.name}</span>
-                  <span className='text-[10px] text-muted-foreground'>
-                    {new Date(q.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <p className='text-sm'>{q.question}</p>
-              </div>
-
-              {q.answer && (
-                <>
-                  <Separator />
-                  <div className='space-y-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='text-xs font-medium text-primary'>
-                        Seller
-                      </span>
-                      {q.answeredAt && (
-                        <span className='text-[10px] text-muted-foreground'>
-                          {new Date(q.answeredAt).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                    <p className='text-sm text-muted-foreground'>{q.answer}</p>
-                  </div>
-                </>
-              )}
-
-              {!q.answer && (
-                <p className='text-[11px] text-muted-foreground italic'>
-                  Awaiting answer
-                </p>
-              )}
-            </div>
+          {loadedPages.map((p) => (
+            <QuestionListPage key={p} productId={productId} page={p} />
           ))}
+
+          {isLoading && page > 1 && (
+            <div className='h-20 rounded-xl bg-muted/50 animate-pulse' />
+          )}
 
           {hasMore && (
             <Button
+              type='button'
               variant='ghost'
               size='sm'
               className='w-full gap-2 text-muted-foreground'
-              onClick={() => setPage((p) => p + 1)}
+              disabled={isLoading}
+              onClick={handleLoadMore}
             >
               <ChevronDown className='w-4 h-4' />
               Load More Questions
@@ -160,5 +158,61 @@ export function ProductQuestions({ productId }: ProductQuestionsProps) {
         </div>
       )}
     </div>
+  );
+}
+
+function QuestionListPage({
+  productId,
+  page,
+}: {
+  productId: string;
+  page: number;
+}) {
+  const { data } = useProductQuestions(productId, page);
+
+  return (
+    <>
+      {data?.questions.map((q) => (
+        <div
+          key={q.id}
+          className='rounded-xl border border-border p-4 space-y-3'
+        >
+          <div className='space-y-1'>
+            <div className='flex items-center gap-2'>
+              <span className='text-xs font-medium'>{q.user.name}</span>
+              <span className='text-[10px] text-muted-foreground'>
+                {new Date(q.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+            <p className='text-sm'>{q.question}</p>
+          </div>
+
+          {q.answer && (
+            <>
+              <Separator />
+              <div className='space-y-1'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-xs font-medium text-primary'>
+                    Seller
+                  </span>
+                  {q.answeredAt && (
+                    <span className='text-[10px] text-muted-foreground'>
+                      {new Date(q.answeredAt).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+                <p className='text-sm text-muted-foreground'>{q.answer}</p>
+              </div>
+            </>
+          )}
+
+          {!q.answer && (
+            <p className='text-[11px] text-muted-foreground italic'>
+              Awaiting answer
+            </p>
+          )}
+        </div>
+      ))}
+    </>
   );
 }

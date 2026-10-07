@@ -12,6 +12,7 @@ type ColorSwatchProps = {
 
 function isLightColor(hex: string): boolean {
   const h = hex.replace('#', '');
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return false;
   const r = Number.parseInt(h.substr(0, 2), 16);
   const g = Number.parseInt(h.substr(2, 2), 16);
   const b = Number.parseInt(h.substr(4, 2), 16);
@@ -47,6 +48,7 @@ export function ColorSwatch({
         onClick={onClick}
         disabled={disabled}
         aria-label={label ?? color}
+        aria-pressed={isSelected}
       >
         {isSelected && (
           <div className='absolute inset-0 flex items-center justify-center'>

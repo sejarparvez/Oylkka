@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Loader2, Search, Store, X } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import { ShopCard, ShopCardSkeleton } from '@/components/pages/shop/shop-card';
+import { QueryErrorState } from '@/components/query-state';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -44,17 +45,24 @@ const viewportOpts = { once: true, margin: '-80px' } as const;
 
 function RouteComponent() {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
-  const { data, isLoading } = usePublicShops({
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data, isLoading, isError, refetch } = usePublicShops({
     page,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
   });
 
   const shops = data?.shops ?? [];
   const total = data?.total ?? 0;
   const totalPages = data?.totalPages ?? 0;
   const hasMore = page < totalPages;
-  const hasActiveSearch = !!search;
+  const hasActiveSearch = !!debouncedSearch;
 
   const isInitialLoading = isLoading && page === 1;
   const isLoadingMore = isLoading && page > 1;
@@ -135,7 +143,7 @@ function RouteComponent() {
                 <>
                   Shops matching{' '}
                   <span className='italic font-bold text-primary'>
-                    &ldquo;{search}&rdquo;
+                    &ldquo;{debouncedSearch}&rdquo;
                   </span>
                   <span className='text-primary'>.</span>
                 </>
@@ -177,6 +185,7 @@ function RouteComponent() {
                   type='button'
                   onClick={() => {
                     setSearch('');
+                    setDebouncedSearch('');
                     setPage(1);
                   }}
                   className='pr-3 text-muted-foreground hover:text-foreground transition-colors'
@@ -201,6 +210,11 @@ function RouteComponent() {
                 <ShopCardSkeleton key={i} />
               ))}
             </motion.div>
+          ) : isError ? (
+            <QueryErrorState
+              title='Failed to load shops'
+              onRetry={() => refetch()}
+            />
           ) : shops.length > 0 ? (
             <>
               <motion.div
@@ -276,7 +290,7 @@ function RouteComponent() {
                 </p>
                 <p className='text-sm text-muted-foreground mt-1 max-w-xs'>
                   {hasActiveSearch
-                    ? `No shops matching "${search}". Try adjusting your search.`
+                    ? `No shops matching "${debouncedSearch}". Try adjusting your search.`
                     : 'Shops will appear here once vendors join.'}
                 </p>
               </div>
@@ -287,6 +301,7 @@ function RouteComponent() {
                   className='mt-2'
                   onClick={() => {
                     setSearch('');
+                    setDebouncedSearch('');
                     setPage(1);
                   }}
                 >

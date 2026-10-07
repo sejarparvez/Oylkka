@@ -268,6 +268,30 @@ export const Route = createFileRoute('/api/product/edit')({
           }
 
           // ------------------------------------------------------------------
+          // FE-41: duplicate SKUs inside the payload would only surface as a
+          // unique-constraint violation (500) deep inside the transaction, so
+          // reject them here as a clear 400 instead.
+          // ------------------------------------------------------------------
+          const variantSkuCounts = new Map<string, number>();
+          for (const variant of variants ?? []) {
+            variantSkuCounts.set(
+              variant.sku,
+              (variantSkuCounts.get(variant.sku) ?? 0) + 1,
+            );
+          }
+          const duplicateVariantSku = [...variantSkuCounts.entries()].find(
+            ([, count]) => count > 1,
+          )?.[0];
+          if (duplicateVariantSku) {
+            return Response.json(
+              {
+                error: `Variant SKU "${duplicateVariantSku}" is used more than once — variant SKUs must be unique`,
+              },
+              { status: 400 },
+            );
+          }
+
+          // ------------------------------------------------------------------
           // Images: validate everything before uploading anything, so a bad
           // file late in the list cannot strand the uploads already done.
           // ------------------------------------------------------------------
@@ -458,6 +482,7 @@ export const Route = createFileRoute('/api/product/edit')({
                         imageUrl?: string | null;
                         imagePublicId?: string | null;
                         metadata?: Record<string, unknown> | null;
+                        priceModifier?: number | null;
                       }>;
                       isVariantDefining?: boolean;
                       displayOrder?: number;
@@ -473,6 +498,7 @@ export const Route = createFileRoute('/api/product/edit')({
                         displayOrder: av.displayOrder ?? 0,
                         imageUrl: av.imageUrl ?? null,
                         imagePublicId: av.imagePublicId ?? null,
+                        priceModifier: av.priceModifier ?? null,
                         ...(av.metadata != null
                           ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
                             { metadata: av.metadata as any }
@@ -521,6 +547,7 @@ export const Route = createFileRoute('/api/product/edit')({
                       displayOrder: av.displayOrder ?? 0,
                       imageUrl: av.imageUrl ?? null,
                       imagePublicId: av.imagePublicId ?? null,
+                      priceModifier: av.priceModifier ?? null,
                       ...(av.metadata != null
                         ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
                           { metadata: av.metadata as any }
@@ -531,6 +558,7 @@ export const Route = createFileRoute('/api/product/edit')({
                       displayOrder: av.displayOrder ?? 0,
                       imageUrl: av.imageUrl ?? null,
                       imagePublicId: av.imagePublicId ?? null,
+                      priceModifier: av.priceModifier ?? null,
                       ...(av.metadata != null
                         ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
                           { metadata: av.metadata as any }
@@ -595,6 +623,30 @@ export const Route = createFileRoute('/api/product/edit')({
                 resultingVariantIds.push(current.id);
 
                 if (uploaded) {
+                  // FE-43 — the form has a single image slot, so a new upload
+                  // replaces whatever the variant already had: delete the old
+                  // rows first instead of letting them pile up beside the new
+                  // one. Their Cloudinary assets are collected here and only
+                  // deleted once the transaction has committed.
+                  const staleRows = await tx.productVariantImage.findMany({
+                    where: { variantId: current.id },
+                    select: { imagePublicId: true },
+                  });
+                  await tx.productVariantImage.deleteMany({
+                    where: { variantId: current.id },
+                  });
+                  for (const row of staleRows) {
+                    supersededVariantPublicIds.push(row.imagePublicId);
+                  }
+                  if (
+                    current.imagePublicId &&
+                    !staleRows.some(
+                      (row) => row.imagePublicId === current.imagePublicId,
+                    )
+                  ) {
+                    supersededVariantPublicIds.push(current.imagePublicId);
+                  }
+
                   await tx.productVariantImage.create({
                     data: {
                       variantId: current.id,
@@ -604,9 +656,6 @@ export const Route = createFileRoute('/api/product/edit')({
                       order: 0,
                     },
                   });
-                  if (current.imagePublicId) {
-                    supersededVariantPublicIds.push(current.imagePublicId);
-                  }
                 }
               } else {
                 const created = await tx.productVariant.create({

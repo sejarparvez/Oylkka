@@ -11,12 +11,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 type GalleryImage = {
@@ -42,6 +36,10 @@ export function ProductGallery({
   const [magnify, setMagnify] = useState(false);
   const [magnifyPos, setMagnifyPos] = useState({ x: 0, y: 0 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setActive((p) => Math.min(p, Math.max(images.length - 1, 0)));
+  }, [images]);
 
   const hasImages = images.length > 0;
   const activeImage = hasImages ? images[active] : null;
@@ -88,65 +86,52 @@ export function ProductGallery({
 
   return (
     <div className='space-y-4'>
-      <Dialog>
-        {/** biome-ignore lint/a11y/noStaticElementInteractions: this is fine */}
-        <div
-          ref={imageContainerRef}
-          className='relative block aspect-square w-full rounded-2xl overflow-hidden bg-muted cursor-zoom-in text-left'
-          onMouseMove={handleMouseMove}
-          onMouseEnter={() => setMagnify(true)}
-          onMouseLeave={() => setMagnify(false)}
+      {/** biome-ignore lint/a11y/noStaticElementInteractions: this is fine */}
+      <div
+        ref={imageContainerRef}
+        className='relative block aspect-square w-full rounded-2xl overflow-hidden bg-muted cursor-zoom-in text-left'
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setMagnify(true)}
+        onMouseLeave={() => setMagnify(false)}
+      >
+        <Image
+          src={img.imageUrl}
+          width={800}
+          height={800}
+          alt={img.altText ?? productName}
+          layout='constrained'
+          className='object-cover w-full h-full transition-opacity duration-300'
+        />
+
+        {magnify && (
+          <span
+            className='pointer-events-none absolute inset-0 z-10'
+            style={{
+              backgroundImage: `url(${img.imageUrl})`,
+              backgroundPosition: `${magnifyPos.x}% ${magnifyPos.y}%`,
+              backgroundSize: '250%',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+        )}
+
+        {discountPercent && (
+          <Badge className='absolute top-4 left-4 z-20 bg-red-500'>
+            -{discountPercent}%
+          </Badge>
+        )}
+
+        <Button
+          type='button'
+          variant='secondary'
+          size='icon'
+          aria-label='Open image viewer'
+          onClick={() => setLightboxOpen(true)}
+          className='absolute right-4 bottom-4 z-20 opacity-80 hover:opacity-100'
         >
-          <Image
-            src={img.imageUrl}
-            width={800}
-            height={800}
-            alt={img.altText ?? productName}
-            layout='constrained'
-            className='object-cover w-full h-full transition-opacity duration-300'
-          />
-
-          {magnify && (
-            <span
-              className='pointer-events-none absolute inset-0 z-10'
-              style={{
-                backgroundImage: `url(${img.imageUrl})`,
-                backgroundPosition: `${magnifyPos.x}% ${magnifyPos.y}%`,
-                backgroundSize: '250%',
-                backgroundRepeat: 'no-repeat',
-              }}
-            />
-          )}
-
-          {discountPercent && (
-            <Badge className='absolute top-4 left-4 z-20 bg-red-500'>
-              -{discountPercent}%
-            </Badge>
-          )}
-
-          <DialogTrigger asChild>
-            <Button
-              variant='secondary'
-              size='icon'
-              className='absolute right-4 bottom-4 z-20 opacity-80 hover:opacity-100'
-            >
-              <Maximize2 className='w-4 h-4' />
-            </Button>
-          </DialogTrigger>
-        </div>
-
-        <DialogContent className='max-w-4xl'>
-          <DialogTitle className='sr-only'>{productName}</DialogTitle>
-          <Image
-            src={activeImage.imageUrl}
-            width={1200}
-            height={1200}
-            alt={activeImage.altText ?? productName}
-            layout='constrained'
-            className='object-contain w-full h-full rounded-lg'
-          />
-        </DialogContent>
-      </Dialog>
+          <Maximize2 className='w-4 h-4' />
+        </Button>
+      </div>
 
       <Carousel className='w-full'>
         <CarouselContent>

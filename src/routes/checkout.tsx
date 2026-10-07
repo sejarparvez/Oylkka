@@ -205,12 +205,14 @@ function RouteComponent() {
     enabled: !!cart,
   });
 
+  const isEmptyCart = !isLoading && !isError && !!cart && cart.items.length === 0;
+  useEffect(() => {
+    if (isEmptyCart) navigate({ to: '/cart', replace: true });
+  }, [isEmptyCart, navigate]);
+
   if (isLoading) return <CheckoutSkeleton />;
   if (isError || !cart) return <CheckoutError />;
-  if (cart.items.length === 0) {
-    navigate({ to: '/cart' });
-    return null;
-  }
+  if (cart.items.length === 0) return <CheckoutSkeleton />;
 
   const groupedByShop = cart.items.reduce<
     Record<
@@ -903,6 +905,7 @@ function CheckoutSkeleton() {
 }
 
 function CheckoutError() {
+  const queryClient = useQueryClient();
   return (
     <>
       <Header />
@@ -915,7 +918,9 @@ function CheckoutError() {
           <Button
             variant='outline'
             className='mt-4'
-            onClick={() => window.location.reload()}
+            onClick={() =>
+              queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] })
+            }
           >
             Try Again
           </Button>

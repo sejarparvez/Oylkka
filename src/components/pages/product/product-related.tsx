@@ -5,6 +5,7 @@ import {
   ProductCard,
   ProductCardSkeleton,
 } from '@/components/pages/shop/product-card';
+import { QueryErrorState } from '@/components/query-state';
 import { Button } from '@/components/ui/button';
 import { useCategoryProducts } from '@/services/product';
 
@@ -17,11 +18,21 @@ export function ProductRelated({
   categorySlug,
   currentProductId,
 }: ProductRelatedProps) {
-  const { data: products, isLoading } = useCategoryProducts(categorySlug);
+  const { data: products, isLoading, isError, refetch } = useCategoryProducts(
+    categorySlug,
+  );
 
   const related = (products ?? [])
     .filter((p) => p.id !== currentProductId)
     .slice(0, 5);
+
+  if (isError)
+    return (
+      <QueryErrorState
+        title='Failed to load related products'
+        onRetry={() => refetch()}
+      />
+    );
 
   if (!isLoading && related.length === 0) return null;
 

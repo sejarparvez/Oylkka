@@ -1,5 +1,5 @@
 import { ImageIcon, Upload, X } from 'lucide-react';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
@@ -8,11 +8,10 @@ import { FieldDescription } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ProductImage } from '@/hooks/use-product-image';
+import { PRODUCT_IMAGE_ACCEPT, PRODUCT_IMAGE_MAX_BYTES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 import { ProductFormContext } from './product-form-context';
-
-const MAX_IMAGE_SIZE = 500 * 1024;
 
 export function ProductImagesCard() {
   const { productImages, setProductImages } = useContext(ProductFormContext);
@@ -20,44 +19,83 @@ export function ProductImagesCard() {
   const [draggedImage, setDraggedImage] = useState<ProductImage | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const formMethods = useFormContext();
-  const { register: registerForm } = formMethods;
   const formErrors = formMethods.formState.errors;
-  const imageError = formErrors.images?.message as string | undefined;
+  const imageError = (formErrors.images?.message ??
+    formErrors.images?.root?.message) as string | undefined;
+
+  const createdObjectUrlsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    return () => {
+      createdObjectUrlsRef.current.forEach((url) => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {}
+      });
+      createdObjectUrlsRef.current.clear();
+    };
+  }, []);
+
+  const revokeIfCreated = (url: string) => {
+    if (createdObjectUrlsRef.current.has(url)) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch {}
+      createdObjectUrlsRef.current.delete(url);
+    }
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-
-    if (productImages.length + files.length > 4) {
-      setErrorMessage('You can only upload up to 4 images');
+    const input = event.target;
+    const files = input.files;
+    if (!files) {
+      input.value = '';
       return;
     }
 
-    const oversizedFiles = Array.from(files).filter(
-      (file) => file.size > MAX_IMAGE_SIZE,
-    );
-    if (oversizedFiles.length > 0) {
-      setErrorMessage(
-        `Some images exceed the maximum size of 500KB: ${oversizedFiles.map((f) => f.name).join(', ')}`,
+    try {
+      if (productImages.length + files.length > 4) {
+        setErrorMessage('You can only upload up to 4 images');
+        return;
+      }
+
+      const oversizedFiles = Array.from(files).filter(
+        (file) => file.size > PRODUCT_IMAGE_MAX_BYTES,
       );
-      return;
+      if (oversizedFiles.length > 0) {
+        setErrorMessage(
+          `Some images exceed the maximum size of 500KB: ${oversizedFiles
+            .map((f) => f.name)
+            .join(', ')}`,
+        );
+        return;
+      }
+
+      setErrorMessage(null);
+      const newImages: ProductImage[] = [];
+
+      Array.from(files).forEach((file) => {
+        const id = `img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        const preview = URL.createObjectURL(file);
+        createdObjectUrlsRef.current.add(preview);
+        newImages.push({ id, file, preview });
+      });
+
+      setProductImages([...productImages, ...newImages]);
+    } finally {
+      input.value = '';
     }
-
-    setErrorMessage(null);
-    const newImages: ProductImage[] = [];
-
-    Array.from(files).forEach((file) => {
-      const id = `img_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      const preview = URL.createObjectURL(file);
-      newImages.push({ id, file, preview });
-    });
-
-    setProductImages([...productImages, ...newImages]);
-    event.target.value = '';
   };
 
   const removeImage = (id: string) => {
-    setProductImages(productImages.filter((img) => img.id !== id));
+    setProductImages(
+      productImages.filter((img) => {
+        if (img.id === id && img.preview) {
+          revokeIfCreated(img.preview);
+        }
+        return img.id !== id;
+      }),
+    );
   };
 
   const handleDragStart = (image: ProductImage) => {
@@ -102,7 +140,6 @@ export function ProductImagesCard() {
         <span className='text-lg font-semibold'>Product Images</span>
       </CardHeader>
       <CardContent className='space-y-4'>
-        <input type='hidden' {...registerForm('images')} />
         <div className='flex flex-col gap-2'>
           <Label htmlFor='image-upload'>Upload Images</Label>
           <FieldDescription>
@@ -119,7 +156,7 @@ export function ProductImagesCard() {
             <Input
               type='file'
               id='image-upload'
-              accept='image/*'
+              accept={PRODUCT_IMAGE_ACCEPT}
               multiple
               onChange={handleImageUpload}
               disabled={productImages.length >= 4}
@@ -171,7 +208,7 @@ export function ProductImagesCard() {
                       type='button'
                       variant='destructive'
                       size='icon'
-                      className='absolute top-2 right-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100'
+                      className='absolute top-2 right-2 h-7 w-7 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100'
                       onClick={() => removeImage(image.id)}
                     >
                       <X className='h-4 w-4' />

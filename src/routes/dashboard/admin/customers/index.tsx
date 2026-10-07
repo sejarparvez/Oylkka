@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { Search, Users } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { QueryErrorState } from '@/components/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -78,7 +79,7 @@ function RouteComponent() {
     limit: 20,
   };
 
-  const { data, isLoading } = useAdminCustomers(filters);
+  const { data, isLoading, isError, refetch } = useAdminCustomers(filters);
 
   return (
     <motion.div
@@ -159,6 +160,11 @@ function RouteComponent() {
                   <Skeleton key={i} className='h-14 w-full' />
                 ))}
               </div>
+            ) : isError ? (
+              <QueryErrorState
+                title='Failed to load customers'
+                onRetry={() => refetch()}
+              />
             ) : !data?.customers || data.customers.length === 0 ? (
               <div className='flex flex-col items-center justify-center py-12 text-center'>
                 <Users className='w-10 h-10 text-muted-foreground mb-3' />

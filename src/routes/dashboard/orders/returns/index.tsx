@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { ArrowLeft, Package, RotateCcw } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { QueryErrorState } from '@/components/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,7 +42,7 @@ export const Route = createFileRoute('/dashboard/orders/returns/')({
 });
 
 function RouteComponent() {
-  const { data: returns, isLoading } = useMyReturns();
+  const { data: returns, isLoading, isError, refetch } = useMyReturns();
 
   return (
     <motion.div
@@ -84,6 +85,11 @@ function RouteComponent() {
                   <Skeleton key={i} className='h-20 w-full' />
                 ))}
               </div>
+            ) : isError ? (
+              <QueryErrorState
+                title='Failed to load returns'
+                onRetry={() => refetch()}
+              />
             ) : !returns || returns.length === 0 ? (
               <div className='flex flex-col items-center justify-center py-16 text-center'>
                 <Package className='w-10 h-10 text-muted-foreground mb-3' />

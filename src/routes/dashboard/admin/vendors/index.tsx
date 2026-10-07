@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { QueryErrorState } from '@/components/query-state';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -93,7 +94,7 @@ function RouteComponent() {
   const [suspendId, setSuspendId] = useState<string | null>(null);
   const [suspendReason, setSuspendReason] = useState('');
 
-  const { data: shops, isLoading } = useAdminShops(
+  const { data: shops, isLoading, isError, refetch } = useAdminShops(
     status,
     debouncedSearch || undefined,
   );
@@ -177,6 +178,14 @@ function RouteComponent() {
             <Skeleton key={i} className='h-20 rounded-2xl' />
           ))}
         </div>
+      )}
+
+      {/* Error state */}
+      {isError && (
+        <QueryErrorState
+          title='Failed to load vendors'
+          onRetry={() => refetch()}
+        />
       )}
 
       {!isLoading && shops?.length === 0 && (

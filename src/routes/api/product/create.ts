@@ -141,6 +141,30 @@ export const Route = createFileRoute('/api/product/create')({
             );
           }
 
+          // ------------------------------------------------------------------
+          // FE-41: duplicate SKUs inside the payload would only surface as a
+          // unique-constraint violation (500) deep inside the transaction, so
+          // reject them here as a clear 400 instead.
+          // ------------------------------------------------------------------
+          const variantSkuCounts = new Map<string, number>();
+          for (const variant of v.variants) {
+            variantSkuCounts.set(
+              variant.sku,
+              (variantSkuCounts.get(variant.sku) ?? 0) + 1,
+            );
+          }
+          const duplicateVariantSku = [...variantSkuCounts.entries()].find(
+            ([, count]) => count > 1,
+          )?.[0];
+          if (duplicateVariantSku) {
+            return Response.json(
+              {
+                error: `Variant SKU "${duplicateVariantSku}" is used more than once — variant SKUs must be unique`,
+              },
+              { status: 400 },
+            );
+          }
+
           // Map field names (handle both old and new formats)
           const categoryId = v.category;
 
@@ -299,6 +323,7 @@ export const Route = createFileRoute('/api/product/create')({
                       imageUrl?: string | null;
                       imagePublicId?: string | null;
                       metadata?: Record<string, unknown> | null;
+                      priceModifier?: number | null;
                     }>;
                     isVariantDefining?: boolean;
                     displayOrder?: number;
@@ -314,6 +339,7 @@ export const Route = createFileRoute('/api/product/create')({
                       displayOrder: v.displayOrder ?? 0,
                       imageUrl: v.imageUrl ?? null,
                       imagePublicId: v.imagePublicId ?? null,
+                      priceModifier: v.priceModifier ?? null,
                       ...(v.metadata != null
                         ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
                           { metadata: v.metadata as any }

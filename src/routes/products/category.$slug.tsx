@@ -22,7 +22,12 @@ function formatSlug(slug: string) {
 
 function RouteComponent() {
   const { slug } = Route.useParams();
-  const { data: products, isLoading, isError } = useCategoryProducts(slug);
+  const {
+    data: products,
+    isLoading,
+    isError,
+    refetch,
+  } = useCategoryProducts(slug);
 
   return (
     <div>
@@ -64,7 +69,7 @@ function RouteComponent() {
             <Button
               size='sm'
               variant='outline'
-              onClick={() => window.location.reload()}
+              onClick={() => refetch()}
               className='mt-2'
             >
               Try Again

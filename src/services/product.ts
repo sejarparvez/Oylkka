@@ -513,6 +513,7 @@ export function useDeleteProductMutation() {
         id: 'product-delete',
       });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS] });
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)
@@ -539,12 +540,7 @@ export function useCreateProduct() {
     onSuccess: () => {
       // Toast handled by form-layer (product-form-provider.tsx) to avoid duplicates
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
-    },
-    onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
-        ? (error.response?.data?.error ?? error.message)
-        : 'Failed to create product';
-      toast.error(`Error: ${message}`);
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS] });
     },
   });
 }
@@ -568,41 +564,7 @@ export function useUpdateProduct({ productId }: { productId: string }) {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.PRODUCTS, productId],
       });
-    },
-    onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
-        ? (error.response?.data?.error ?? error.message)
-        : 'Failed to update product';
-      toast.error(`Error: ${message}`);
-    },
-  });
-}
-
-export function useAdminUpdateProduct({ productId }: { productId: string }) {
-  const queryClient = useQueryClient();
-
-  return useMutation<CreateProductResponse, Error, FormData>({
-    mutationFn: async (formData) => {
-      formData.append('id', productId);
-      const response = await apiClient.post<CreateProductResponse>(
-        '/api/product/edit',
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } },
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      // Toast handled by form-layer (product-form-provider.tsx) to avoid duplicates
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PRODUCTS] });
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.PRODUCTS, productId],
-      });
-    },
-    onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
-        ? (error.response?.data?.error ?? error.message)
-        : 'Failed to update product';
-      toast.error(`Error: ${message}`);
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS] });
     },
   });
 }

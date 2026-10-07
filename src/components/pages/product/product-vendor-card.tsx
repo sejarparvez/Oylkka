@@ -1,4 +1,4 @@
-import { useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { Image } from '@unpic/react';
 import { ArrowRight, BadgeCheck, Star, Store } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -32,7 +32,6 @@ const cardVariants = {
 };
 
 export function ProductVendorCard({ shop }: ProductVendorCardProps) {
-  const navigate = useNavigate();
   const memberSince = new Date(shop.createdAt).toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
@@ -43,10 +42,7 @@ export function ProductVendorCard({ shop }: ProductVendorCardProps) {
       variants={cardVariants}
       whileHover={{ y: -3 }}
       transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-      className='group rounded-2xl border border-border bg-card p-5 hover:border-primary/30 hover:bg-primary/[0.02] transition-colors duration-300 flex items-center gap-4 cursor-pointer'
-      onClick={() =>
-        navigate({ to: '/shop/$slug', params: { slug: shop.slug } })
-      }
+      className='group relative rounded-2xl border border-border bg-card p-5 hover:border-primary/30 hover:bg-primary/[0.02] transition-colors duration-300 flex items-center gap-4 cursor-pointer'
     >
       <div className='relative w-14 h-14 rounded-xl overflow-hidden bg-muted shrink-0 ring-2 ring-border group-hover:ring-primary/30 transition-all duration-300'>
         {shop.logoUrl ? (
@@ -91,6 +87,13 @@ export function ProductVendorCard({ shop }: ProductVendorCardProps) {
       </div>
 
       <ArrowRight className='w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200 shrink-0' />
+
+      <Link
+        to='/shop/$slug'
+        params={{ slug: shop.slug }}
+        aria-label={`Visit ${shop.name}`}
+        className='absolute inset-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+      />
     </motion.div>
   );
 }

@@ -1,6 +1,6 @@
 import { Image } from '@unpic/react';
 import { Loader2, Star, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,6 +41,22 @@ export function ReviewForm({
   const [images, setImages] = useState<ImageFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const readersRef = useRef<FileReader[]>([]);
+
+  const abortReaders = useCallback(() => {
+    for (const reader of readersRef.current) {
+      reader.abort();
+    }
+    readersRef.current = [];
+  }, []);
+
+  useEffect(() => {
+    if (!open) abortReaders();
+  }, [open, abortReaders]);
+
+  useEffect(() => {
+    return () => abortReaders();
+  }, [abortReaders]);
 
   const reset = () => {
     setRating(0);
@@ -51,6 +67,7 @@ export function ReviewForm({
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    abortReaders();
     const selected = Array.from(e.target.files ?? []);
     const remaining = 3 - images.length;
     const toAdd = selected.slice(0, remaining);
@@ -58,6 +75,7 @@ export function ReviewForm({
     for (const file of toAdd) {
       const id = `img-${++imageIdCounter}`;
       const reader = new FileReader();
+      readersRef.current.push(reader);
       reader.onload = () => {
         setImages((prev) => [
           ...prev,
@@ -134,7 +152,13 @@ export function ReviewForm({
           <DialogTitle>Write a Review</DialogTitle>
         </DialogHeader>
 
-        <div className='space-y-5'>
+        <form
+          className='space-y-5'
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           <div>
             <Label className='mb-2 block'>Rating</Label>
             <div className='flex gap-1'>
@@ -241,6 +265,7 @@ export function ReviewForm({
 
           <div className='flex gap-3 justify-end pt-2'>
             <Button
+              type='button'
               variant='outline'
               onClick={() => {
                 reset();
@@ -249,12 +274,12 @@ export function ReviewForm({
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={submitting}>
+            <Button type='submit' disabled={submitting}>
               {submitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
               Submit Review
             </Button>
           </div>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   );

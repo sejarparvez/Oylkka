@@ -7,6 +7,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { QueryErrorState } from '@/components/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,8 +84,18 @@ const quickLinks = [
 
 function DashboardHome() {
   const { user } = Route.useRouteContext();
-  const { data: orders, isLoading: ordersLoading } = useMyOrders();
-  const { data: wishlist, isLoading: wishlistLoading } = useWishlist();
+  const {
+    data: orders,
+    isLoading: ordersLoading,
+    isError: ordersError,
+    refetch: refetchOrders,
+  } = useMyOrders();
+  const {
+    data: wishlist,
+    isLoading: wishlistLoading,
+    isError: wishlistError,
+    refetch: refetchWishlist,
+  } = useWishlist();
 
   const recentOrders = orders?.slice(0, 5) ?? [];
   const wishlistCount = wishlist?.items?.length ?? 0;
@@ -124,6 +135,14 @@ function DashboardHome() {
               </CardContent>
             </Card>
           ))
+        ) : ordersError || wishlistError ? (
+          <QueryErrorState
+            title='Failed to load your summary'
+            onRetry={() => {
+              refetchOrders();
+              refetchWishlist();
+            }}
+          />
         ) : (
           <>
             <Card>
@@ -189,6 +208,11 @@ function DashboardHome() {
                     <Skeleton key={i} className='h-12 w-full' />
                   ))}
                 </div>
+              ) : ordersError ? (
+                <QueryErrorState
+                  title='Failed to load orders'
+                  onRetry={() => refetchOrders()}
+                />
               ) : recentOrders.length === 0 ? (
                 <div className='flex flex-col items-center justify-center py-12 text-center'>
                   <ShoppingCart className='w-10 h-10 text-muted-foreground mb-3' />

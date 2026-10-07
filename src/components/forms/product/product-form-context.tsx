@@ -5,6 +5,7 @@ import type { ProductImage } from '@/hooks/use-product-image';
 import type { ProductFormValues } from './product-form-type';
 
 interface ProductFormContextType {
+  productId?: string;
   productImages: ProductImage[];
   setProductImages: React.Dispatch<React.SetStateAction<ProductImage[]>>;
   onSubmit: (data: ProductFormValues) => void;
@@ -12,6 +13,7 @@ interface ProductFormContextType {
 }
 
 export const ProductFormContext = createContext<ProductFormContextType>({
+  productId: undefined,
   productImages: [],
   setProductImages: () => {},
   onSubmit: () => {},

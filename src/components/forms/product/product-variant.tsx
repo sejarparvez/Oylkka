@@ -140,6 +140,28 @@ export default function ProductVariant() {
     return `${attributeName.substring(0, 2)}${attributeValue.substring(0, 2)}`.toUpperCase();
   };
 
+  // FE-41: abbreviated attribute codes collide ("Color: Red" and
+  // "Color: Reddish" both abbreviate to CO-RE), so the free SKU is decided by
+  // trying the base, then `-1`, `-2`, ... until the taken-set says it is free.
+  // Every SKU handed out is added to the set immediately, which keeps later
+  // combinations in the same run from claiming it again.
+  const resolveUniqueSku = (
+    baseSku: string,
+    takenSkus: Set<string>,
+  ): string => {
+    if (!takenSkus.has(baseSku)) {
+      takenSkus.add(baseSku);
+      return baseSku;
+    }
+    let suffix = 1;
+    while (takenSkus.has(`${baseSku}-${suffix}`)) {
+      suffix++;
+    }
+    const uniqueSku = `${baseSku}-${suffix}`;
+    takenSkus.add(uniqueSku);
+    return uniqueSku;
+  };
+
   const generateAllVariants = () => {
     if (Object.keys(attributeOptions).length === 0) return;
 
@@ -158,6 +180,8 @@ export default function ProductVariant() {
     if (!primary || !attributeOptions[primary]) return;
 
     const primaryValues = attributeOptions[primary];
+    // Seeded from live form state — including SKUs the vendor typed by hand —
+    // and grown below as each variant SKU is generated (FE-41).
     const existingSkus = new Set(variants.map((v) => v.sku));
 
     primaryValues.forEach((primaryValue) => {
@@ -179,9 +203,7 @@ export default function ProductVariant() {
           const baseSku = productSku
             ? `${productSku}-${attributeCodes}`
             : attributeCodes;
-          const finalSku = existingSkus.has(baseSku)
-            ? `${baseSku}-${Date.now()}`
-            : baseSku;
+          const finalSku = resolveUniqueSku(baseSku, existingSkus);
 
           const exists = variants.some((v) => {
             if (!v.attributes) return false;
@@ -215,9 +237,7 @@ export default function ProductVariant() {
         const baseSku = productSku
           ? `${productSku}-${attributeCodes}`
           : attributeCodes;
-        const finalSku = existingSkus.has(baseSku)
-          ? `${baseSku}-${Date.now()}`
-          : baseSku;
+        const finalSku = resolveUniqueSku(baseSku, existingSkus);
 
         const exists = variants.some(
           (v) => v.attributes?.[primary] === primaryValue,
@@ -294,6 +314,8 @@ export default function ProductVariant() {
     generateCombinations(attrKeys, 0, {});
 
     const existingCombos = variants.map((v) => v.attributes);
+    // Seeded from live form state — including SKUs the vendor typed by hand —
+    // and grown below as each variant SKU is generated (FE-41).
     const existingSkus = new Set(variants.map((v) => v.sku));
 
     const newCombinations = combinations.filter(
@@ -314,9 +336,7 @@ export default function ProductVariant() {
       const baseSku = productSku
         ? `${productSku}-${attributeCodes}-${index + variants.length}`
         : `${attributeCodes}-${index + variants.length}`;
-      const finalSku = existingSkus.has(baseSku)
-        ? `${baseSku}-${Date.now()}`
-        : baseSku;
+      const finalSku = resolveUniqueSku(baseSku, existingSkus);
 
       const variantId = `variant-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
       append({

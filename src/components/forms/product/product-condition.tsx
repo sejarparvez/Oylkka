@@ -111,7 +111,7 @@ export function ProductCondition({ productId }: ProductConditionProps) {
               <Input
                 placeholder='SKU-12345'
                 value={sku || ''}
-                disabled
+                onChange={(event) => setValue('sku', event.target.value)}
                 onBlur={handleSkuBlur}
               />
               {sku && (

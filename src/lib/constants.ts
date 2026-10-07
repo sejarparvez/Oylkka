@@ -39,3 +39,7 @@ export const QUERY_KEYS = {
 
 /** Days after delivery a customer may request a return (CUST-02). */
 export const RETURN_WINDOW_DAYS = 30;
+
+export const PRODUCT_IMAGE_MAX_BYTES = 500 * 1024;
+export const PRODUCT_IMAGE_ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+export const PRODUCT_IMAGE_ACCEPT = PRODUCT_IMAGE_ACCEPTED_TYPES.join(',');

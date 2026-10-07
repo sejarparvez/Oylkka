@@ -49,6 +49,13 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
     null,
   );
   const lastCheckedSlug = useRef<string>('');
+  const slugEditedRef = useRef(false);
+
+  useEffect(() => {
+    slugEditedRef.current = false;
+    lastCheckedSlug.current = '';
+    setSlugStatus({ isUnique: null, suggestions: [] });
+  }, [productId]);
 
   const productName = useWatch({ control, name: 'productName' });
   const slug = useWatch({ control, name: 'slug' });
@@ -77,7 +84,7 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
   };
 
   useEffect(() => {
-    if (productName) {
+    if (!slugEditedRef.current && productName) {
       const newSlug = slugify(productName);
       setValue('slug', newSlug, { shouldValidate: true });
     }
@@ -141,9 +148,10 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
                 id='slug'
                 placeholder='product-slug'
                 value={slug || ''}
-                onChange={(e) =>
-                  setValue('slug', e.target.value, { shouldValidate: true })
-                }
+                onChange={(e) => {
+                  slugEditedRef.current = true;
+                  setValue('slug', e.target.value, { shouldValidate: true });
+                }}
                 className={
                   slugStatus.isUnique === true
                     ? 'border-green-500 pr-8'

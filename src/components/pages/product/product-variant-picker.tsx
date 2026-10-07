@@ -1,5 +1,5 @@
 import namer from 'color-namer';
-import { Minus, Plus, Ruler } from 'lucide-react';
+import { Ruler } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,6 +44,8 @@ export type Variant = {
   price: number;
   discountPrice: number | null;
   stock: number;
+  status?: string;
+  reservedStock?: number;
   attributes: Record<string, string>;
   imageUrl: string | null;
   attributeValues: VariantAttributeValue[];
@@ -67,6 +69,10 @@ function getColorName(color: string): string {
   }
 }
 
+function variantAvailable(v: Variant): number {
+  return Math.max(0, v.stock - (v.reservedStock ?? 0));
+}
+
 export function ProductVariantPicker({
   attributeOptions,
   variants,
@@ -75,7 +81,6 @@ export function ProductVariantPicker({
   onVariantChange,
 }: ProductVariantPickerProps) {
   const [selected, setSelected] = useState<Record<string, string>>({});
-  const [quantity, setQuantity] = useState(1);
 
   const variantMatchesSelection = useCallback(
     (v: Variant, selection: Record<string, string>) =>
@@ -111,7 +116,7 @@ export function ProductVariantPicker({
       ? basePrice
       : null;
 
-  const displayStock = currentVariant?.stock ?? null;
+  const displayStock = currentVariant ? variantAvailable(currentVariant) : null;
   const missingAttributes = attributeOptions.filter(
     (opt) => !selected[opt.name],
   );
@@ -120,17 +125,17 @@ export function ProductVariantPicker({
   const isSizeType = (name: string) => name.toLowerCase() === 'size';
 
   const handleSelect = (attrName: string, value: string) => {
-    setSelected((prev) => {
-      const next = { ...prev, [attrName]: value };
-      const allSelected = attributeOptions.every((opt) => next[opt.name]);
-      if (allSelected) {
-        const match =
-          variants.find((v) => variantMatchesSelection(v, next)) ?? null;
-        onVariantChange?.(match);
-      }
-      return next;
-    });
-    setQuantity(1);
+    const next = { ...selected, [attrName]: value };
+    setSelected(next);
+
+    // Side effects belong outside the state updater — updaters must be pure
+    // (they can run twice under StrictMode) (FE-12).
+    const allSelected = attributeOptions.every((opt) => next[opt.name]);
+    if (allSelected) {
+      const match =
+        variants.find((v) => variantMatchesSelection(v, next)) ?? null;
+      onVariantChange?.(match);
+    }
   };
 
   const findAttrValue = (
@@ -255,32 +260,6 @@ export function ProductVariantPicker({
       ))}
 
       <div className='flex items-center gap-6 pt-2'>
-        <div>
-          <p className='text-xs text-muted-foreground mb-1'>Quantity</p>
-          <div className='flex items-center gap-1 border border-border rounded-lg overflow-hidden'>
-            <button
-              type='button'
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className='w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors'
-            >
-              <Minus className='w-3 h-3' />
-            </button>
-            <span className='w-10 text-center text-sm font-medium tabular-nums'>
-              {quantity}
-            </span>
-            <button
-              type='button'
-              onClick={() => {
-                const max = displayStock ?? Infinity;
-                setQuantity((prev) => Math.min(max, prev + 1));
-              }}
-              className='w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors'
-            >
-              <Plus className='w-3 h-3' />
-            </button>
-          </div>
-        </div>
-
         <div>
           <p className='text-xs text-muted-foreground mb-1'>Price</p>
           <div className='flex items-baseline gap-2'>

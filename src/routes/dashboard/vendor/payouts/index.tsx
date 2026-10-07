@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { DollarSign, Package, Percent, Wallet } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { QueryErrorState } from '@/components/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,8 +24,18 @@ export const Route = createFileRoute('/dashboard/vendor/payouts/')({
 });
 
 function RouteComponent() {
-  const { data: payouts, isLoading: payoutsLoading } = useVendorPayouts();
-  const { data: pending, isLoading: pendingLoading } = useVendorPendingPayout();
+  const {
+    data: payouts,
+    isLoading: payoutsLoading,
+    isError: payoutsError,
+    refetch: refetchPayouts,
+  } = useVendorPayouts();
+  const {
+    data: pending,
+    isLoading: pendingLoading,
+    isError: pendingError,
+    refetch: refetchPending,
+  } = useVendorPendingPayout();
 
   return (
     <motion.div
@@ -65,6 +76,11 @@ function RouteComponent() {
           <CardContent>
             {pendingLoading ? (
               <Skeleton className='h-8 w-24' />
+            ) : pendingError ? (
+              <QueryErrorState
+                title='Failed to load pending balance'
+                onRetry={() => refetchPending()}
+              />
             ) : (
               <p className='text-2xl font-bold'>
                 BDT {pending?.totalPending?.toLocaleString() ?? '0'}
@@ -82,6 +98,11 @@ function RouteComponent() {
           <CardContent>
             {pendingLoading ? (
               <Skeleton className='h-8 w-16' />
+            ) : pendingError ? (
+              <QueryErrorState
+                title='Failed to load pending items'
+                onRetry={() => refetchPending()}
+              />
             ) : (
               <p className='text-2xl font-bold'>{pending?.pendingItems ?? 0}</p>
             )}
@@ -97,6 +118,11 @@ function RouteComponent() {
           <CardContent>
             {pendingLoading ? (
               <Skeleton className='h-8 w-24' />
+            ) : pendingError ? (
+              <QueryErrorState
+                title='Failed to load commission'
+                onRetry={() => refetchPending()}
+              />
             ) : (
               <p className='text-2xl font-bold'>
                 BDT {pending?.totalCommission?.toLocaleString() ?? '0'}
@@ -118,6 +144,11 @@ function RouteComponent() {
                   <Skeleton key={i} className='h-14 w-full' />
                 ))}
               </div>
+            ) : payoutsError ? (
+              <QueryErrorState
+                title='Failed to load payouts'
+                onRetry={() => refetchPayouts()}
+              />
             ) : !payouts || payouts.length === 0 ? (
               <div className='flex flex-col items-center justify-center py-16 text-center'>
                 <Wallet className='w-10 h-10 text-muted-foreground mb-3' />

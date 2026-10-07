@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { Eye, Package, Search } from 'lucide-react';
 import { useRef, useState } from 'react';
 
+import { QueryErrorState } from '@/components/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,7 +68,7 @@ function RouteComponent() {
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { data: items, isLoading } = useVendorOrders(
+  const { data: items, isLoading, isError, refetch } = useVendorOrders(
     status || undefined,
     debouncedSearch || undefined,
   );
@@ -134,7 +135,14 @@ function RouteComponent() {
         </div>
       )}
 
-      {!isLoading && items?.length === 0 && (
+      {!isLoading && isError && (
+        <QueryErrorState
+          title='Failed to load orders'
+          onRetry={() => refetch()}
+        />
+      )}
+
+      {!isLoading && !isError && items?.length === 0 && (
         <div className='flex flex-col items-center justify-center py-20 gap-4 text-center'>
           <div className='w-16 h-16 rounded-2xl bg-muted flex items-center justify-center'>
             <Package className='w-7 h-7 text-muted-foreground' />

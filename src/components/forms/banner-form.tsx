@@ -8,7 +8,7 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { type Resolver, useForm } from 'react-hook-form';
 import type * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -82,7 +82,7 @@ export function BannerForm(props: BannerFormProps) {
   const [keepImage, setKeepImage] = useState<boolean>(true);
 
   const schema = isEdit ? EditBannerFormSchema : BannerFormSchema;
-  type FormData = z.infer<typeof BannerFormSchema> &
+  type BannerFormValues = z.infer<typeof BannerFormSchema> &
     z.infer<typeof EditBannerFormSchema>;
 
   const {
@@ -92,8 +92,10 @@ export function BannerForm(props: BannerFormProps) {
     setValue,
     reset,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema) as never,
+  } = useForm<BannerFormValues>({
+    // The schema switches between create/edit at runtime; both validate the
+    // same BannerFormValues shape, so one honest resolver type covers both.
+    resolver: zodResolver(schema) as unknown as Resolver<BannerFormValues>,
     defaultValues: (isEdit
       ? props.defaultValues
       : {
@@ -110,7 +112,7 @@ export function BannerForm(props: BannerFormProps) {
           startDate: undefined,
           endDate: undefined,
           image: undefined,
-        }) as FormData,
+        }) as BannerFormValues,
   });
 
   const startDate = watch('startDate');
@@ -121,7 +123,7 @@ export function BannerForm(props: BannerFormProps) {
   const editMutation = useEditBannerMutation();
   const isPending = isEdit ? editMutation.isPending : createMutation.isPending;
 
-  const onSubmit = async (values: FormData) => {
+  const onSubmit = async (values: BannerFormValues) => {
     if (isEdit) {
       await editMutation.mutateAsync({
         ...values,

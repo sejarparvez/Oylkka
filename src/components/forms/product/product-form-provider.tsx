@@ -1,15 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type ReactNode, useEffect, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import type { ProductImage } from '@/hooks/use-product-image';
 import { cleanFormData } from '@/lib/utils';
-import {
-  useAdminUpdateProduct,
-  useCreateProduct,
-  useUpdateProduct,
-} from '@/services/product';
+import { useCreateProduct, useUpdateProduct } from '@/services/product';
 
 import { ProductFormContext } from './product-form-context';
 import {
@@ -23,7 +20,6 @@ interface ProductFormProviderProps {
   defaultValues?: Partial<ProductFormInput>;
   productId?: string;
   initialImages?: ProductImage[];
-  isAdmin?: boolean;
 }
 
 export function ProductFormProvider({
@@ -31,11 +27,11 @@ export function ProductFormProvider({
   defaultValues,
   productId,
   initialImages,
-  isAdmin = false,
 }: ProductFormProviderProps) {
   const [productImages, setProductImages] = useState<ProductImage[]>(
     initialImages || [],
   );
+  const navigate = useNavigate();
 
   const methods = useForm<ProductFormInput>({
     resolver: zodResolver(ProductFormSchema),
@@ -66,11 +62,22 @@ export function ProductFormProvider({
     },
   });
 
+  // The reset must fire when the form switches to a *different* product, not
+  // when `defaultValues` gets a fresh object identity on a background refetch —
+  // the latter re-runs `reset()` on every render and discards unsaved edits
+  // (FE-03). Keep the latest values in a ref; key the effect on a primitive.
+  const defaultValuesRef = useRef(defaultValues);
   useEffect(() => {
-    if (defaultValues && Object.keys(defaultValues).length > 0) {
-      methods.reset(defaultValues);
+    defaultValuesRef.current = defaultValues;
+  }, [defaultValues]);
+
+  const resetKey = productId ?? 'new';
+  useEffect(() => {
+    const values = defaultValuesRef.current;
+    if (values && Object.keys(values).length > 0) {
+      methods.reset(values);
     }
-  }, [defaultValues, methods]);
+  }, [resetKey, methods]);
 
   useEffect(() => {
     methods.setValue('images', productImages);
@@ -78,22 +85,15 @@ export function ProductFormProvider({
 
   const { mutate: createMutate, isPending: createIsPending } =
     useCreateProduct();
-  const { mutate: vendorUpdateMutate, isPending: vendorUpdateIsPending } =
+  const { mutate: updateMutate, isPending: updateIsPending } =
     useUpdateProduct({ productId: productId || '' });
-  const { mutate: adminUpdateMutate, isPending: adminUpdateIsPending } =
-    useAdminUpdateProduct({ productId: productId || '' });
 
   let mutate = createMutate;
   let isPending = createIsPending;
 
   if (productId) {
-    if (isAdmin) {
-      mutate = adminUpdateMutate;
-      isPending = adminUpdateIsPending;
-    } else {
-      mutate = vendorUpdateMutate;
-      isPending = vendorUpdateIsPending;
-    }
+    mutate = updateMutate;
+    isPending = updateIsPending;
   }
 
   const onSubmit = (data: ProductFormValues) => {
@@ -180,6 +180,9 @@ export function ProductFormProvider({
               toast.success('Product submitted successfully!');
               setProductImages([]);
               methods.reset();
+              // FE-28: leave the creation form instead of stranding the user
+              // on a reset copy of it.
+              void navigate({ to: '/dashboard/vendor/products' });
             }
             resolve(response);
           },
@@ -202,6 +205,7 @@ export function ProductFormProvider({
   return (
     <ProductFormContext.Provider
       value={{
+        productId,
         productImages,
         setProductImages,
         onSubmit,

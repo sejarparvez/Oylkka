@@ -13,6 +13,7 @@ import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
+import { QueryErrorState } from '@/components/query-state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -59,7 +60,7 @@ function ComparePage() {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  const { data, isLoading } = useCompareProducts(idList);
+  const { data, isLoading, isError, refetch } = useCompareProducts(idList);
   const addToCart = useAddToCartMutation();
 
   const products = data?.products ?? [];
@@ -72,7 +73,11 @@ function ComparePage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const { data: searchData } = useAllProducts(
+  const {
+    data: searchData,
+    isError: searchError,
+    refetch: refetchSearch,
+  } = useAllProducts(
     { search: debouncedSearch || undefined, page: 1, limit: 8 },
     { enabled: debouncedSearch.length > 0 },
   );
@@ -287,7 +292,14 @@ function ComparePage() {
               </div>
             )}
 
-            {isSearching && searchResults.length === 0 && (
+            {isSearching && searchError && (
+              <QueryErrorState
+                title='Failed to search products'
+                onRetry={() => refetchSearch()}
+              />
+            )}
+
+            {isSearching && !searchError && searchResults.length === 0 && (
               <p className='text-sm text-muted-foreground text-center py-8'>
                 No products found for &ldquo;{debouncedSearch}&rdquo;
               </p>
@@ -328,8 +340,15 @@ function ComparePage() {
           </div>
         )}
 
+        {isError && (
+          <QueryErrorState
+            title='Failed to load products'
+            onRetry={() => refetch()}
+          />
+        )}
+
         {/* Products not found */}
-        {idList.length >= 2 && !isLoading && products.length < 2 && (
+        {idList.length > 1 && !isLoading && !isError && products.length < 2 && (
           <motion.div
             initial='hidden'
             animate='show'

@@ -6,15 +6,16 @@ import {
   HeadContent,
   Outlet,
   Scripts,
+  useRouter,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Toaster } from '#/components/ui/sonner';
 import { TooltipProvider } from '#/components/ui/tooltip';
 import { ThemeProvider } from '#/context/theme-provider';
 import { RouteErrorBoundary } from '@/components/error-boundary';
 import { NotFound } from '@/components/not-found';
-import { getSession } from '@/lib/auth.functions';
+import { getSession, signOut } from '@/lib/auth.functions';
 import appCss from '../styles.css?url';
 
 export const Route = createRootRoute({
@@ -63,6 +64,27 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const [queryClient] = useState(() => new QueryClient());
+  const router = useRouter();
+  const handlingUnauthorized = useRef(false);
+
+  // FE-24: a 401 must clear all cached auth-scoped data and bounce to sign-in
+  // instead of leaving a stale session rendering private data.
+  useEffect(() => {
+    const onUnauthorized = () => {
+      if (handlingUnauthorized.current) return;
+      handlingUnauthorized.current = true;
+      queryClient.clear();
+      void router
+        .navigate({ to: '/auth/signin', replace: true })
+        .then(() => signOut())
+        .catch(() => undefined)
+        .finally(() => {
+          handlingUnauthorized.current = false;
+        });
+    };
+    window.addEventListener('auth:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', onUnauthorized);
+  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>

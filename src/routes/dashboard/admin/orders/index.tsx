@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { Eye, Package, Search } from 'lucide-react';
 import { useState } from 'react';
 import { StatusBadge } from '@/components/orders/status-badge';
+import { QueryErrorState } from '@/components/query-state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -67,7 +68,7 @@ function RouteComponent() {
   const [vendorSearch, setVendorSearch] = useState('');
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useAdminOrders({
+  const { data, isLoading, isError, refetch } = useAdminOrders({
     status: status || undefined,
     paymentStatus: paymentStatus || undefined,
     search: debouncedSearch || undefined,
@@ -206,8 +207,16 @@ function RouteComponent() {
         </div>
       )}
 
+      {/* Error state */}
+      {isError && (
+        <QueryErrorState
+          title='Failed to load orders'
+          onRetry={() => refetch()}
+        />
+      )}
+
       {/* Empty state */}
-      {!isLoading && orders.length === 0 && (
+      {!isLoading && !isError && orders.length === 0 && (
         <div className='flex flex-col items-center justify-center py-20 gap-4 text-center'>
           <div className='w-16 h-16 rounded-2xl bg-muted flex items-center justify-center'>
             <Package className='w-7 h-7 text-muted-foreground' />

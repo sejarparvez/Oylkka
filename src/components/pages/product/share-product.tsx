@@ -1,6 +1,6 @@
 import { Check, Copy, QrCode, Share2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,8 +17,15 @@ type ShareProductProps = {
 };
 
 export function ShareProduct({ slug }: ShareProductProps) {
-  const url = `${window.location.origin}/product/${slug}`;
+  // `window` must never be touched in the render body — this component is
+  // rendered during SSR (FE-01). Seed with a path-relative URL so server and
+  // first client render agree, then upgrade to the absolute origin after mount.
+  const [url, setUrl] = useState(`/product/${slug}`);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setUrl(`${window.location.origin}/product/${slug}`);
+  }, [slug]);
 
   const handleCopy = async () => {
     try {

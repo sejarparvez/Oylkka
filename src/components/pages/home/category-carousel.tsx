@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { ImageIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { QueryErrorState } from '@/components/query-state';
 import {
   Carousel,
   type CarouselApi,
@@ -14,7 +15,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { usePublicCategories } from '@/services/category';
 
 export default function CategoryCarousel() {
-  const { data: categories, isLoading } = usePublicCategories();
+  const { data: categories, isLoading, isError, refetch } =
+    usePublicCategories();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
@@ -56,6 +58,15 @@ export default function CategoryCarousel() {
   }, [api, isHovered, categories?.length, startAutoplay, stopAutoplay]);
 
   if (isLoading) return <CategoryCarouselSkeleton />;
+  if (isError)
+    return (
+      <div className='flex justify-center'>
+        <QueryErrorState
+          title='Failed to load categories'
+          onRetry={() => refetch()}
+        />
+      </div>
+    );
   if (!categories || categories.length === 0) return null;
 
   return (
