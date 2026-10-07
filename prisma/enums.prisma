@@ -12,10 +12,15 @@ enum UserRole {
 
 enum ShopStatus {
   PENDING
-  APPROVED
   ACTIVE
   SUSPENDED
   REJECTED
+}
+
+enum PayoutMethod {
+  BANK
+  BKASH
+  NAGAD
 }
 
 // --- Order ---

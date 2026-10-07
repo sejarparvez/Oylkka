@@ -150,6 +150,24 @@ function RouteComponent() {
       : []),
   ] as const;
 
+  const policySections = [
+    {
+      key: 'shippingPolicy',
+      label: 'Shipping Policy',
+      text: shop.policies?.shippingPolicy,
+    },
+    {
+      key: 'returnPolicy',
+      label: 'Return & Refund Policy',
+      text: shop.policies?.returnPolicy,
+    },
+    {
+      key: 'termsAndConditions',
+      label: 'Terms & Conditions',
+      text: shop.policies?.termsAndConditions,
+    },
+  ].filter((s) => s.text?.trim());
+
   return (
     <div className='min-h-screen bg-background'>
       <Header />
@@ -232,6 +250,38 @@ function RouteComponent() {
                   </div>
                 </div>
               )}
+            </div>
+          </motion.div>
+        )}
+
+        {policySections.length > 0 && (
+          <motion.div
+            initial='hidden'
+            whileInView='show'
+            viewport={{ once: true, margin: '-60px' }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <div className='flex items-center gap-3 mb-6'>
+              <div className='h-px w-8 bg-primary' />
+              <span className='text-xs font-semibold tracking-[0.18em] uppercase text-primary'>
+                Shop Policies
+              </span>
+            </div>
+            <div className='grid md:grid-cols-3 gap-4'>
+              {policySections.map((section) => (
+                <div
+                  key={section.key}
+                  className='rounded-2xl border border-border bg-card p-6'
+                >
+                  <p className='text-xs font-semibold tracking-[0.18em] uppercase text-muted-foreground mb-3'>
+                    {section.label}
+                  </p>
+                  <p className='text-sm text-muted-foreground leading-relaxed whitespace-pre-line'>
+                    {section.text}
+                  </p>
+                </div>
+              ))}
             </div>
           </motion.div>
         )}

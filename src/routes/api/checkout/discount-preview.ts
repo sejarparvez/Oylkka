@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { computeShippingEstimate } from '@/services/checkout/shipping';
 import type {
   CartWithItems,
   VoucherWithCoupon,
@@ -10,7 +11,6 @@ import {
   processVouchers,
   sumVoucherTotals,
 } from '@/services/checkout/voucher-processor';
-import { computeShippingEstimate } from '@/services/checkout/shipping';
 
 export const Route = createFileRoute('/api/checkout/discount-preview')({
   server: {
@@ -33,7 +33,7 @@ export const Route = createFileRoute('/api/checkout/discount-preview')({
 
           // Zone-aware shipping estimate, matching the actual charge in
           // checkout/create.ts (MONEY-30).
-          const baseShipping = await computeShippingEstimate(
+          const shipping = await computeShippingEstimate(
             body.cart.items.map((item) => ({
               quantity: item.quantity,
               freeShipping: item.product.freeShipping,
@@ -91,10 +91,12 @@ export const Route = createFileRoute('/api/checkout/discount-preview')({
           }
 
           return Response.json({
-            baseShipping,
+            baseShipping: shipping.cost,
             totalDiscount,
             totalShippingDiscount,
             freeShipping,
+            // Zone delivery estimate shown next to the shipping line (CUST-05).
+            estDays: shipping.estDays,
             // Share the server tax rate so the client summary can show the
             // same tax it will be charged (MONEY-29b).
             taxRate: Number(process.env.TAX_RATE ?? 0) / 100,

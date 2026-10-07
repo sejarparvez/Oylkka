@@ -1,14 +1,16 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import {
+  Ban,
   CheckCircle,
   Eye,
   Loader2,
+  RotateCcw,
   Search,
   Store,
   XCircle,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import {
   AlertDialog,
@@ -30,12 +32,15 @@ import {
   useAdminShops,
   useApproveShopMutation,
   useRejectShopMutation,
+  useSuspendShopMutation,
+  useUnsuspendShopMutation,
 } from '@/services/shop';
 
 const STATUS_TABS = [
   { label: 'All', value: '' },
   { label: 'Pending', value: 'PENDING' },
   { label: 'Active', value: 'ACTIVE' },
+  { label: 'Suspended', value: 'SUSPENDED' },
   { label: 'Rejected', value: 'REJECTED' },
 ] as const;
 
@@ -45,6 +50,8 @@ const statusBadge = (status: string) => {
       return { variant: 'secondary' as const, label: 'Pending' };
     case 'ACTIVE':
       return { variant: 'default' as const, label: 'Active' };
+    case 'SUSPENDED':
+      return { variant: 'destructive' as const, label: 'Suspended' };
     case 'REJECTED':
       return { variant: 'destructive' as const, label: 'Rejected' };
     default:
@@ -62,24 +69,29 @@ export const Route = createFileRoute('/dashboard/admin/vendors/')({
     }
     return { user: context.user };
   },
+  validateSearch: (
+    search: Record<string, string | undefined>,
+  ): { status?: string } => ({
+    status: search.status,
+  }),
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const [status, setStatus] = useState('');
+  const { user } = Route.useRouteContext();
+  const { status: statusParam } = Route.useSearch();
+  const isAdmin = user?.role === 'ADMIN';
+  const status =
+    statusParam && STATUS_TABS.some((t) => t.value === statusParam)
+      ? statusParam
+      : '';
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get('status') || '';
-    if (STATUS_TABS.some((t) => t.value === s)) {
-      setStatus(s);
-    }
-  }, []);
+  const [suspendId, setSuspendId] = useState<string | null>(null);
+  const [suspendReason, setSuspendReason] = useState('');
 
   const { data: shops, isLoading } = useAdminShops(
     status,
@@ -89,6 +101,10 @@ function RouteComponent() {
     useApproveShopMutation();
   const { mutate: rejectShop, isPending: isRejecting } =
     useRejectShopMutation();
+  const { mutate: suspendShop, isPending: isSuspending } =
+    useSuspendShopMutation();
+  const { mutate: unsuspendShop, isPending: isUnsuspending } =
+    useUnsuspendShopMutation();
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -96,18 +112,10 @@ function RouteComponent() {
   };
 
   const handleStatusChange = (newStatus: string) => {
-    setStatus(newStatus);
-    const params = new URLSearchParams(window.location.search);
-    if (newStatus) {
-      params.set('status', newStatus);
-    } else {
-      params.delete('status');
-    }
-    const qs = params.toString();
     navigate({
-      to: `/dashboard/admin/vendors/${qs ? `?${qs}` : ''}`,
-      // biome-ignore lint/suspicious/noExplicitAny: navigate type limitations with index routes
-    } as any);
+      to: '/dashboard/admin/vendors',
+      search: newStatus ? { status: newStatus } : {},
+    });
   };
 
   const handleReject = () => {
@@ -115,6 +123,14 @@ function RouteComponent() {
       rejectShop({ id: rejectId, rejectionReason: rejectReason.trim() });
       setRejectId(null);
       setRejectReason('');
+    }
+  };
+
+  const handleSuspend = () => {
+    if (suspendId && suspendReason.trim()) {
+      suspendShop({ id: suspendId, reason: suspendReason.trim() });
+      setSuspendId(null);
+      setSuspendReason('');
     }
   };
 
@@ -187,13 +203,57 @@ function RouteComponent() {
             <VendorRow
               key={shop.id}
               shop={shop}
+              canManage={isAdmin}
               onApprove={() => approveShop(shop.id)}
               onReject={() => setRejectId(shop.id)}
-              isApproving={isApproving}
+              onSuspend={() => setSuspendId(shop.id)}
+              onUnsuspend={() => unsuspendShop(shop.id)}
+              isApproving={isApproving || isUnsuspending}
             />
           ))}
         </div>
       )}
+
+      <AlertDialog
+        open={!!suspendId}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSuspendId(null);
+            setSuspendReason('');
+          }
+        }}
+      >
+        <AlertDialogContent size='sm'>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Suspend shop?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The shop will be hidden from customers and the vendor will be
+              notified with this reason.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className='py-2'>
+            <Input
+              placeholder='Reason for suspension...'
+              value={suspendReason}
+              onChange={(e) => setSuspendReason(e.target.value)}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant='destructive'
+              disabled={isSuspending || !suspendReason.trim()}
+              onClick={(e) => {
+                e.preventDefault();
+                handleSuspend();
+              }}
+            >
+              {isSuspending && <Loader2 className='w-3.5 h-3.5 animate-spin' />}
+              Suspend
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={!!rejectId}
@@ -240,13 +300,19 @@ function RouteComponent() {
 
 function VendorRow({
   shop,
+  canManage,
   onApprove,
   onReject,
+  onSuspend,
+  onUnsuspend,
   isApproving,
 }: {
   shop: AdminShopResponse;
+  canManage: boolean;
   onApprove: () => void;
   onReject: () => void;
+  onSuspend: () => void;
+  onUnsuspend: () => void;
   isApproving: boolean;
 }) {
   const navigate = useNavigate();
@@ -288,14 +354,14 @@ function VendorRow({
           className='w-8 h-8 rounded-lg'
           onClick={(_e) =>
             navigate({
-              to: `/dashboard/admin/vendors/detail?vendorId=${shop.slug}`,
-              // biome-ignore lint/suspicious/noExplicitAny: navigate type limitations
-            } as any)
+              to: '/dashboard/admin/vendors/detail',
+              search: { vendorId: shop.slug },
+            })
           }
         >
           <Eye className='w-3.5 h-3.5' />
         </Button>
-        {shop.status === 'PENDING' && (
+        {canManage && shop.status === 'PENDING' && (
           <>
             <AlertDialog open={approveOpen} onOpenChange={setApproveOpen}>
               <AlertDialogTrigger asChild>
@@ -343,6 +409,33 @@ function VendorRow({
               <XCircle className='w-3.5 h-3.5' />
             </Button>
           </>
+        )}
+        {canManage && shop.status === 'ACTIVE' && (
+          <Button
+            variant='ghost'
+            size='icon'
+            className='w-8 h-8 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10'
+            title='Suspend shop'
+            onClick={onSuspend}
+          >
+            <Ban className='w-3.5 h-3.5' />
+          </Button>
+        )}
+        {canManage && shop.status === 'SUSPENDED' && (
+          <Button
+            variant='ghost'
+            size='icon'
+            className='w-8 h-8 rounded-lg text-green-600 hover:text-green-700 hover:bg-green-50'
+            title='Reinstate shop'
+            disabled={isApproving}
+            onClick={onUnsuspend}
+          >
+            {isApproving ? (
+              <Loader2 className='w-3.5 h-3.5 animate-spin' />
+            ) : (
+              <RotateCcw className='w-3.5 h-3.5' />
+            )}
+          </Button>
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Navigate, useNavigate } from '@tanstack/react-router';
 import { Clock, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -13,13 +13,15 @@ export const Route = createFileRoute('/dashboard/become-vendor/pending')({
 function RouteComponent() {
   const navigate = useNavigate();
   const { data: shop, isLoading, refetch } = useMyShop();
+  const isPending = shop?.status === 'PENDING';
 
   useEffect(() => {
+    if (!isPending) return;
     const interval = setInterval(() => {
       refetch();
     }, 30000);
     return () => clearInterval(interval);
-  }, [refetch]);
+  }, [isPending, refetch]);
 
   if (isLoading) {
     return (
@@ -30,13 +32,7 @@ function RouteComponent() {
   }
 
   if (!shop) {
-    navigate({ to: '/dashboard/become-vendor/apply' });
-    return null;
-  }
-
-  if (shop.status === 'ACTIVE') {
-    navigate({ to: '/dashboard' });
-    return null;
+    return <Navigate to='/dashboard/become-vendor/apply' />;
   }
 
   if (shop.status === 'REJECTED') {
@@ -61,6 +57,10 @@ function RouteComponent() {
         </div>
       </div>
     );
+  }
+
+  if (shop.status !== 'PENDING') {
+    return <Navigate to='/dashboard/vendor' />;
   }
 
   return (

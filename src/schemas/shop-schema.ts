@@ -59,8 +59,8 @@ const logoImageValidation = z
     (files) =>
       !files ||
       files.length === 0 ||
-      (files instanceof FileList && files[0]?.size <= 512000),
-    { message: 'Image size must not exceed 500KB' },
+      (files instanceof FileList && files[0]?.size <= 2_097_152),
+    { message: 'Image size must not exceed 2MB' },
   );
 
 const bannerImageValidation = z
@@ -95,7 +95,13 @@ export const EditShopFormSchema = BaseShopSchema.extend({
   keepExistingBanner: z.boolean().optional(),
 });
 
-export const ShopApiSchema = BaseShopSchema;
+export const ShopApiSchema = BaseShopSchema.extend({
+  shippingCost: z.coerce
+    .number()
+    .min(0, 'Shipping cost cannot be negative')
+    .max(100000, 'Shipping cost is too high')
+    .optional(),
+});
 
 export type ShopApplicationFormType = z.infer<typeof ShopApplicationFormSchema>;
 export type EditShopFormType = z.infer<typeof EditShopFormSchema>;

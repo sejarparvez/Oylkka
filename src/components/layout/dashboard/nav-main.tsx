@@ -74,7 +74,7 @@ export function NavMain({ user }: { user: User }) {
         { title: 'My Wishlist', url: '/dashboard/wishlist' },
         { title: 'Followed Shops', url: '/dashboard/followed-shops' },
         { title: 'My Reviews', url: '/dashboard/reviews' },
-        { title: 'Recently Viewed', url: '/shop/recently-viewed' },
+        { title: 'Recently Viewed', url: '/recently-viewed' },
       ],
     },
     {
@@ -204,6 +204,7 @@ export function NavMain({ user }: { user: User }) {
         { title: 'Shop Profile', url: '/dashboard/vendor/shop' },
         { title: 'Branding', url: '/dashboard/vendor/shop/branding' },
         { title: 'Policies', url: '/dashboard/vendor/shop/policies' },
+        { title: 'Payout Details', url: '/dashboard/vendor/shop/payout' },
         { title: 'Messages', url: '/dashboard/vendor/shop/messages' },
       ],
     },

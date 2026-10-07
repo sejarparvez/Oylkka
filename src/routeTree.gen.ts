@@ -15,6 +15,7 @@ import { Route as SizeGuideRouteImport } from './routes/size-guide'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RecentlyViewedRouteImport } from './routes/recently-viewed'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
@@ -34,7 +35,6 @@ import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopsIndexRouteImport } from './routes/shops/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as ShopRecentlyViewedRouteImport } from './routes/shop.recently-viewed'
 import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as DashboardWishlistRouteImport } from './routes/dashboard/wishlist'
@@ -45,6 +45,7 @@ import { Route as DashboardAddressesRouteImport } from './routes/dashboard/addre
 import { Route as CheckoutConfirmationRouteImport } from './routes/checkout/confirmation'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
+import { Route as AuthTwoFactorRouteImport } from './routes/auth/two-factor'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/auth/signin'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
@@ -54,9 +55,11 @@ import { Route as DashboardVendorRouteRouteImport } from './routes/dashboard/ven
 import { Route as DashboardOrdersRouteRouteImport } from './routes/dashboard/orders/route'
 import { Route as DashboardBecomeVendorRouteRouteImport } from './routes/dashboard/become-vendor/route'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/admin/route'
+import { Route as DashboardVendorIndexRouteImport } from './routes/dashboard/vendor/index'
 import { Route as DashboardReviewsIndexRouteImport } from './routes/dashboard/reviews/index'
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
 import { Route as DashboardMessagesIndexRouteImport } from './routes/dashboard/messages/index'
+import { Route as DashboardBecomeVendorIndexRouteImport } from './routes/dashboard/become-vendor/index'
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
 import { Route as ProductsCategorySlugRouteImport } from './routes/products/category.$slug'
 import { Route as DashboardOrdersOrderIdRouteImport } from './routes/dashboard/orders/$orderId'
@@ -76,6 +79,8 @@ import { Route as ApiVouchersAutoApplyRouteImport } from './routes/api/vouchers/
 import { Route as ApiUploadMessageRouteImport } from './routes/api/upload/message'
 import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
 import { Route as ApiShopUpdateRouteImport } from './routes/api/shop/update'
+import { Route as ApiShopUnsuspendRouteImport } from './routes/api/shop/unsuspend'
+import { Route as ApiShopSuspendRouteImport } from './routes/api/shop/suspend'
 import { Route as ApiShopRejectRouteImport } from './routes/api/shop/reject'
 import { Route as ApiShopPublicSingleRouteImport } from './routes/api/shop/public-single'
 import { Route as ApiShopPublicProductsRouteImport } from './routes/api/shop/public-products'
@@ -93,10 +98,12 @@ import { Route as ApiProductVendorListRouteImport } from './routes/api/product/v
 import { Route as ApiProductVendorCategoriesRouteImport } from './routes/api/product/vendor-categories'
 import { Route as ApiProductPublicSingleRouteImport } from './routes/api/product/public-single'
 import { Route as ApiProductPublicReviewsRouteImport } from './routes/api/product/public-reviews'
+import { Route as ApiProductPublicRecentRouteImport } from './routes/api/product/public-recent'
 import { Route as ApiProductPublicQuestionsRouteImport } from './routes/api/product/public-questions'
 import { Route as ApiProductPublicListRouteImport } from './routes/api/product/public-list'
 import { Route as ApiProductPublicCompareRouteImport } from './routes/api/product/public-compare'
 import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/product/public-by-category'
+import { Route as ApiProductHelpfulVoteRouteImport } from './routes/api/product/helpful-vote'
 import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/get-single'
 import { Route as ApiProductEditRouteImport } from './routes/api/product/edit'
 import { Route as ApiProductDeleteRouteImport } from './routes/api/product/delete'
@@ -105,6 +112,7 @@ import { Route as ApiProductCreateRouteImport } from './routes/api/product/creat
 import { Route as ApiProductCheckSkuRouteImport } from './routes/api/product/check-sku'
 import { Route as ApiProductAnswerQuestionRouteImport } from './routes/api/product/answer-question'
 import { Route as ApiOrdersListRouteImport } from './routes/api/orders/list'
+import { Route as ApiOrdersCancelRouteImport } from './routes/api/orders/cancel'
 import { Route as ApiOrdersAdminSingleRouteImport } from './routes/api/orders/admin-single'
 import { Route as ApiOrdersAdminRefundRouteImport } from './routes/api/orders/admin-refund'
 import { Route as ApiOrdersAdminListRouteImport } from './routes/api/orders/admin-list'
@@ -114,6 +122,7 @@ import { Route as ApiOrdersOrderIdRouteImport } from './routes/api/orders/$order
 import { Route as ApiMessagesListRouteImport } from './routes/api/messages/list'
 import { Route as ApiMessagesCreateRouteImport } from './routes/api/messages/create'
 import { Route as ApiMessagesContactVendorRouteImport } from './routes/api/messages/contact-vendor'
+import { Route as ApiConversationsUnreadRouteImport } from './routes/api/conversations/unread'
 import { Route as ApiConversationsListRouteImport } from './routes/api/conversations/list'
 import { Route as ApiConversationsCreateRouteImport } from './routes/api/conversations/create'
 import { Route as ApiConversationsConversationIdRouteImport } from './routes/api/conversations/$conversationId'
@@ -161,6 +170,7 @@ import { Route as DashboardVendorPayoutsIndexRouteImport } from './routes/dashbo
 import { Route as DashboardVendorOrdersIndexRouteImport } from './routes/dashboard/vendor/orders/index'
 import { Route as DashboardOrdersReturnsIndexRouteImport } from './routes/dashboard/orders/returns/index'
 import { Route as DashboardAdminVendorsIndexRouteImport } from './routes/dashboard/admin/vendors/index'
+import { Route as DashboardAdminStaffIndexRouteImport } from './routes/dashboard/admin/staff/index'
 import { Route as DashboardAdminSettingsIndexRouteImport } from './routes/dashboard/admin/settings/index'
 import { Route as DashboardAdminReviewsIndexRouteImport } from './routes/dashboard/admin/reviews/index'
 import { Route as DashboardAdminOrdersIndexRouteImport } from './routes/dashboard/admin/orders/index'
@@ -170,6 +180,7 @@ import { Route as DashboardAdminCustomersIndexRouteImport } from './routes/dashb
 import { Route as DashboardAdminCouponsIndexRouteImport } from './routes/dashboard/admin/coupons/index'
 import { Route as DashboardAdminContentIndexRouteImport } from './routes/dashboard/admin/content/index'
 import { Route as DashboardVendorShopPoliciesRouteImport } from './routes/dashboard/vendor/shop/policies'
+import { Route as DashboardVendorShopPayoutRouteImport } from './routes/dashboard/vendor/shop/payout'
 import { Route as DashboardVendorShopBrandingRouteImport } from './routes/dashboard/vendor/shop/branding'
 import { Route as DashboardVendorShippingTrackingRouteImport } from './routes/dashboard/vendor/shipping/tracking'
 import { Route as DashboardVendorShippingLabelsRouteImport } from './routes/dashboard/vendor/shipping/labels'
@@ -195,6 +206,7 @@ import { Route as DashboardAdminBannerListRouteImport } from './routes/dashboard
 import { Route as DashboardAdminBannerEditRouteImport } from './routes/dashboard/admin/banner/edit'
 import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/admin/banner/add'
 import { Route as ApiVendorShopPoliciesRouteImport } from './routes/api/vendor/shop/policies'
+import { Route as ApiVendorShopPayoutDetailsRouteImport } from './routes/api/vendor/shop/payout-details'
 import { Route as ApiVendorShippingPublicListRouteImport } from './routes/api/vendor/shipping/public-list'
 import { Route as ApiVendorShippingListRouteImport } from './routes/api/vendor/shipping/list'
 import { Route as ApiVendorShippingEditRouteImport } from './routes/api/vendor/shipping/edit'
@@ -216,6 +228,8 @@ import { Route as ApiShopFollowListRouteImport } from './routes/api/shop/follow/
 import { Route as ApiReviewsMyListRouteImport } from './routes/api/reviews/my/list'
 import { Route as ApiReviewsMyIdRouteImport } from './routes/api/reviews/my/$id'
 import { Route as ApiProductReportCreateRouteImport } from './routes/api/product/report/create'
+import { Route as ApiOrdersInvoiceInvoiceIdRouteImport } from './routes/api/orders/invoice/$invoiceId'
+import { Route as ApiAdminShopsShopIdRouteImport } from './routes/api/admin/shops/$shopId'
 import { Route as ApiAdminSettingsUpdateRouteImport } from './routes/api/admin/settings/update'
 import { Route as ApiAdminSettingsListRouteImport } from './routes/api/admin/settings/list'
 import { Route as ApiAdminReviewsListRouteImport } from './routes/api/admin/reviews/list'
@@ -274,6 +288,11 @@ const ReturnsRoute = ReturnsRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecentlyViewedRoute = RecentlyViewedRouteImport.update({
+  id: '/recently-viewed',
+  path: '/recently-viewed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductsRoute = ProductsRouteImport.update({
@@ -371,11 +390,6 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const ShopRecentlyViewedRoute = ShopRecentlyViewedRouteImport.update({
-  id: '/shop/recently-viewed',
-  path: '/shop/recently-viewed',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ShopSlugRoute = ShopSlugRouteImport.update({
   id: '/shop/$slug',
   path: '/shop/$slug',
@@ -426,6 +440,11 @@ const AuthVerifyRoute = AuthVerifyRouteImport.update({
   path: '/auth/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthTwoFactorRoute = AuthTwoFactorRouteImport.update({
+  id: '/auth/two-factor',
+  path: '/auth/two-factor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
   path: '/auth/signup',
@@ -472,6 +491,11 @@ const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardVendorIndexRoute = DashboardVendorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardVendorRouteRoute,
+} as any)
 const DashboardReviewsIndexRoute = DashboardReviewsIndexRouteImport.update({
   id: '/reviews/',
   path: '/reviews/',
@@ -487,6 +511,12 @@ const DashboardMessagesIndexRoute = DashboardMessagesIndexRouteImport.update({
   path: '/messages/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
+const DashboardBecomeVendorIndexRoute =
+  DashboardBecomeVendorIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardBecomeVendorRouteRoute,
+  } as any)
 const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -585,6 +615,16 @@ const ApiShopUpdateRoute = ApiShopUpdateRouteImport.update({
   path: '/api/shop/update',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiShopUnsuspendRoute = ApiShopUnsuspendRouteImport.update({
+  id: '/api/shop/unsuspend',
+  path: '/api/shop/unsuspend',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopSuspendRoute = ApiShopSuspendRouteImport.update({
+  id: '/api/shop/suspend',
+  path: '/api/shop/suspend',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiShopRejectRoute = ApiShopRejectRouteImport.update({
   id: '/api/shop/reject',
   path: '/api/shop/reject',
@@ -671,6 +711,11 @@ const ApiProductPublicReviewsRoute = ApiProductPublicReviewsRouteImport.update({
   path: '/api/product/public-reviews',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiProductPublicRecentRoute = ApiProductPublicRecentRouteImport.update({
+  id: '/api/product/public-recent',
+  path: '/api/product/public-recent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProductPublicQuestionsRoute =
   ApiProductPublicQuestionsRouteImport.update({
     id: '/api/product/public-questions',
@@ -693,6 +738,11 @@ const ApiProductPublicByCategoryRoute =
     path: '/api/product/public-by-category',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiProductHelpfulVoteRoute = ApiProductHelpfulVoteRouteImport.update({
+  id: '/api/product/helpful-vote',
+  path: '/api/product/helpful-vote',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiProductGetSingleRoute = ApiProductGetSingleRouteImport.update({
   id: '/api/product/get-single',
   path: '/api/product/get-single',
@@ -732,6 +782,11 @@ const ApiProductAnswerQuestionRoute =
 const ApiOrdersListRoute = ApiOrdersListRouteImport.update({
   id: '/api/orders/list',
   path: '/api/orders/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersCancelRoute = ApiOrdersCancelRouteImport.update({
+  id: '/api/orders/cancel',
+  path: '/api/orders/cancel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiOrdersAdminSingleRoute = ApiOrdersAdminSingleRouteImport.update({
@@ -780,6 +835,11 @@ const ApiMessagesContactVendorRoute =
     path: '/api/messages/contact-vendor',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiConversationsUnreadRoute = ApiConversationsUnreadRouteImport.update({
+  id: '/api/conversations/unread',
+  path: '/api/conversations/unread',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiConversationsListRoute = ApiConversationsListRouteImport.update({
   id: '/api/conversations/list',
   path: '/api/conversations/list',
@@ -1033,6 +1093,12 @@ const DashboardAdminVendorsIndexRoute =
     path: '/vendors/',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
+const DashboardAdminStaffIndexRoute =
+  DashboardAdminStaffIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminStaffRouteRoute,
+  } as any)
 const DashboardAdminSettingsIndexRoute =
   DashboardAdminSettingsIndexRouteImport.update({
     id: '/settings/',
@@ -1085,6 +1151,12 @@ const DashboardVendorShopPoliciesRoute =
   DashboardVendorShopPoliciesRouteImport.update({
     id: '/shop/policies',
     path: '/shop/policies',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorShopPayoutRoute =
+  DashboardVendorShopPayoutRouteImport.update({
+    id: '/shop/payout',
+    path: '/shop/payout',
     getParentRoute: () => DashboardVendorRouteRoute,
   } as any)
 const DashboardVendorShopBrandingRoute =
@@ -1234,6 +1306,12 @@ const ApiVendorShopPoliciesRoute = ApiVendorShopPoliciesRouteImport.update({
   path: '/api/vendor/shop/policies',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVendorShopPayoutDetailsRoute =
+  ApiVendorShopPayoutDetailsRouteImport.update({
+    id: '/api/vendor/shop/payout-details',
+    path: '/api/vendor/shop/payout-details',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiVendorShippingPublicListRoute =
   ApiVendorShippingPublicListRouteImport.update({
     id: '/api/vendor/shipping/public-list',
@@ -1342,6 +1420,17 @@ const ApiReviewsMyIdRoute = ApiReviewsMyIdRouteImport.update({
 const ApiProductReportCreateRoute = ApiProductReportCreateRouteImport.update({
   id: '/api/product/report/create',
   path: '/api/product/report/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersInvoiceInvoiceIdRoute =
+  ApiOrdersInvoiceInvoiceIdRouteImport.update({
+    id: '/api/orders/invoice/$invoiceId',
+    path: '/api/orders/invoice/$invoiceId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAdminShopsShopIdRoute = ApiAdminShopsShopIdRouteImport.update({
+  id: '/api/admin/shops/$shopId',
+  path: '/api/admin/shops/$shopId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminSettingsUpdateRoute = ApiAdminSettingsUpdateRouteImport.update({
@@ -1518,6 +1607,7 @@ export interface FileRoutesByFullPath {
   '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/recently-viewed': typeof RecentlyViewedRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
@@ -1533,6 +1623,7 @@ export interface FileRoutesByFullPath {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
@@ -1543,7 +1634,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
-  '/shop/recently-viewed': typeof ShopRecentlyViewedRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/shops/': typeof ShopsIndexRoute
   '/dashboard/admin/global-attributes': typeof DashboardAdminGlobalAttributesRouteRouteWithChildren
@@ -1585,6 +1675,7 @@ export interface FileRoutesByFullPath {
   '/api/conversations/$conversationId': typeof ApiConversationsConversationIdRoute
   '/api/conversations/create': typeof ApiConversationsCreateRoute
   '/api/conversations/list': typeof ApiConversationsListRoute
+  '/api/conversations/unread': typeof ApiConversationsUnreadRoute
   '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/messages/create': typeof ApiMessagesCreateRoute
   '/api/messages/list': typeof ApiMessagesListRoute
@@ -1594,6 +1685,7 @@ export interface FileRoutesByFullPath {
   '/api/orders/admin-list': typeof ApiOrdersAdminListRoute
   '/api/orders/admin-refund': typeof ApiOrdersAdminRefundRoute
   '/api/orders/admin-single': typeof ApiOrdersAdminSingleRoute
+  '/api/orders/cancel': typeof ApiOrdersCancelRoute
   '/api/orders/list': typeof ApiOrdersListRoute
   '/api/product/answer-question': typeof ApiProductAnswerQuestionRoute
   '/api/product/check-sku': typeof ApiProductCheckSkuRoute
@@ -1602,10 +1694,12 @@ export interface FileRoutesByFullPath {
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
+  '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
+  '/api/product/public-recent': typeof ApiProductPublicRecentRoute
   '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
   '/api/product/public-single': typeof ApiProductPublicSingleRoute
   '/api/product/vendor-categories': typeof ApiProductVendorCategoriesRoute
@@ -1623,6 +1717,8 @@ export interface FileRoutesByFullPath {
   '/api/shop/public-products': typeof ApiShopPublicProductsRoute
   '/api/shop/public-single': typeof ApiShopPublicSingleRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
+  '/api/shop/suspend': typeof ApiShopSuspendRoute
+  '/api/shop/unsuspend': typeof ApiShopUnsuspendRoute
   '/api/shop/update': typeof ApiShopUpdateRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/api/upload/message': typeof ApiUploadMessageRoute
@@ -1642,9 +1738,11 @@ export interface FileRoutesByFullPath {
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
+  '/dashboard/become-vendor/': typeof DashboardBecomeVendorIndexRoute
   '/dashboard/messages/': typeof DashboardMessagesIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
   '/dashboard/reviews/': typeof DashboardReviewsIndexRoute
+  '/dashboard/vendor/': typeof DashboardVendorIndexRoute
   '/api/admin/content/list': typeof ApiAdminContentListRoute
   '/api/admin/content/save': typeof ApiAdminContentSaveRoute
   '/api/admin/conversations/$conversationId': typeof ApiAdminConversationsConversationIdRoute
@@ -1672,6 +1770,8 @@ export interface FileRoutesByFullPath {
   '/api/admin/reviews/list': typeof ApiAdminReviewsListRoute
   '/api/admin/settings/list': typeof ApiAdminSettingsListRoute
   '/api/admin/settings/update': typeof ApiAdminSettingsUpdateRoute
+  '/api/admin/shops/$shopId': typeof ApiAdminShopsShopIdRoute
+  '/api/orders/invoice/$invoiceId': typeof ApiOrdersInvoiceInvoiceIdRoute
   '/api/product/report/create': typeof ApiProductReportCreateRoute
   '/api/reviews/my/$id': typeof ApiReviewsMyIdRoute
   '/api/reviews/my/list': typeof ApiReviewsMyListRoute
@@ -1693,6 +1793,7 @@ export interface FileRoutesByFullPath {
   '/api/vendor/shipping/edit': typeof ApiVendorShippingEditRoute
   '/api/vendor/shipping/list': typeof ApiVendorShippingListRoute
   '/api/vendor/shipping/public-list': typeof ApiVendorShippingPublicListRoute
+  '/api/vendor/shop/payout-details': typeof ApiVendorShopPayoutDetailsRoute
   '/api/vendor/shop/policies': typeof ApiVendorShopPoliciesRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
@@ -1718,6 +1819,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/vendor/shipping/labels': typeof DashboardVendorShippingLabelsRoute
   '/dashboard/vendor/shipping/tracking': typeof DashboardVendorShippingTrackingRoute
   '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
+  '/dashboard/vendor/shop/payout': typeof DashboardVendorShopPayoutRoute
   '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/content/': typeof DashboardAdminContentIndexRoute
   '/dashboard/admin/coupons/': typeof DashboardAdminCouponsIndexRoute
@@ -1727,6 +1829,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/orders/': typeof DashboardAdminOrdersIndexRoute
   '/dashboard/admin/reviews/': typeof DashboardAdminReviewsIndexRoute
   '/dashboard/admin/settings/': typeof DashboardAdminSettingsIndexRoute
+  '/dashboard/admin/staff/': typeof DashboardAdminStaffIndexRoute
   '/dashboard/admin/vendors/': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/orders/returns/': typeof DashboardOrdersReturnsIndexRoute
   '/dashboard/vendor/orders/': typeof DashboardVendorOrdersIndexRoute
@@ -1755,19 +1858,19 @@ export interface FileRoutesByTo {
   '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/recently-viewed': typeof RecentlyViewedRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/tracking': typeof TrackingRoute
-  '/dashboard/become-vendor': typeof DashboardBecomeVendorRouteRouteWithChildren
-  '/dashboard/vendor': typeof DashboardVendorRouteRouteWithChildren
   '/api/contact': typeof ApiContactRoute
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
@@ -1778,10 +1881,8 @@ export interface FileRoutesByTo {
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
-  '/shop/recently-viewed': typeof ShopRecentlyViewedRoute
   '/dashboard': typeof DashboardIndexRoute
   '/shops': typeof ShopsIndexRoute
-  '/dashboard/admin/staff': typeof DashboardAdminStaffRouteRouteWithChildren
   '/api/addresses/create': typeof ApiAddressesCreateRoute
   '/api/addresses/delete': typeof ApiAddressesDeleteRoute
   '/api/addresses/edit': typeof ApiAddressesEditRoute
@@ -1816,6 +1917,7 @@ export interface FileRoutesByTo {
   '/api/conversations/$conversationId': typeof ApiConversationsConversationIdRoute
   '/api/conversations/create': typeof ApiConversationsCreateRoute
   '/api/conversations/list': typeof ApiConversationsListRoute
+  '/api/conversations/unread': typeof ApiConversationsUnreadRoute
   '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/messages/create': typeof ApiMessagesCreateRoute
   '/api/messages/list': typeof ApiMessagesListRoute
@@ -1825,6 +1927,7 @@ export interface FileRoutesByTo {
   '/api/orders/admin-list': typeof ApiOrdersAdminListRoute
   '/api/orders/admin-refund': typeof ApiOrdersAdminRefundRoute
   '/api/orders/admin-single': typeof ApiOrdersAdminSingleRoute
+  '/api/orders/cancel': typeof ApiOrdersCancelRoute
   '/api/orders/list': typeof ApiOrdersListRoute
   '/api/product/answer-question': typeof ApiProductAnswerQuestionRoute
   '/api/product/check-sku': typeof ApiProductCheckSkuRoute
@@ -1833,10 +1936,12 @@ export interface FileRoutesByTo {
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
+  '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
+  '/api/product/public-recent': typeof ApiProductPublicRecentRoute
   '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
   '/api/product/public-single': typeof ApiProductPublicSingleRoute
   '/api/product/vendor-categories': typeof ApiProductVendorCategoriesRoute
@@ -1854,6 +1959,8 @@ export interface FileRoutesByTo {
   '/api/shop/public-products': typeof ApiShopPublicProductsRoute
   '/api/shop/public-single': typeof ApiShopPublicSingleRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
+  '/api/shop/suspend': typeof ApiShopSuspendRoute
+  '/api/shop/unsuspend': typeof ApiShopUnsuspendRoute
   '/api/shop/update': typeof ApiShopUpdateRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/api/upload/message': typeof ApiUploadMessageRoute
@@ -1873,9 +1980,11 @@ export interface FileRoutesByTo {
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
   '/dashboard/admin': typeof DashboardAdminIndexRoute
+  '/dashboard/become-vendor': typeof DashboardBecomeVendorIndexRoute
   '/dashboard/messages': typeof DashboardMessagesIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
   '/dashboard/reviews': typeof DashboardReviewsIndexRoute
+  '/dashboard/vendor': typeof DashboardVendorIndexRoute
   '/api/admin/content/list': typeof ApiAdminContentListRoute
   '/api/admin/content/save': typeof ApiAdminContentSaveRoute
   '/api/admin/conversations/$conversationId': typeof ApiAdminConversationsConversationIdRoute
@@ -1903,6 +2012,8 @@ export interface FileRoutesByTo {
   '/api/admin/reviews/list': typeof ApiAdminReviewsListRoute
   '/api/admin/settings/list': typeof ApiAdminSettingsListRoute
   '/api/admin/settings/update': typeof ApiAdminSettingsUpdateRoute
+  '/api/admin/shops/$shopId': typeof ApiAdminShopsShopIdRoute
+  '/api/orders/invoice/$invoiceId': typeof ApiOrdersInvoiceInvoiceIdRoute
   '/api/product/report/create': typeof ApiProductReportCreateRoute
   '/api/reviews/my/$id': typeof ApiReviewsMyIdRoute
   '/api/reviews/my/list': typeof ApiReviewsMyListRoute
@@ -1924,6 +2035,7 @@ export interface FileRoutesByTo {
   '/api/vendor/shipping/edit': typeof ApiVendorShippingEditRoute
   '/api/vendor/shipping/list': typeof ApiVendorShippingListRoute
   '/api/vendor/shipping/public-list': typeof ApiVendorShippingPublicListRoute
+  '/api/vendor/shop/payout-details': typeof ApiVendorShopPayoutDetailsRoute
   '/api/vendor/shop/policies': typeof ApiVendorShopPoliciesRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
@@ -1949,6 +2061,7 @@ export interface FileRoutesByTo {
   '/dashboard/vendor/shipping/labels': typeof DashboardVendorShippingLabelsRoute
   '/dashboard/vendor/shipping/tracking': typeof DashboardVendorShippingTrackingRoute
   '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
+  '/dashboard/vendor/shop/payout': typeof DashboardVendorShopPayoutRoute
   '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/content': typeof DashboardAdminContentIndexRoute
   '/dashboard/admin/coupons': typeof DashboardAdminCouponsIndexRoute
@@ -1958,6 +2071,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/orders': typeof DashboardAdminOrdersIndexRoute
   '/dashboard/admin/reviews': typeof DashboardAdminReviewsIndexRoute
   '/dashboard/admin/settings': typeof DashboardAdminSettingsIndexRoute
+  '/dashboard/admin/staff': typeof DashboardAdminStaffIndexRoute
   '/dashboard/admin/vendors': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/orders/returns': typeof DashboardOrdersReturnsIndexRoute
   '/dashboard/vendor/orders': typeof DashboardVendorOrdersIndexRoute
@@ -1988,6 +2102,7 @@ export interface FileRoutesById {
   '/new-arrivals': typeof NewArrivalsRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRouteWithChildren
+  '/recently-viewed': typeof RecentlyViewedRoute
   '/reset-password': typeof ResetPasswordRoute
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
@@ -2003,6 +2118,7 @@ export interface FileRoutesById {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/signin': typeof AuthSigninRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/auth/two-factor': typeof AuthTwoFactorRoute
   '/auth/verify': typeof AuthVerifyRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
@@ -2013,7 +2129,6 @@ export interface FileRoutesById {
   '/dashboard/wishlist': typeof DashboardWishlistRoute
   '/product/$slug': typeof ProductSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
-  '/shop/recently-viewed': typeof ShopRecentlyViewedRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/shops/': typeof ShopsIndexRoute
   '/dashboard/admin/global-attributes': typeof DashboardAdminGlobalAttributesRouteRouteWithChildren
@@ -2055,6 +2170,7 @@ export interface FileRoutesById {
   '/api/conversations/$conversationId': typeof ApiConversationsConversationIdRoute
   '/api/conversations/create': typeof ApiConversationsCreateRoute
   '/api/conversations/list': typeof ApiConversationsListRoute
+  '/api/conversations/unread': typeof ApiConversationsUnreadRoute
   '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/messages/create': typeof ApiMessagesCreateRoute
   '/api/messages/list': typeof ApiMessagesListRoute
@@ -2064,6 +2180,7 @@ export interface FileRoutesById {
   '/api/orders/admin-list': typeof ApiOrdersAdminListRoute
   '/api/orders/admin-refund': typeof ApiOrdersAdminRefundRoute
   '/api/orders/admin-single': typeof ApiOrdersAdminSingleRoute
+  '/api/orders/cancel': typeof ApiOrdersCancelRoute
   '/api/orders/list': typeof ApiOrdersListRoute
   '/api/product/answer-question': typeof ApiProductAnswerQuestionRoute
   '/api/product/check-sku': typeof ApiProductCheckSkuRoute
@@ -2072,10 +2189,12 @@ export interface FileRoutesById {
   '/api/product/delete': typeof ApiProductDeleteRoute
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
+  '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
   '/api/product/public-questions': typeof ApiProductPublicQuestionsRoute
+  '/api/product/public-recent': typeof ApiProductPublicRecentRoute
   '/api/product/public-reviews': typeof ApiProductPublicReviewsRoute
   '/api/product/public-single': typeof ApiProductPublicSingleRoute
   '/api/product/vendor-categories': typeof ApiProductVendorCategoriesRoute
@@ -2093,6 +2212,8 @@ export interface FileRoutesById {
   '/api/shop/public-products': typeof ApiShopPublicProductsRoute
   '/api/shop/public-single': typeof ApiShopPublicSingleRoute
   '/api/shop/reject': typeof ApiShopRejectRoute
+  '/api/shop/suspend': typeof ApiShopSuspendRoute
+  '/api/shop/unsuspend': typeof ApiShopUnsuspendRoute
   '/api/shop/update': typeof ApiShopUpdateRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/api/upload/message': typeof ApiUploadMessageRoute
@@ -2112,9 +2233,11 @@ export interface FileRoutesById {
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
+  '/dashboard/become-vendor/': typeof DashboardBecomeVendorIndexRoute
   '/dashboard/messages/': typeof DashboardMessagesIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
   '/dashboard/reviews/': typeof DashboardReviewsIndexRoute
+  '/dashboard/vendor/': typeof DashboardVendorIndexRoute
   '/api/admin/content/list': typeof ApiAdminContentListRoute
   '/api/admin/content/save': typeof ApiAdminContentSaveRoute
   '/api/admin/conversations/$conversationId': typeof ApiAdminConversationsConversationIdRoute
@@ -2142,6 +2265,8 @@ export interface FileRoutesById {
   '/api/admin/reviews/list': typeof ApiAdminReviewsListRoute
   '/api/admin/settings/list': typeof ApiAdminSettingsListRoute
   '/api/admin/settings/update': typeof ApiAdminSettingsUpdateRoute
+  '/api/admin/shops/$shopId': typeof ApiAdminShopsShopIdRoute
+  '/api/orders/invoice/$invoiceId': typeof ApiOrdersInvoiceInvoiceIdRoute
   '/api/product/report/create': typeof ApiProductReportCreateRoute
   '/api/reviews/my/$id': typeof ApiReviewsMyIdRoute
   '/api/reviews/my/list': typeof ApiReviewsMyListRoute
@@ -2163,6 +2288,7 @@ export interface FileRoutesById {
   '/api/vendor/shipping/edit': typeof ApiVendorShippingEditRoute
   '/api/vendor/shipping/list': typeof ApiVendorShippingListRoute
   '/api/vendor/shipping/public-list': typeof ApiVendorShippingPublicListRoute
+  '/api/vendor/shop/payout-details': typeof ApiVendorShopPayoutDetailsRoute
   '/api/vendor/shop/policies': typeof ApiVendorShopPoliciesRoute
   '/dashboard/admin/banner/add': typeof DashboardAdminBannerAddRoute
   '/dashboard/admin/banner/edit': typeof DashboardAdminBannerEditRoute
@@ -2188,6 +2314,7 @@ export interface FileRoutesById {
   '/dashboard/vendor/shipping/labels': typeof DashboardVendorShippingLabelsRoute
   '/dashboard/vendor/shipping/tracking': typeof DashboardVendorShippingTrackingRoute
   '/dashboard/vendor/shop/branding': typeof DashboardVendorShopBrandingRoute
+  '/dashboard/vendor/shop/payout': typeof DashboardVendorShopPayoutRoute
   '/dashboard/vendor/shop/policies': typeof DashboardVendorShopPoliciesRoute
   '/dashboard/admin/content/': typeof DashboardAdminContentIndexRoute
   '/dashboard/admin/coupons/': typeof DashboardAdminCouponsIndexRoute
@@ -2197,6 +2324,7 @@ export interface FileRoutesById {
   '/dashboard/admin/orders/': typeof DashboardAdminOrdersIndexRoute
   '/dashboard/admin/reviews/': typeof DashboardAdminReviewsIndexRoute
   '/dashboard/admin/settings/': typeof DashboardAdminSettingsIndexRoute
+  '/dashboard/admin/staff/': typeof DashboardAdminStaffIndexRoute
   '/dashboard/admin/vendors/': typeof DashboardAdminVendorsIndexRoute
   '/dashboard/orders/returns/': typeof DashboardOrdersReturnsIndexRoute
   '/dashboard/vendor/orders/': typeof DashboardVendorOrdersIndexRoute
@@ -2228,6 +2356,7 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/privacy'
     | '/products'
+    | '/recently-viewed'
     | '/reset-password'
     | '/returns'
     | '/shipping'
@@ -2243,6 +2372,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/two-factor'
     | '/auth/verify'
     | '/blog/$slug'
     | '/checkout/confirmation'
@@ -2253,7 +2383,6 @@ export interface FileRouteTypes {
     | '/dashboard/wishlist'
     | '/product/$slug'
     | '/shop/$slug'
-    | '/shop/recently-viewed'
     | '/dashboard/'
     | '/shops/'
     | '/dashboard/admin/global-attributes'
@@ -2295,6 +2424,7 @@ export interface FileRouteTypes {
     | '/api/conversations/$conversationId'
     | '/api/conversations/create'
     | '/api/conversations/list'
+    | '/api/conversations/unread'
     | '/api/messages/contact-vendor'
     | '/api/messages/create'
     | '/api/messages/list'
@@ -2304,6 +2434,7 @@ export interface FileRouteTypes {
     | '/api/orders/admin-list'
     | '/api/orders/admin-refund'
     | '/api/orders/admin-single'
+    | '/api/orders/cancel'
     | '/api/orders/list'
     | '/api/product/answer-question'
     | '/api/product/check-sku'
@@ -2312,10 +2443,12 @@ export interface FileRouteTypes {
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
+    | '/api/product/helpful-vote'
     | '/api/product/public-by-category'
     | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
+    | '/api/product/public-recent'
     | '/api/product/public-reviews'
     | '/api/product/public-single'
     | '/api/product/vendor-categories'
@@ -2333,6 +2466,8 @@ export interface FileRouteTypes {
     | '/api/shop/public-products'
     | '/api/shop/public-single'
     | '/api/shop/reject'
+    | '/api/shop/suspend'
+    | '/api/shop/unsuspend'
     | '/api/shop/update'
     | '/api/upload/avatar'
     | '/api/upload/message'
@@ -2352,9 +2487,11 @@ export interface FileRouteTypes {
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
     | '/dashboard/admin/'
+    | '/dashboard/become-vendor/'
     | '/dashboard/messages/'
     | '/dashboard/orders/'
     | '/dashboard/reviews/'
+    | '/dashboard/vendor/'
     | '/api/admin/content/list'
     | '/api/admin/content/save'
     | '/api/admin/conversations/$conversationId'
@@ -2382,6 +2519,8 @@ export interface FileRouteTypes {
     | '/api/admin/reviews/list'
     | '/api/admin/settings/list'
     | '/api/admin/settings/update'
+    | '/api/admin/shops/$shopId'
+    | '/api/orders/invoice/$invoiceId'
     | '/api/product/report/create'
     | '/api/reviews/my/$id'
     | '/api/reviews/my/list'
@@ -2403,6 +2542,7 @@ export interface FileRouteTypes {
     | '/api/vendor/shipping/edit'
     | '/api/vendor/shipping/list'
     | '/api/vendor/shipping/public-list'
+    | '/api/vendor/shop/payout-details'
     | '/api/vendor/shop/policies'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
@@ -2428,6 +2568,7 @@ export interface FileRouteTypes {
     | '/dashboard/vendor/shipping/labels'
     | '/dashboard/vendor/shipping/tracking'
     | '/dashboard/vendor/shop/branding'
+    | '/dashboard/vendor/shop/payout'
     | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/content/'
     | '/dashboard/admin/coupons/'
@@ -2437,6 +2578,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/orders/'
     | '/dashboard/admin/reviews/'
     | '/dashboard/admin/settings/'
+    | '/dashboard/admin/staff/'
     | '/dashboard/admin/vendors/'
     | '/dashboard/orders/returns/'
     | '/dashboard/vendor/orders/'
@@ -2465,19 +2607,19 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/privacy'
     | '/products'
+    | '/recently-viewed'
     | '/reset-password'
     | '/returns'
     | '/shipping'
     | '/size-guide'
     | '/terms'
     | '/tracking'
-    | '/dashboard/become-vendor'
-    | '/dashboard/vendor'
     | '/api/contact'
     | '/auth/error'
     | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/two-factor'
     | '/auth/verify'
     | '/blog/$slug'
     | '/checkout/confirmation'
@@ -2488,10 +2630,8 @@ export interface FileRouteTypes {
     | '/dashboard/wishlist'
     | '/product/$slug'
     | '/shop/$slug'
-    | '/shop/recently-viewed'
     | '/dashboard'
     | '/shops'
-    | '/dashboard/admin/staff'
     | '/api/addresses/create'
     | '/api/addresses/delete'
     | '/api/addresses/edit'
@@ -2526,6 +2666,7 @@ export interface FileRouteTypes {
     | '/api/conversations/$conversationId'
     | '/api/conversations/create'
     | '/api/conversations/list'
+    | '/api/conversations/unread'
     | '/api/messages/contact-vendor'
     | '/api/messages/create'
     | '/api/messages/list'
@@ -2535,6 +2676,7 @@ export interface FileRouteTypes {
     | '/api/orders/admin-list'
     | '/api/orders/admin-refund'
     | '/api/orders/admin-single'
+    | '/api/orders/cancel'
     | '/api/orders/list'
     | '/api/product/answer-question'
     | '/api/product/check-sku'
@@ -2543,10 +2685,12 @@ export interface FileRouteTypes {
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
+    | '/api/product/helpful-vote'
     | '/api/product/public-by-category'
     | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
+    | '/api/product/public-recent'
     | '/api/product/public-reviews'
     | '/api/product/public-single'
     | '/api/product/vendor-categories'
@@ -2564,6 +2708,8 @@ export interface FileRouteTypes {
     | '/api/shop/public-products'
     | '/api/shop/public-single'
     | '/api/shop/reject'
+    | '/api/shop/suspend'
+    | '/api/shop/unsuspend'
     | '/api/shop/update'
     | '/api/upload/avatar'
     | '/api/upload/message'
@@ -2583,9 +2729,11 @@ export interface FileRouteTypes {
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
     | '/dashboard/admin'
+    | '/dashboard/become-vendor'
     | '/dashboard/messages'
     | '/dashboard/orders'
     | '/dashboard/reviews'
+    | '/dashboard/vendor'
     | '/api/admin/content/list'
     | '/api/admin/content/save'
     | '/api/admin/conversations/$conversationId'
@@ -2613,6 +2761,8 @@ export interface FileRouteTypes {
     | '/api/admin/reviews/list'
     | '/api/admin/settings/list'
     | '/api/admin/settings/update'
+    | '/api/admin/shops/$shopId'
+    | '/api/orders/invoice/$invoiceId'
     | '/api/product/report/create'
     | '/api/reviews/my/$id'
     | '/api/reviews/my/list'
@@ -2634,6 +2784,7 @@ export interface FileRouteTypes {
     | '/api/vendor/shipping/edit'
     | '/api/vendor/shipping/list'
     | '/api/vendor/shipping/public-list'
+    | '/api/vendor/shop/payout-details'
     | '/api/vendor/shop/policies'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
@@ -2659,6 +2810,7 @@ export interface FileRouteTypes {
     | '/dashboard/vendor/shipping/labels'
     | '/dashboard/vendor/shipping/tracking'
     | '/dashboard/vendor/shop/branding'
+    | '/dashboard/vendor/shop/payout'
     | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/content'
     | '/dashboard/admin/coupons'
@@ -2668,6 +2820,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/orders'
     | '/dashboard/admin/reviews'
     | '/dashboard/admin/settings'
+    | '/dashboard/admin/staff'
     | '/dashboard/admin/vendors'
     | '/dashboard/orders/returns'
     | '/dashboard/vendor/orders'
@@ -2697,6 +2850,7 @@ export interface FileRouteTypes {
     | '/new-arrivals'
     | '/privacy'
     | '/products'
+    | '/recently-viewed'
     | '/reset-password'
     | '/returns'
     | '/shipping'
@@ -2712,6 +2866,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/signin'
     | '/auth/signup'
+    | '/auth/two-factor'
     | '/auth/verify'
     | '/blog/$slug'
     | '/checkout/confirmation'
@@ -2722,7 +2877,6 @@ export interface FileRouteTypes {
     | '/dashboard/wishlist'
     | '/product/$slug'
     | '/shop/$slug'
-    | '/shop/recently-viewed'
     | '/dashboard/'
     | '/shops/'
     | '/dashboard/admin/global-attributes'
@@ -2764,6 +2918,7 @@ export interface FileRouteTypes {
     | '/api/conversations/$conversationId'
     | '/api/conversations/create'
     | '/api/conversations/list'
+    | '/api/conversations/unread'
     | '/api/messages/contact-vendor'
     | '/api/messages/create'
     | '/api/messages/list'
@@ -2773,6 +2928,7 @@ export interface FileRouteTypes {
     | '/api/orders/admin-list'
     | '/api/orders/admin-refund'
     | '/api/orders/admin-single'
+    | '/api/orders/cancel'
     | '/api/orders/list'
     | '/api/product/answer-question'
     | '/api/product/check-sku'
@@ -2781,10 +2937,12 @@ export interface FileRouteTypes {
     | '/api/product/delete'
     | '/api/product/edit'
     | '/api/product/get-single'
+    | '/api/product/helpful-vote'
     | '/api/product/public-by-category'
     | '/api/product/public-compare'
     | '/api/product/public-list'
     | '/api/product/public-questions'
+    | '/api/product/public-recent'
     | '/api/product/public-reviews'
     | '/api/product/public-single'
     | '/api/product/vendor-categories'
@@ -2802,6 +2960,8 @@ export interface FileRouteTypes {
     | '/api/shop/public-products'
     | '/api/shop/public-single'
     | '/api/shop/reject'
+    | '/api/shop/suspend'
+    | '/api/shop/unsuspend'
     | '/api/shop/update'
     | '/api/upload/avatar'
     | '/api/upload/message'
@@ -2821,9 +2981,11 @@ export interface FileRouteTypes {
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
     | '/dashboard/admin/'
+    | '/dashboard/become-vendor/'
     | '/dashboard/messages/'
     | '/dashboard/orders/'
     | '/dashboard/reviews/'
+    | '/dashboard/vendor/'
     | '/api/admin/content/list'
     | '/api/admin/content/save'
     | '/api/admin/conversations/$conversationId'
@@ -2851,6 +3013,8 @@ export interface FileRouteTypes {
     | '/api/admin/reviews/list'
     | '/api/admin/settings/list'
     | '/api/admin/settings/update'
+    | '/api/admin/shops/$shopId'
+    | '/api/orders/invoice/$invoiceId'
     | '/api/product/report/create'
     | '/api/reviews/my/$id'
     | '/api/reviews/my/list'
@@ -2872,6 +3036,7 @@ export interface FileRouteTypes {
     | '/api/vendor/shipping/edit'
     | '/api/vendor/shipping/list'
     | '/api/vendor/shipping/public-list'
+    | '/api/vendor/shop/payout-details'
     | '/api/vendor/shop/policies'
     | '/dashboard/admin/banner/add'
     | '/dashboard/admin/banner/edit'
@@ -2897,6 +3062,7 @@ export interface FileRouteTypes {
     | '/dashboard/vendor/shipping/labels'
     | '/dashboard/vendor/shipping/tracking'
     | '/dashboard/vendor/shop/branding'
+    | '/dashboard/vendor/shop/payout'
     | '/dashboard/vendor/shop/policies'
     | '/dashboard/admin/content/'
     | '/dashboard/admin/coupons/'
@@ -2906,6 +3072,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/orders/'
     | '/dashboard/admin/reviews/'
     | '/dashboard/admin/settings/'
+    | '/dashboard/admin/staff/'
     | '/dashboard/admin/vendors/'
     | '/dashboard/orders/returns/'
     | '/dashboard/vendor/orders/'
@@ -2936,6 +3103,7 @@ export interface RootRouteChildren {
   NewArrivalsRoute: typeof NewArrivalsRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductsRoute: typeof ProductsRouteWithChildren
+  RecentlyViewedRoute: typeof RecentlyViewedRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReturnsRoute: typeof ReturnsRoute
   ShippingRoute: typeof ShippingRoute
@@ -2947,10 +3115,10 @@ export interface RootRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthSigninRoute: typeof AuthSigninRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  AuthTwoFactorRoute: typeof AuthTwoFactorRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
-  ShopRecentlyViewedRoute: typeof ShopRecentlyViewedRoute
   ShopsIndexRoute: typeof ShopsIndexRoute
   ApiAddressesCreateRoute: typeof ApiAddressesCreateRoute
   ApiAddressesDeleteRoute: typeof ApiAddressesDeleteRoute
@@ -2986,6 +3154,7 @@ export interface RootRouteChildren {
   ApiConversationsConversationIdRoute: typeof ApiConversationsConversationIdRoute
   ApiConversationsCreateRoute: typeof ApiConversationsCreateRoute
   ApiConversationsListRoute: typeof ApiConversationsListRoute
+  ApiConversationsUnreadRoute: typeof ApiConversationsUnreadRoute
   ApiMessagesContactVendorRoute: typeof ApiMessagesContactVendorRoute
   ApiMessagesCreateRoute: typeof ApiMessagesCreateRoute
   ApiMessagesListRoute: typeof ApiMessagesListRoute
@@ -2995,6 +3164,7 @@ export interface RootRouteChildren {
   ApiOrdersAdminListRoute: typeof ApiOrdersAdminListRoute
   ApiOrdersAdminRefundRoute: typeof ApiOrdersAdminRefundRoute
   ApiOrdersAdminSingleRoute: typeof ApiOrdersAdminSingleRoute
+  ApiOrdersCancelRoute: typeof ApiOrdersCancelRoute
   ApiOrdersListRoute: typeof ApiOrdersListRoute
   ApiProductAnswerQuestionRoute: typeof ApiProductAnswerQuestionRoute
   ApiProductCheckSkuRoute: typeof ApiProductCheckSkuRoute
@@ -3003,10 +3173,12 @@ export interface RootRouteChildren {
   ApiProductDeleteRoute: typeof ApiProductDeleteRoute
   ApiProductEditRoute: typeof ApiProductEditRoute
   ApiProductGetSingleRoute: typeof ApiProductGetSingleRoute
+  ApiProductHelpfulVoteRoute: typeof ApiProductHelpfulVoteRoute
   ApiProductPublicByCategoryRoute: typeof ApiProductPublicByCategoryRoute
   ApiProductPublicCompareRoute: typeof ApiProductPublicCompareRoute
   ApiProductPublicListRoute: typeof ApiProductPublicListRoute
   ApiProductPublicQuestionsRoute: typeof ApiProductPublicQuestionsRoute
+  ApiProductPublicRecentRoute: typeof ApiProductPublicRecentRoute
   ApiProductPublicReviewsRoute: typeof ApiProductPublicReviewsRoute
   ApiProductPublicSingleRoute: typeof ApiProductPublicSingleRoute
   ApiProductVendorCategoriesRoute: typeof ApiProductVendorCategoriesRoute
@@ -3024,6 +3196,8 @@ export interface RootRouteChildren {
   ApiShopPublicProductsRoute: typeof ApiShopPublicProductsRoute
   ApiShopPublicSingleRoute: typeof ApiShopPublicSingleRoute
   ApiShopRejectRoute: typeof ApiShopRejectRoute
+  ApiShopSuspendRoute: typeof ApiShopSuspendRoute
+  ApiShopUnsuspendRoute: typeof ApiShopUnsuspendRoute
   ApiShopUpdateRoute: typeof ApiShopUpdateRoute
   ApiUploadAvatarRoute: typeof ApiUploadAvatarRoute
   ApiUploadMessageRoute: typeof ApiUploadMessageRoute
@@ -3064,6 +3238,8 @@ export interface RootRouteChildren {
   ApiAdminReviewsListRoute: typeof ApiAdminReviewsListRoute
   ApiAdminSettingsListRoute: typeof ApiAdminSettingsListRoute
   ApiAdminSettingsUpdateRoute: typeof ApiAdminSettingsUpdateRoute
+  ApiAdminShopsShopIdRoute: typeof ApiAdminShopsShopIdRoute
+  ApiOrdersInvoiceInvoiceIdRoute: typeof ApiOrdersInvoiceInvoiceIdRoute
   ApiProductReportCreateRoute: typeof ApiProductReportCreateRoute
   ApiReviewsMyIdRoute: typeof ApiReviewsMyIdRoute
   ApiReviewsMyListRoute: typeof ApiReviewsMyListRoute
@@ -3085,6 +3261,7 @@ export interface RootRouteChildren {
   ApiVendorShippingEditRoute: typeof ApiVendorShippingEditRoute
   ApiVendorShippingListRoute: typeof ApiVendorShippingListRoute
   ApiVendorShippingPublicListRoute: typeof ApiVendorShippingPublicListRoute
+  ApiVendorShopPayoutDetailsRoute: typeof ApiVendorShopPayoutDetailsRoute
   ApiVendorShopPoliciesRoute: typeof ApiVendorShopPoliciesRoute
 }
 
@@ -3130,6 +3307,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recently-viewed': {
+      id: '/recently-viewed'
+      path: '/recently-viewed'
+      fullPath: '/recently-viewed'
+      preLoaderRoute: typeof RecentlyViewedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/products': {
@@ -3265,13 +3449,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/shop/recently-viewed': {
-      id: '/shop/recently-viewed'
-      path: '/shop/recently-viewed'
-      fullPath: '/shop/recently-viewed'
-      preLoaderRoute: typeof ShopRecentlyViewedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/shop/$slug': {
       id: '/shop/$slug'
       path: '/shop/$slug'
@@ -3342,6 +3519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/two-factor': {
+      id: '/auth/two-factor'
+      path: '/auth/two-factor'
+      fullPath: '/auth/two-factor'
+      preLoaderRoute: typeof AuthTwoFactorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/signup': {
       id: '/auth/signup'
       path: '/auth/signup'
@@ -3405,6 +3589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/vendor/': {
+      id: '/dashboard/vendor/'
+      path: '/'
+      fullPath: '/dashboard/vendor/'
+      preLoaderRoute: typeof DashboardVendorIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
     '/dashboard/reviews/': {
       id: '/dashboard/reviews/'
       path: '/reviews'
@@ -3425,6 +3616,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/messages/'
       preLoaderRoute: typeof DashboardMessagesIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/become-vendor/': {
+      id: '/dashboard/become-vendor/'
+      path: '/'
+      fullPath: '/dashboard/become-vendor/'
+      preLoaderRoute: typeof DashboardBecomeVendorIndexRouteImport
+      parentRoute: typeof DashboardBecomeVendorRouteRoute
     }
     '/dashboard/admin/': {
       id: '/dashboard/admin/'
@@ -3559,6 +3757,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiShopUpdateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/shop/unsuspend': {
+      id: '/api/shop/unsuspend'
+      path: '/api/shop/unsuspend'
+      fullPath: '/api/shop/unsuspend'
+      preLoaderRoute: typeof ApiShopUnsuspendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/suspend': {
+      id: '/api/shop/suspend'
+      path: '/api/shop/suspend'
+      fullPath: '/api/shop/suspend'
+      preLoaderRoute: typeof ApiShopSuspendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/shop/reject': {
       id: '/api/shop/reject'
       path: '/api/shop/reject'
@@ -3678,6 +3890,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProductPublicReviewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/product/public-recent': {
+      id: '/api/product/public-recent'
+      path: '/api/product/public-recent'
+      fullPath: '/api/product/public-recent'
+      preLoaderRoute: typeof ApiProductPublicRecentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/product/public-questions': {
       id: '/api/product/public-questions'
       path: '/api/product/public-questions'
@@ -3704,6 +3923,13 @@ declare module '@tanstack/react-router' {
       path: '/api/product/public-by-category'
       fullPath: '/api/product/public-by-category'
       preLoaderRoute: typeof ApiProductPublicByCategoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/helpful-vote': {
+      id: '/api/product/helpful-vote'
+      path: '/api/product/helpful-vote'
+      fullPath: '/api/product/helpful-vote'
+      preLoaderRoute: typeof ApiProductHelpfulVoteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/product/get-single': {
@@ -3760,6 +3986,13 @@ declare module '@tanstack/react-router' {
       path: '/api/orders/list'
       fullPath: '/api/orders/list'
       preLoaderRoute: typeof ApiOrdersListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/cancel': {
+      id: '/api/orders/cancel'
+      path: '/api/orders/cancel'
+      fullPath: '/api/orders/cancel'
+      preLoaderRoute: typeof ApiOrdersCancelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/orders/admin-single': {
@@ -3823,6 +4056,13 @@ declare module '@tanstack/react-router' {
       path: '/api/messages/contact-vendor'
       fullPath: '/api/messages/contact-vendor'
       preLoaderRoute: typeof ApiMessagesContactVendorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/conversations/unread': {
+      id: '/api/conversations/unread'
+      path: '/api/conversations/unread'
+      fullPath: '/api/conversations/unread'
+      preLoaderRoute: typeof ApiConversationsUnreadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/conversations/list': {
@@ -4154,6 +4394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminVendorsIndexRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
+    '/dashboard/admin/staff/': {
+      id: '/dashboard/admin/staff/'
+      path: '/'
+      fullPath: '/dashboard/admin/staff/'
+      preLoaderRoute: typeof DashboardAdminStaffIndexRouteImport
+      parentRoute: typeof DashboardAdminStaffRouteRoute
+    }
     '/dashboard/admin/settings/': {
       id: '/dashboard/admin/settings/'
       path: '/settings'
@@ -4215,6 +4462,13 @@ declare module '@tanstack/react-router' {
       path: '/shop/policies'
       fullPath: '/dashboard/vendor/shop/policies'
       preLoaderRoute: typeof DashboardVendorShopPoliciesRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/shop/payout': {
+      id: '/dashboard/vendor/shop/payout'
+      path: '/shop/payout'
+      fullPath: '/dashboard/vendor/shop/payout'
+      preLoaderRoute: typeof DashboardVendorShopPayoutRouteImport
       parentRoute: typeof DashboardVendorRouteRoute
     }
     '/dashboard/vendor/shop/branding': {
@@ -4392,6 +4646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiVendorShopPoliciesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/vendor/shop/payout-details': {
+      id: '/api/vendor/shop/payout-details'
+      path: '/api/vendor/shop/payout-details'
+      fullPath: '/api/vendor/shop/payout-details'
+      preLoaderRoute: typeof ApiVendorShopPayoutDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/vendor/shipping/public-list': {
       id: '/api/vendor/shipping/public-list'
       path: '/api/vendor/shipping/public-list'
@@ -4537,6 +4798,20 @@ declare module '@tanstack/react-router' {
       path: '/api/product/report/create'
       fullPath: '/api/product/report/create'
       preLoaderRoute: typeof ApiProductReportCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/invoice/$invoiceId': {
+      id: '/api/orders/invoice/$invoiceId'
+      path: '/api/orders/invoice/$invoiceId'
+      fullPath: '/api/orders/invoice/$invoiceId'
+      preLoaderRoute: typeof ApiOrdersInvoiceInvoiceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/shops/$shopId': {
+      id: '/api/admin/shops/$shopId'
+      path: '/api/admin/shops/$shopId'
+      fullPath: '/api/admin/shops/$shopId'
+      preLoaderRoute: typeof ApiAdminShopsShopIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/settings/update': {
@@ -4768,11 +5043,13 @@ const DashboardAdminGlobalAttributesRouteRouteWithChildren =
 
 interface DashboardAdminStaffRouteRouteChildren {
   DashboardAdminStaffAuditLogsRoute: typeof DashboardAdminStaffAuditLogsRoute
+  DashboardAdminStaffIndexRoute: typeof DashboardAdminStaffIndexRoute
 }
 
 const DashboardAdminStaffRouteRouteChildren: DashboardAdminStaffRouteRouteChildren =
   {
     DashboardAdminStaffAuditLogsRoute: DashboardAdminStaffAuditLogsRoute,
+    DashboardAdminStaffIndexRoute: DashboardAdminStaffIndexRoute,
   }
 
 const DashboardAdminStaffRouteRouteWithChildren =
@@ -4841,12 +5118,14 @@ const DashboardAdminRouteRouteWithChildren =
 interface DashboardBecomeVendorRouteRouteChildren {
   DashboardBecomeVendorApplyRoute: typeof DashboardBecomeVendorApplyRoute
   DashboardBecomeVendorPendingRoute: typeof DashboardBecomeVendorPendingRoute
+  DashboardBecomeVendorIndexRoute: typeof DashboardBecomeVendorIndexRoute
 }
 
 const DashboardBecomeVendorRouteRouteChildren: DashboardBecomeVendorRouteRouteChildren =
   {
     DashboardBecomeVendorApplyRoute: DashboardBecomeVendorApplyRoute,
     DashboardBecomeVendorPendingRoute: DashboardBecomeVendorPendingRoute,
+    DashboardBecomeVendorIndexRoute: DashboardBecomeVendorIndexRoute,
   }
 
 const DashboardBecomeVendorRouteRouteWithChildren =
@@ -4923,10 +5202,12 @@ const DashboardVendorShippingRouteRouteWithChildren =
 interface DashboardVendorRouteRouteChildren {
   DashboardVendorPayoutsRouteRoute: typeof DashboardVendorPayoutsRouteRouteWithChildren
   DashboardVendorShippingRouteRoute: typeof DashboardVendorShippingRouteRouteWithChildren
+  DashboardVendorIndexRoute: typeof DashboardVendorIndexRoute
   DashboardVendorOrdersOrderIdRoute: typeof DashboardVendorOrdersOrderIdRoute
   DashboardVendorProductsAddRoute: typeof DashboardVendorProductsAddRoute
   DashboardVendorProductsEditRoute: typeof DashboardVendorProductsEditRoute
   DashboardVendorShopBrandingRoute: typeof DashboardVendorShopBrandingRoute
+  DashboardVendorShopPayoutRoute: typeof DashboardVendorShopPayoutRoute
   DashboardVendorShopPoliciesRoute: typeof DashboardVendorShopPoliciesRoute
   DashboardVendorOrdersIndexRoute: typeof DashboardVendorOrdersIndexRoute
   DashboardVendorProductsIndexRoute: typeof DashboardVendorProductsIndexRoute
@@ -4941,10 +5222,12 @@ const DashboardVendorRouteRouteChildren: DashboardVendorRouteRouteChildren = {
     DashboardVendorPayoutsRouteRouteWithChildren,
   DashboardVendorShippingRouteRoute:
     DashboardVendorShippingRouteRouteWithChildren,
+  DashboardVendorIndexRoute: DashboardVendorIndexRoute,
   DashboardVendorOrdersOrderIdRoute: DashboardVendorOrdersOrderIdRoute,
   DashboardVendorProductsAddRoute: DashboardVendorProductsAddRoute,
   DashboardVendorProductsEditRoute: DashboardVendorProductsEditRoute,
   DashboardVendorShopBrandingRoute: DashboardVendorShopBrandingRoute,
+  DashboardVendorShopPayoutRoute: DashboardVendorShopPayoutRoute,
   DashboardVendorShopPoliciesRoute: DashboardVendorShopPoliciesRoute,
   DashboardVendorOrdersIndexRoute: DashboardVendorOrdersIndexRoute,
   DashboardVendorProductsIndexRoute: DashboardVendorProductsIndexRoute,
@@ -5045,6 +5328,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewArrivalsRoute: NewArrivalsRoute,
   PrivacyRoute: PrivacyRoute,
   ProductsRoute: ProductsRouteWithChildren,
+  RecentlyViewedRoute: RecentlyViewedRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ReturnsRoute: ReturnsRoute,
   ShippingRoute: ShippingRoute,
@@ -5056,10 +5340,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthSigninRoute: AuthSigninRoute,
   AuthSignupRoute: AuthSignupRoute,
+  AuthTwoFactorRoute: AuthTwoFactorRoute,
   AuthVerifyRoute: AuthVerifyRoute,
   ProductSlugRoute: ProductSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
-  ShopRecentlyViewedRoute: ShopRecentlyViewedRoute,
   ShopsIndexRoute: ShopsIndexRoute,
   ApiAddressesCreateRoute: ApiAddressesCreateRoute,
   ApiAddressesDeleteRoute: ApiAddressesDeleteRoute,
@@ -5096,6 +5380,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiConversationsConversationIdRoute: ApiConversationsConversationIdRoute,
   ApiConversationsCreateRoute: ApiConversationsCreateRoute,
   ApiConversationsListRoute: ApiConversationsListRoute,
+  ApiConversationsUnreadRoute: ApiConversationsUnreadRoute,
   ApiMessagesContactVendorRoute: ApiMessagesContactVendorRoute,
   ApiMessagesCreateRoute: ApiMessagesCreateRoute,
   ApiMessagesListRoute: ApiMessagesListRoute,
@@ -5105,6 +5390,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiOrdersAdminListRoute: ApiOrdersAdminListRoute,
   ApiOrdersAdminRefundRoute: ApiOrdersAdminRefundRoute,
   ApiOrdersAdminSingleRoute: ApiOrdersAdminSingleRoute,
+  ApiOrdersCancelRoute: ApiOrdersCancelRoute,
   ApiOrdersListRoute: ApiOrdersListRoute,
   ApiProductAnswerQuestionRoute: ApiProductAnswerQuestionRoute,
   ApiProductCheckSkuRoute: ApiProductCheckSkuRoute,
@@ -5113,10 +5399,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductDeleteRoute: ApiProductDeleteRoute,
   ApiProductEditRoute: ApiProductEditRoute,
   ApiProductGetSingleRoute: ApiProductGetSingleRoute,
+  ApiProductHelpfulVoteRoute: ApiProductHelpfulVoteRoute,
   ApiProductPublicByCategoryRoute: ApiProductPublicByCategoryRoute,
   ApiProductPublicCompareRoute: ApiProductPublicCompareRoute,
   ApiProductPublicListRoute: ApiProductPublicListRoute,
   ApiProductPublicQuestionsRoute: ApiProductPublicQuestionsRoute,
+  ApiProductPublicRecentRoute: ApiProductPublicRecentRoute,
   ApiProductPublicReviewsRoute: ApiProductPublicReviewsRoute,
   ApiProductPublicSingleRoute: ApiProductPublicSingleRoute,
   ApiProductVendorCategoriesRoute: ApiProductVendorCategoriesRoute,
@@ -5134,6 +5422,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiShopPublicProductsRoute: ApiShopPublicProductsRoute,
   ApiShopPublicSingleRoute: ApiShopPublicSingleRoute,
   ApiShopRejectRoute: ApiShopRejectRoute,
+  ApiShopSuspendRoute: ApiShopSuspendRoute,
+  ApiShopUnsuspendRoute: ApiShopUnsuspendRoute,
   ApiShopUpdateRoute: ApiShopUpdateRoute,
   ApiUploadAvatarRoute: ApiUploadAvatarRoute,
   ApiUploadMessageRoute: ApiUploadMessageRoute,
@@ -5177,6 +5467,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminReviewsListRoute: ApiAdminReviewsListRoute,
   ApiAdminSettingsListRoute: ApiAdminSettingsListRoute,
   ApiAdminSettingsUpdateRoute: ApiAdminSettingsUpdateRoute,
+  ApiAdminShopsShopIdRoute: ApiAdminShopsShopIdRoute,
+  ApiOrdersInvoiceInvoiceIdRoute: ApiOrdersInvoiceInvoiceIdRoute,
   ApiProductReportCreateRoute: ApiProductReportCreateRoute,
   ApiReviewsMyIdRoute: ApiReviewsMyIdRoute,
   ApiReviewsMyListRoute: ApiReviewsMyListRoute,
@@ -5199,6 +5491,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiVendorShippingEditRoute: ApiVendorShippingEditRoute,
   ApiVendorShippingListRoute: ApiVendorShippingListRoute,
   ApiVendorShippingPublicListRoute: ApiVendorShippingPublicListRoute,
+  ApiVendorShopPayoutDetailsRoute: ApiVendorShopPayoutDetailsRoute,
   ApiVendorShopPoliciesRoute: ApiVendorShopPoliciesRoute,
 }
 export const routeTree = rootRouteImport

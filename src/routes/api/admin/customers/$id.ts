@@ -173,18 +173,21 @@ export const Route = createFileRoute('/api/admin/customers/$id')({
             }
           }
 
+          const wasBanned = existing.banned;
           const user = await prisma.$transaction(async (tx) => {
             const updated = await tx.user.update({
               where: { id: params.id },
               data: {
                 ...(banned !== undefined && { banned }),
-                ...(banReason !== undefined && { banReason: banReason || null }),
+                ...(banReason !== undefined && {
+                  banReason: banReason || null,
+                }),
                 ...(banExpires !== undefined && { banExpires }),
                 ...(role !== undefined && { role }),
               },
             });
 
-            if (banned === true && !existing.banned) {
+            if (banned === true && !wasBanned) {
               await tx.session.deleteMany({ where: { userId: params.id } });
             }
 
@@ -193,7 +196,7 @@ export const Route = createFileRoute('/api/admin/customers/$id')({
 
           const ipAddress = getClientIp(headers) ?? undefined;
 
-          if (banned === true && !existing.banned) {
+          if (banned === true && !wasBanned) {
             await createAuditLog({
               actorId: session.user.id,
               actorRole,

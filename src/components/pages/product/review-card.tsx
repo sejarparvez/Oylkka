@@ -3,6 +3,7 @@ import { BadgeCheck, Star, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { PublicReview } from '@/services/product';
+import { useToggleHelpfulVoteMutation } from '@/services/product';
 
 type ReviewCardProps = {
   review: PublicReview;
@@ -10,6 +11,7 @@ type ReviewCardProps = {
 
 export function ReviewCard({ review }: ReviewCardProps) {
   const [showAllImages, setShowAllImages] = useState(false);
+  const toggleVote = useToggleHelpfulVoteMutation();
   const displayImages = review.images.slice(
     0,
     showAllImages ? review.images.length : 3,
@@ -108,10 +110,26 @@ export function ReviewCard({ review }: ReviewCardProps) {
       <div className='flex items-center gap-3 mt-3 pt-3 border-t border-border'>
         <button
           type='button'
-          className='flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors'
+          aria-pressed={review.viewerVoted}
+          disabled={toggleVote.isPending}
+          onClick={() =>
+            toggleVote.mutate({
+              productId: review.productId,
+              reviewId: review.id,
+            })
+          }
+          className={cn(
+            'flex items-center gap-1 text-xs transition-colors disabled:opacity-60',
+            review.viewerVoted
+              ? 'text-primary font-medium'
+              : 'text-muted-foreground hover:text-primary',
+          )}
         >
-          <ThumbsUp className='w-3.5 h-3.5' />
+          <ThumbsUp
+            className={cn('w-3.5 h-3.5', review.viewerVoted && 'fill-current')}
+          />
           <span>{review.helpfulCount}</span>
+          <span className='sr-only'>helpful</span>
         </button>
       </div>
 

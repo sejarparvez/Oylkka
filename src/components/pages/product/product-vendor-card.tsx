@@ -7,6 +7,7 @@ type VendorCardShop = {
   id: string;
   name: string;
   slug: string;
+  status: string;
   logoUrl: string | null;
   rating: number;
   totalReviews: number;
@@ -67,10 +68,12 @@ export function ProductVendorCard({ shop }: ProductVendorCardProps) {
       <div className='flex-1 min-w-0'>
         <div className='flex items-center gap-2'>
           <h3 className='text-sm font-semibold truncate'>{shop.name}</h3>
-          <div className='flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full'>
-            <BadgeCheck className='w-3 h-3' />
-            Verified
-          </div>
+          {shop.status === 'ACTIVE' && (
+            <div className='flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full'>
+              <BadgeCheck className='w-3 h-3' />
+              Verified
+            </div>
+          )}
         </div>
         <p className='text-xs text-muted-foreground mt-0.5'>
           Member since {memberSince} · {shop.totalSales.toLocaleString()} sales

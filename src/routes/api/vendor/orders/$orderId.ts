@@ -5,6 +5,7 @@ import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { logError } from '@/lib/logger';
+import { requireActiveVendorShop } from '@/lib/vendor-guard';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   PENDING: ['PROCESSING'],
@@ -66,26 +67,38 @@ export const Route = createFileRoute('/api/vendor/orders/$orderId')({
             );
           }
 
+          const items = order.items;
+          const vendorSubtotal = items.reduce(
+            (sum, item) => sum + Number(item.total),
+            0,
+          );
+          const vendorTotal = items.reduce(
+            (sum, item) => sum + Number(item.vendorAmount || 0),
+            0,
+          );
+
           const data = {
             id: order.id,
             orderNumber: order.orderNumber,
             orderDate: order.createdAt.toISOString(),
             customerName: order.shippingName,
-            customerEmail: order.shippingEmail,
-            customerPhone: order.shippingPhone,
+            ...(order.paymentStatus === 'PAID' && {
+              customerEmail: order.shippingEmail,
+              customerPhone: order.shippingPhone,
+            }),
             shippingAddress: order.shippingAddress,
             shippingUpzila: order.shippingUpzila,
             shippingDistrict: order.shippingDistrict,
             shippingPostalCode: order.shippingPostalCode,
             shippingComment: order.shippingComment,
-            subtotal: order.subtotal,
-            shippingCost: order.shippingCost,
-            total: order.total,
+            subtotal: vendorSubtotal,
+            shippingCost: 0,
+            total: vendorTotal,
             currency: order.currency,
             paymentMethod: order.paymentMethod,
             paymentStatus: order.paymentStatus,
             orderStatus: order.status,
-            items: order.items.map((item) => ({
+            items: items.map((item) => ({
               id: item.id,
               productId: item.productId,
               productName: item.productName,
@@ -132,13 +145,9 @@ export const Route = createFileRoute('/api/vendor/orders/$orderId')({
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
 
-          const shop = await prisma.shop.findUnique({
-            where: { ownerId: session.user.id },
-          });
-
-          if (!shop) {
-            return Response.json({ error: 'No shop found' }, { status: 404 });
-          }
+          const guard = await requireActiveVendorShop(session.user.id);
+          if (guard.response) return guard.response;
+          const shop = guard.shop;
 
           const { orderId } = params;
           const body: {
@@ -172,6 +181,14 @@ export const Route = createFileRoute('/api/vendor/orders/$orderId')({
               orderId,
               shopId: shop.id,
             },
+            include: {
+              order: {
+                select: {
+                  status: true,
+                  paymentStatus: true,
+                },
+              },
+            },
           });
 
           if (!item) {
@@ -184,6 +201,16 @@ export const Route = createFileRoute('/api/vendor/orders/$orderId')({
           if (item.fulfillmentStatus === body.fulfillmentStatus) {
             return Response.json(
               { error: 'Item is already in this status' },
+              { status: 400 },
+            );
+          }
+
+          if (
+            item.order.status === 'CANCELLED' ||
+            item.order.status === 'REFUNDED'
+          ) {
+            return Response.json(
+              { error: 'Cannot update items on a cancelled or refunded order' },
               { status: 400 },
             );
           }

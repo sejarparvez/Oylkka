@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { RETURN_WINDOW_DAYS } from '@/lib/constants';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -76,7 +77,7 @@ const faqGroups = [
     items: [
       {
         q: 'What is your return policy?',
-        a: 'We accept returns within 7 days of delivery for defective or incorrect items. Products must be unused and in original packaging.',
+        a: `We accept returns within ${RETURN_WINDOW_DAYS} days of delivery for defective or incorrect items. Products must be unused and in original packaging.`,
       },
       {
         q: 'How do I request a return?',

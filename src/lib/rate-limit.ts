@@ -76,6 +76,7 @@ export const couponLimiter = build('ratelimit:coupon', 10);
 export const reviewLimiter = build('ratelimit:review', 5);
 export const messageLimiter = build('ratelimit:message', 10);
 export const generalLimiter = build('ratelimit:general', 100);
+export const adminLimiter = build('ratelimit:admin', 60);
 
 /** Whether Upstash credentials were present at boot. Exposed for tests. */
 export const isRedisConfigured = redis !== null;

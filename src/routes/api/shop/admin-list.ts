@@ -18,7 +18,10 @@ export const Route = createFileRoute('/api/shop/admin-list')({
 
           const where: Record<string, unknown> = {};
 
-          if (status && ['PENDING', 'ACTIVE', 'REJECTED'].includes(status)) {
+          if (
+            status &&
+            ['PENDING', 'ACTIVE', 'REJECTED', 'SUSPENDED'].includes(status)
+          ) {
             where.status = status;
           }
 

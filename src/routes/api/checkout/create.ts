@@ -18,16 +18,16 @@ import {
   StockError,
 } from '@/lib/stock';
 import { checkCouponEligibility } from '@/services/checkout/coupon-validator';
+import { computeShippingEstimate } from '@/services/checkout/shipping';
 import type {
   CartWithItems,
   VoucherWithCoupon,
 } from '@/services/checkout/voucher-processor';
 import {
   applyShippingDiscounts,
-processVouchers,
-sumVoucherTotals,
+  processVouchers,
+  sumVoucherTotals,
 } from '@/services/checkout/voucher-processor';
-import { computeShippingEstimate } from '@/services/checkout/shipping';
 import type { OrderMetadata } from '@/types/orders';
 
 class CheckoutError extends Error {
@@ -153,8 +153,7 @@ export const Route = createFileRoute('/api/checkout/create')({
           // purchasable, even if they are still PUBLISHED (MONEY-21).
           const blockedItem = cart.items.find(
             (item) =>
-              !item.product.shop ||
-              !['APPROVED', 'ACTIVE'].includes(item.product.shop.status),
+              !item.product.shop || item.product.shop.status !== 'ACTIVE',
           );
           if (blockedItem) {
             return Response.json(
@@ -333,20 +332,20 @@ export const Route = createFileRoute('/api/checkout/create')({
           }
 
           // --- Shipping calculation (zone-aware, shared with the preview quote) ---
-const baseShipping = await computeShippingEstimate(
-  cart.items.map((item) => ({
-    quantity: item.quantity,
-    freeShipping: item.product.freeShipping,
-    shop: item.product.shop,
-    unitPrice: Number(
-      item.variant?.discountPrice ??
-        item.variant?.price ??
-        item.product.discountPrice ??
-        item.product.price,
-    ),
-  })),
-  parsed.data.shippingDistrict,
-);
+          const { cost: baseShipping } = await computeShippingEstimate(
+            cart.items.map((item) => ({
+              quantity: item.quantity,
+              freeShipping: item.product.freeShipping,
+              shop: item.product.shop,
+              unitPrice: Number(
+                item.variant?.discountPrice ??
+                  item.variant?.price ??
+                  item.product.discountPrice ??
+                  item.product.price,
+              ),
+            })),
+            parsed.data.shippingDistrict,
+          );
 
           // --- Voucher validation & application ---
           const customerOrderCount = await prisma.order.count({
@@ -796,6 +795,7 @@ const baseShipping = await computeShippingEstimate(
                 discountAmount: Number(order.discountAmount),
                 couponDiscount: Number(order.couponDiscount),
                 shippingCost: Number(order.shippingCost),
+                tax: Number(order.tax),
                 paymentMethod: order.paymentMethod,
                 paymentStatus: order.paymentStatus,
                 status: order.status,

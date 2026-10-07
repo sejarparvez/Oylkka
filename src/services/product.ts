@@ -210,6 +210,7 @@ export type PublicProduct = {
     id: string;
     name: string;
     slug: string;
+    status: string;
     logoUrl: string | null;
     rating: number;
     totalReviews: number;
@@ -291,11 +292,13 @@ export function useCompareProducts(ids: string[]) {
 
 export type PublicReview = {
   id: string;
+  productId: string;
   rating: number;
   title: string | null;
   content: string;
   verified: boolean;
   helpfulCount: number;
+  viewerVoted: boolean;
   vendorReply: string | null;
   vendorRepliedAt: string | null;
   createdAt: string;
@@ -323,6 +326,61 @@ export function usePublicProductReviews(productId: string, page: number = 1) {
       return response.data;
     },
     enabled: !!productId,
+  });
+}
+
+// CUST-21: toggle a "helpful" vote; the cached review list is patched in
+// place so the button and count update without a refetch.
+export function useToggleHelpfulVoteMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { helpfulCount: number; voted: boolean },
+    Error,
+    { productId: string; reviewId: string }
+  >({
+    mutationFn: async ({ reviewId }) => {
+      const response = await apiClient.post('/api/product/helpful-vote', {
+        reviewId,
+      });
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      queryClient.setQueriesData<ProductReviewsResponse>(
+        {
+          queryKey: [
+            QUERY_KEYS.PUBLIC_PRODUCTS,
+            'reviews',
+            variables.productId,
+          ],
+        },
+        (old) =>
+          old
+            ? {
+                ...old,
+                reviews: old.reviews.map((review) =>
+                  review.id === variables.reviewId
+                    ? {
+                        ...review,
+                        helpfulCount: data.helpfulCount,
+                        viewerVoted: data.voted,
+                      }
+                    : review,
+                ),
+              }
+            : old,
+      );
+    },
+    onError: (error) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to record vote';
+      toast.error(
+        axios.isAxiosError(error) && error.response?.status === 401
+          ? 'Sign in to mark a review as helpful'
+          : message,
+      );
+    },
   });
 }
 

@@ -90,10 +90,12 @@ export function ShopHeader({ shop }: ShopHeaderProps) {
               {shop.name}
               <span className='text-primary'>.</span>
             </h1>
-            <div className='flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full'>
-              <BadgeCheck className='w-3 h-3' />
-              Verified
-            </div>
+            {shop.status === 'ACTIVE' && (
+              <div className='flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full'>
+                <BadgeCheck className='w-3 h-3' />
+                Verified
+              </div>
+            )}
           </div>
           <div className='flex items-center gap-2 mt-1.5'>
             <div className='flex items-center gap-0.5'>

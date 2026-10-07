@@ -31,6 +31,8 @@ model Shop {
   bankName          String?
   bankAccountName   String?
   bankAccountNumber String?
+  payoutMethod      PayoutMethod?
+  mobileNumber      String?
   commissionRate    Decimal @default(10) @db.Decimal(5, 2)
   // Flat-country default when no shipping zone covers the district. Kept
   // non-zero so a shop that never configures zones does not silently ship

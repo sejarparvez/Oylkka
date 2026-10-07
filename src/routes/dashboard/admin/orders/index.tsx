@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Eye, Package, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StatusBadge } from '@/components/orders/status-badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,26 +45,27 @@ export const Route = createFileRoute('/dashboard/admin/orders/')({
     }
     return { user: context.user };
   },
+  validateSearch: (
+    search: Record<string, string | undefined>,
+  ): { status?: string } => ({
+    status: search.status,
+  }),
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { status: statusParam } = Route.useSearch();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('');
+  const status =
+    statusParam && STATUS_TABS.some((t) => t.value === statusParam)
+      ? statusParam
+      : '';
   const [paymentStatus, setPaymentStatus] = useState('');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [customerSearch, setCustomerSearch] = useState('');
   const [vendorSearch, setVendorSearch] = useState('');
   const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const s = params.get('status') || '';
-    if (STATUS_TABS.some((t) => t.value === s)) {
-      setStatus(s);
-    }
-  }, []);
 
   const { data, isLoading } = useAdminOrders({
     status: status || undefined,
@@ -82,18 +83,11 @@ function RouteComponent() {
   };
 
   const handleStatusChange = (newStatus: string) => {
-    setStatus(newStatus);
     setPage(1);
-    const params = new URLSearchParams(window.location.search);
-    if (newStatus) {
-      params.set('status', newStatus);
-    } else {
-      params.delete('status');
-    }
-    const qs = params.toString();
     navigate({
-      to: `/dashboard/admin/orders/${qs ? `?${qs}` : ''}`,
-    } as never);
+      to: '/dashboard/admin/orders',
+      search: newStatus ? { status: newStatus } : {},
+    });
   };
 
   const viewOrder = (orderId: string) => {
@@ -128,7 +122,7 @@ function RouteComponent() {
         <div className='rounded-2xl border border-border bg-card p-4'>
           <p className='text-xs text-muted-foreground'>Total Revenue</p>
           <p className='text-2xl font-bold mt-1'>
-            {isLoading ? '-' : `৳${totalRevenue.toLocaleString('en-BD')}`}
+            {isLoading ? '-' : `Ã Â§Â³${totalRevenue.toLocaleString('en-BD')}`}
           </p>
         </div>
         <div className='rounded-2xl border border-border bg-card p-4'>
@@ -255,7 +249,7 @@ function RouteComponent() {
                 </div>
 
                 <div className='text-sm font-bold tabular-nums'>
-                  ৳{order.total.toLocaleString('en-BD')}
+                  Ã Â§Â³{order.total.toLocaleString('en-BD')}
                 </div>
 
                 <StatusBadge type='payment' value={order.paymentStatus} />

@@ -27,7 +27,7 @@ import {
   EditShopFormSchema,
   ShopApplicationFormSchema,
 } from '@/schemas/shop-schema';
-import { useApplyShopMutation } from '@/services/shop';
+import { useApplyShopMutation, useUpdateShopMutation } from '@/services/shop';
 
 type ShopFormProps =
   | {
@@ -40,6 +40,7 @@ type ShopFormProps =
         existingLogoUrl?: string;
         existingBannerUrl?: string;
       };
+      onSuccess?: () => void;
     };
 
 function SectionBlock({
@@ -116,7 +117,8 @@ export function ShopForm(props: ShopFormProps) {
   const bannerValue = watch('banner');
 
   const createMutation = useApplyShopMutation();
-  const isPending = createMutation.isPending;
+  const updateMutation = useUpdateShopMutation();
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   const onSubmit = async (values: FormValues) => {
     if (!isEdit) {
@@ -130,7 +132,36 @@ export function ShopForm(props: ShopFormProps) {
         URL.revokeObjectURL(bannerPreview);
         setBannerPreview(null);
       }
+      return;
     }
+
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('description', values.description ?? '');
+    formData.append('email', values.email);
+    formData.append('phone', values.phone ?? '');
+    formData.append('website', values.website ?? '');
+    formData.append('addressLine1', values.addressLine1 ?? '');
+    formData.append('addressLine2', values.addressLine2 ?? '');
+    formData.append('city', values.city ?? '');
+    formData.append('state', values.state ?? '');
+    formData.append('country', values.country ?? '');
+    formData.append('postalCode', values.postalCode ?? '');
+
+    if (values.logo instanceof FileList && values.logo.length > 0) {
+      formData.append('logo', values.logo[0]);
+    } else {
+      formData.append('keepExistingLogo', keepLogo ? 'true' : 'false');
+    }
+
+    if (values.banner instanceof FileList && values.banner.length > 0) {
+      formData.append('banner', values.banner[0]);
+    } else {
+      formData.append('keepExistingBanner', keepBanner ? 'true' : 'false');
+    }
+
+    await updateMutation.mutateAsync(formData);
+    props.onSuccess?.();
   };
 
   const handleReset = () => {

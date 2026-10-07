@@ -67,7 +67,6 @@ const statusConfig: Record<
   }
 > = {
   PENDING: { variant: 'secondary', label: 'Pending Approval' },
-  APPROVED: { variant: 'default', label: 'Approved' },
   ACTIVE: { variant: 'default', label: 'Active' },
   SUSPENDED: { variant: 'destructive', label: 'Suspended' },
   REJECTED: { variant: 'destructive', label: 'Rejected' },
@@ -168,6 +167,7 @@ function RouteComponent() {
         <ShopForm
           mode='edit'
           shopId={shop.id}
+          onSuccess={() => setIsEditing(false)}
           defaultValues={{
             name: shop.name,
             description: shop.description ?? '',

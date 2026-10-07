@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Navigate } from '@tanstack/react-router';
 
 import { ShopForm } from '@/components/forms/shop-form';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,7 +9,6 @@ export const Route = createFileRoute('/dashboard/become-vendor/apply')({
 });
 
 function RouteComponent() {
-  const navigate = useNavigate();
   const { data: shop, isLoading } = useMyShop();
 
   if (isLoading) {
@@ -30,13 +29,33 @@ function RouteComponent() {
   }
 
   if (shop?.status === 'PENDING') {
-    navigate({ to: '/dashboard/become-vendor/pending' });
-    return null;
+    return <Navigate to='/dashboard/become-vendor/pending' />;
   }
 
   if (shop?.status === 'ACTIVE') {
-    navigate({ to: '/dashboard' });
-    return null;
+    return <Navigate to='/dashboard/vendor' />;
+  }
+
+  if (shop?.status === 'REJECTED') {
+    return (
+      <div className='max-w-4xl mx-auto container space-y-6'>
+        <div className='rounded-2xl border border-destructive/30 bg-destructive/5 p-6 space-y-2'>
+          <h2 className='text-lg font-bold text-destructive'>
+            Your previous application was rejected
+          </h2>
+          <p className='text-sm text-muted-foreground'>
+            {shop.rejectionReason
+              ? `Reason: ${shop.rejectionReason}`
+              : 'Your shop application has been rejected.'}
+          </p>
+          <p className='text-sm text-muted-foreground'>
+            Fix the issues above and submit again — your new application will be
+            reviewed by an admin.
+          </p>
+        </div>
+        <ShopForm mode='create' />
+      </div>
+    );
   }
 
   return <ShopForm mode='create' />;

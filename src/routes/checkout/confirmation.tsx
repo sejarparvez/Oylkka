@@ -21,20 +21,40 @@ export const Route = createFileRoute('/checkout/confirmation')({
   component: RouteComponent,
 });
 
+type ConfirmationOrder = {
+  orderNumber: string;
+  total: number | string;
+  subtotal: number | string;
+  shippingCost: number | string;
+  tax: number | string;
+  discountAmount: number | string;
+  couponDiscount: number | string | null;
+  paymentMethod: string | null;
+  paymentStatus: string;
+  invoice: { pdfUrl: string | null } | null;
+};
+
+function num(value: number | string | null | undefined): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 function RouteComponent() {
   const { orderId, error } = Route.useSearch();
-  const [invoiceUrl, setInvoiceUrl] = useState<string | null>(null);
+  const [order, setOrder] = useState<ConfirmationOrder | null>(null);
 
   useEffect(() => {
     if (orderId) {
       fetch(`/api/orders/${orderId}`)
         .then((r) => r.json())
-        .then((data) => {
-          if (data.invoice?.pdfUrl) setInvoiceUrl(data.invoice.pdfUrl);
+        .then((data: ConfirmationOrder & { error?: string }) => {
+          if (data && !data.error) setOrder(data);
         })
         .catch(() => {});
     }
   }, [orderId]);
+
+  const invoiceUrl = order?.invoice?.pdfUrl ?? null;
 
   if (error) {
     const isCancelled = error === 'payment-cancelled';
@@ -109,6 +129,59 @@ function RouteComponent() {
               Thank you for your order. We'll send you a confirmation once it's
               processed.
             </p>
+            {order && (
+              <div className='w-full rounded-xl border border-border p-4 text-left text-sm space-y-2'>
+                <div className='flex justify-between gap-2'>
+                  <span className='text-muted-foreground'>Order</span>
+                  <span className='font-medium'>{order.orderNumber}</span>
+                </div>
+                <div className='flex justify-between gap-2'>
+                  <span className='text-muted-foreground'>Subtotal</span>
+                  <span className='tabular-nums'>
+                    ৳{num(order.subtotal).toLocaleString()}
+                  </span>
+                </div>
+                {num(order.discountAmount) + num(order.couponDiscount) > 0 && (
+                  <div className='flex justify-between gap-2 text-green-600'>
+                    <span>Discount</span>
+                    <span className='tabular-nums'>
+                      -৳
+                      {(
+                        num(order.discountAmount) + num(order.couponDiscount)
+                      ).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+                <div className='flex justify-between gap-2'>
+                  <span className='text-muted-foreground'>Shipping</span>
+                  <span className='tabular-nums'>
+                    {num(order.shippingCost) > 0
+                      ? `৳${num(order.shippingCost).toLocaleString()}`
+                      : 'Free'}
+                  </span>
+                </div>
+                {num(order.tax) > 0 && (
+                  <div className='flex justify-between gap-2'>
+                    <span className='text-muted-foreground'>Tax</span>
+                    <span className='tabular-nums'>
+                      ৳{num(order.tax).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+                <div className='flex justify-between gap-2 border-t border-border pt-2 font-semibold'>
+                  <span>Total</span>
+                  <span className='tabular-nums'>
+                    ৳{num(order.total).toLocaleString()}
+                  </span>
+                </div>
+                <div className='flex justify-between gap-2 pt-1'>
+                  <span className='text-muted-foreground'>Payment</span>
+                  <span className='text-right'>
+                    {order.paymentMethod ?? 'N/A'} · {order.paymentStatus}
+                  </span>
+                </div>
+              </div>
+            )}
             <div className='flex flex-col gap-2 mt-2 w-full'>
               <Button asChild>
                 <Link to='/dashboard/orders/$orderId' params={{ orderId }}>

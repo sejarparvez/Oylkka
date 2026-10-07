@@ -6,6 +6,7 @@ import {
   UserIcon,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,9 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-// import { useNotification } from '@/hooks/use-notification';
-// import { useUnreadMessageCount } from '@/hooks/use-unread-messages';
 import { getInitials } from '@/lib/utils';
+import { useUnreadMessageCount } from '@/services/conversations';
 import { SignOut } from './signout';
 
 // Define the shape of your user based on your Root context
@@ -31,29 +31,10 @@ interface UserDropDownProps {
 }
 
 export default function UserDropDown({ user }: UserDropDownProps) {
-  //   const { unreadCount } = useUnreadMessageCount();
-  //   const { getChannel } = useNotification(user?.id ?? null);
-
-  //   useEffect(() => {
-  //     if (user?.id) {
-  //       const channelName = `private:unread_count:${user.id}`;
-  //       const channel = getChannel(channelName);
-
-  //       if (channel) {
-  //         const handleUpdate = () => {
-  //           notificationSound(true);
-  //           toast('You have a new message!', {
-  //             icon: '✉️',
-  //           });
-  //         };
-
-  //         channel.subscribe('unread_update', handleUpdate);
-  //         return () => {
-  //           channel.unsubscribe('unread_update', handleUpdate);
-  //         };
-  //       }
-  //     }
-  //   }, [user?.id, getChannel]);
+  // Hooks must run before the signed-in early return below.
+  const { data: unreadCount = 0 } = useUnreadMessageCount({
+    enabled: !!user,
+  });
 
   // If no user, show the Sign In button using TanStack Link
   if (!user) {
@@ -78,11 +59,11 @@ export default function UserDropDown({ user }: UserDropDownProps) {
                 {getInitials(user.name || 'U')}
               </AvatarFallback>
             </Avatar>
-            {/* {unreadCount > 0 && (
+            {unreadCount > 0 && (
               <Badge className='absolute -right-2 -top-2 h-5 w-5 items-center justify-center rounded-full p-0 text-xs font-bold'>
-                {unreadCount}
+                {unreadCount > 99 ? '99+' : unreadCount}
               </Badge>
-            )} */}
+            )}
           </div>
         </DropdownMenuTrigger>
 
@@ -123,11 +104,11 @@ export default function UserDropDown({ user }: UserDropDownProps) {
                 <MessageSquare className='text-primary/70 mr-2 h-4 w-4' />
                 Messages
               </div>
-              {/* {unreadCount > 0 && (
+              {unreadCount > 0 && (
                 <Badge className='ml-2 px-2 py-0.5 text-xs font-bold'>
-                  {unreadCount}
+                  {unreadCount > 99 ? '99+' : unreadCount}
                 </Badge>
-              )} */}
+              )}
             </Link>
           </DropdownMenuItem>
 

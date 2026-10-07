@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Loader2, MapPin, Pencil, Plus, Trash2, Truck } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { BD_DISTRICTS } from '@/lib/bd-districts';
-import { useMyShop } from '@/services/shop';
+import { useMyShop, useUpdateShopMutation } from '@/services/shop';
 import type { ShippingZone } from '@/services/vendor-shipping';
 import {
   useCreateShippingZoneMutation,
@@ -67,10 +67,18 @@ function RouteComponent() {
   const createMutation = useCreateShippingZoneMutation();
   const updateMutation = useUpdateShippingZoneMutation();
   const deleteMutation = useDeleteShippingZoneMutation();
+  const updateShopMutation = useUpdateShopMutation();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingZone, setEditingZone] = useState<string | null>(null);
   const [form, setForm] = useState<ZoneFormData>(emptyForm);
+  const [defaultCost, setDefaultCost] = useState('');
+
+  useEffect(() => {
+    if (shop?.shippingCost !== undefined) {
+      setDefaultCost(String(Number(shop.shippingCost)));
+    }
+  }, [shop?.shippingCost]);
 
   const isLoading = shopLoading || zonesLoading;
 
@@ -431,9 +439,38 @@ function RouteComponent() {
               If no matching zone is found for a customer&apos;s district, the
               shop&apos;s default shipping cost will be used.
             </p>
-            <div className='flex items-center gap-2'>
-              <span className='text-sm font-medium'>Default cost:</span>
-              <span className='text-sm'>BDT {shop?.shippingCost ?? 0}</span>
+            <div className='flex items-end gap-3'>
+              <div className='space-y-2'>
+                <Label htmlFor='defaultCost'>Default cost (BDT)</Label>
+                <Input
+                  id='defaultCost'
+                  type='number'
+                  min={0}
+                  max={100000}
+                  className='w-36'
+                  value={defaultCost}
+                  onChange={(e) => setDefaultCost(e.target.value)}
+                />
+              </div>
+              <Button
+                variant='outline'
+                disabled={
+                  updateShopMutation.isPending ||
+                  !defaultCost ||
+                  Number(defaultCost) < 0 ||
+                  Number(defaultCost) === Number(shop?.shippingCost)
+                }
+                onClick={() => {
+                  const fd = new FormData();
+                  fd.append('shippingCost', defaultCost);
+                  updateShopMutation.mutate(fd);
+                }}
+              >
+                {updateShopMutation.isPending && (
+                  <Loader2 className='w-3.5 h-3.5 mr-2 animate-spin' />
+                )}
+                Save
+              </Button>
             </div>
           </CardContent>
         </Card>

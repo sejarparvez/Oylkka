@@ -1,4 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { getRequestHeaders } from '@tanstack/react-start/server';
+import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
 export const Route = createFileRoute('/api/product/public-reviews')({
@@ -26,6 +28,7 @@ export const Route = createFileRoute('/api/product/public-reviews')({
               where: { productId, moderationStatus: 'APPROVED' },
               select: {
                 id: true,
+                productId: true,
                 rating: true,
                 title: true,
                 content: true,
@@ -46,7 +49,9 @@ export const Route = createFileRoute('/api/product/public-reviews')({
               skip: (page - 1) * limit,
               take: limit,
             }),
-            prisma.review.count({ where: { productId, moderationStatus: 'APPROVED' } }),
+            prisma.review.count({
+              where: { productId, moderationStatus: 'APPROVED' },
+            }),
             prisma.review.groupBy({
               by: ['rating'],
               where: { productId, moderationStatus: 'APPROVED' },
@@ -65,9 +70,27 @@ export const Route = createFileRoute('/api/product/public-reviews')({
             ratingBreakdown[r.rating] = r._count;
           }
 
+          // CUST-21: let the signed-in viewer see whether they already voted.
+          const headers = getRequestHeaders();
+          const session = await auth.api.getSession({ headers });
+          let votedIds = new Set<string>();
+          if (session?.user && reviews.length > 0) {
+            const votes = await prisma.reviewHelpfulVote.findMany({
+              where: {
+                userId: session.user.id,
+                reviewId: { in: reviews.map((r) => r.id) },
+              },
+              select: { reviewId: true },
+            });
+            votedIds = new Set(votes.map((v) => v.reviewId));
+          }
+
           return Response.json(
             {
-              reviews,
+              reviews: reviews.map((review) => ({
+                ...review,
+                viewerVoted: votedIds.has(review.id),
+              })),
               total,
               page,
               limit,

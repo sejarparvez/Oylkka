@@ -79,14 +79,21 @@ function RouteComponent() {
               <Separator className='mb-4' />
               <div className='space-y-4'>
                 {items.map((item) => {
-    const price =
-      item.savedPrice ??
-      item.variant?.discountPrice ??
-      item.variant?.price ??
-      item.product.discountPrice ??
-      item.product.price;
+                  const price =
+                    item.savedPrice ??
+                    item.variant?.discountPrice ??
+                    item.variant?.price ??
+                    item.product.discountPrice ??
+                    item.product.price;
                   const imageUrl =
                     item.variant?.imageUrl ?? item.product.images[0]?.imageUrl;
+                  // Stock clamp: prefer the variant's own stock when a
+                  // variant is selected (CUST-17).
+                  const available = item.variant
+                    ? item.variant.stock
+                    : item.product.stock;
+                  const outOfStock = available <= 0;
+                  const atMax = item.quantity >= available;
 
                   return (
                     <div key={item.id} className='flex gap-4 py-2'>
@@ -126,13 +133,14 @@ function RouteComponent() {
                         <div className='flex items-center border border-border rounded-xl overflow-hidden'>
                           <button
                             type='button'
+                            disabled={item.quantity <= 1 || outOfStock}
                             onClick={() =>
                               updateMutation.mutate({
                                 itemId: item.id,
                                 quantity: Math.max(1, item.quantity - 1),
                               })
                             }
-                            className='w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors'
+                            className='w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-40'
                           >
                             <Minus className='w-3 h-3' />
                           </button>
@@ -141,17 +149,29 @@ function RouteComponent() {
                           </span>
                           <button
                             type='button'
+                            disabled={atMax}
+                            title={
+                              atMax
+                                ? `Only ${available} available`
+                                : 'Increase quantity'
+                            }
                             onClick={() =>
                               updateMutation.mutate({
                                 itemId: item.id,
                                 quantity: item.quantity + 1,
                               })
                             }
-                            className='w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors'
+                            className='w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-40'
                           >
                             <Plus className='w-3 h-3' />
                           </button>
                         </div>
+
+                        {outOfStock && (
+                          <span className='text-xs font-medium text-destructive'>
+                            Out of stock
+                          </span>
+                        )}
 
                         <p className='text-sm font-semibold w-20 text-right tabular-nums'>
                           ৳ {((price ?? 0) * item.quantity).toLocaleString()}

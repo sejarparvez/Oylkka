@@ -294,7 +294,7 @@ export function orderShippedHtml(
 
 export function vendorApprovalHtml(name: string, shopName: string): string {
   const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
-  const dashboardLink = `${baseUrl}/vendor/dashboard`;
+  const dashboardLink = `${baseUrl}/dashboard/vendor`;
 
   return baseWrapper(`
     ${eyebrow('Shop Approved')}
@@ -343,6 +343,56 @@ export function vendorRejectionHtml(
     </p>
 
     ${ctaButton('Contact Support', contactLink)}
+  `);
+}
+
+export function vendorSuspensionHtml(
+  name: string,
+  shopName: string,
+  reason: string,
+): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const contactLink = `${baseUrl}/contact`;
+
+  return baseWrapper(`
+    ${eyebrow('Shop Suspended')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Your shop has been suspended<span style="color: ${BRAND.destructive};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${name}, your shop <strong style="color: ${BRAND.foreground};">${shopName}</strong> has been suspended and is no longer visible to customers.
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      <strong>Reason:</strong> ${reason}
+    </p>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Contact support to resolve this and request reinstatement.
+    </p>
+
+    ${ctaButton('Contact Support', contactLink)}
+  `);
+}
+
+export function vendorUnsuspensionHtml(name: string, shopName: string): string {
+  const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+  const dashboardLink = `${baseUrl}/dashboard/vendor`;
+
+  return baseWrapper(`
+    ${eyebrow('Shop Reinstated')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Your shop is live again<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Hi ${name}, your shop <strong style="color: ${BRAND.foreground};">${shopName}</strong> has been reinstated and is visible to customers again.
+    </p>
+
+    ${ctaButton('Go to Dashboard', dashboardLink)}
   `);
 }
 

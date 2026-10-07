@@ -1,7 +1,8 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
-import { Camera, Loader2, Save, User } from 'lucide-react';
+import { Camera, KeyRound, Loader2, Save, User } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { TwoFactorCard } from '@/components/account/two-factor-card';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -13,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { updateUser } from '@/lib/auth-client';
+import { changePassword, updateUser } from '@/lib/auth-client';
 
 export const Route = createFileRoute('/dashboard/my-account')({
   component: MyAccountPage,
@@ -25,6 +26,10 @@ function MyAccountPage() {
   const [name, setName] = useState(user.name ?? '');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleSave() {
@@ -46,6 +51,44 @@ function MyAccountPage() {
       toast.error('Something went wrong');
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!currentPassword) {
+      toast.error('Current password is required');
+      return;
+    }
+    if (newPassword.length < 10) {
+      toast.error('Password must be at least 10 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const { error } = await changePassword({
+        currentPassword,
+        newPassword,
+        revokeOtherSessions: true,
+      });
+      if (error) {
+        toast.error(error.message || 'Failed to change password');
+        return;
+      }
+      toast.success('Password changed successfully');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch {
+      toast.error('Something went wrong');
+    } finally {
+      setIsChangingPassword(false);
     }
   }
 
@@ -191,6 +234,88 @@ function MyAccountPage() {
       <Card className='rounded-2xl border-border shadow-none'>
         <CardHeader>
           <CardTitle className='text-lg flex items-center gap-2'>
+            <KeyRound className='h-5 w-5' />
+            Change Password
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleChangePassword} className='space-y-6'>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor='current-password'>
+                  Current Password
+                </FieldLabel>
+                <Input
+                  id='current-password'
+                  type='password'
+                  autoComplete='current-password'
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  disabled={isChangingPassword}
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor='new-password'>New Password</FieldLabel>
+                <Input
+                  id='new-password'
+                  type='password'
+                  autoComplete='new-password'
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  disabled={isChangingPassword}
+                />
+                {newPassword && newPassword.length < 10 && (
+                  <FieldError>
+                    Password must be at least 10 characters
+                  </FieldError>
+                )}
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor='confirm-new-password'>
+                  Confirm New Password
+                </FieldLabel>
+                <Input
+                  id='confirm-new-password'
+                  type='password'
+                  autoComplete='new-password'
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  disabled={isChangingPassword}
+                />
+                {confirmPassword && newPassword !== confirmPassword && (
+                  <FieldError>Passwords do not match</FieldError>
+                )}
+              </Field>
+            </FieldGroup>
+
+            <div className='flex justify-end'>
+              <Button
+                type='submit'
+                disabled={
+                  isChangingPassword ||
+                  !currentPassword ||
+                  !newPassword ||
+                  !confirmPassword
+                }
+                className='gap-2'
+              >
+                {isChangingPassword ? (
+                  <Loader2 className='h-4 w-4 animate-spin' />
+                ) : (
+                  <KeyRound className='h-4 w-4' />
+                )}
+                Update Password
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card className='rounded-2xl border-border shadow-none'>
+        <CardHeader>
+          <CardTitle className='text-lg flex items-center gap-2'>
             Account Details
           </CardTitle>
         </CardHeader>
@@ -227,6 +352,8 @@ function MyAccountPage() {
           </div>
         </CardContent>
       </Card>
+
+      <TwoFactorCard enabled={Boolean(user.twoFactorEnabled)} />
     </div>
   );
 }

@@ -2,14 +2,17 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import {
   ArrowLeft,
+  Ban,
   Building2,
   Clock,
   Loader2,
   Mail,
   MapPin,
+  Percent,
+  RotateCcw,
   Store,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   AlertDialog,
@@ -30,6 +33,9 @@ import {
   useApproveShopMutation,
   useRejectShopMutation,
   useShopDetail,
+  useSuspendShopMutation,
+  useUnsuspendShopMutation,
+  useUpdateCommissionRateMutation,
 } from '@/services/shop';
 
 const statusBadge = (status: string) => {
@@ -38,6 +44,8 @@ const statusBadge = (status: string) => {
       return { variant: 'secondary' as const, label: 'Pending' };
     case 'ACTIVE':
       return { variant: 'default' as const, label: 'Active' };
+    case 'SUSPENDED':
+      return { variant: 'destructive' as const, label: 'Suspended' };
     case 'REJECTED':
       return { variant: 'destructive' as const, label: 'Rejected' };
     default:
@@ -63,13 +71,29 @@ export const Route = createFileRoute('/dashboard/admin/vendors/detail')({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const { user } = Route.useRouteContext();
+  const isAdmin = user?.role === 'ADMIN';
   const { vendorId: vendorSlug } = Route.useSearch();
   const { data: shop, isLoading, isError } = useShopDetail(vendorSlug);
   const { mutate: approveShop, isPending: isApproving } =
     useApproveShopMutation();
   const { mutate: rejectShop, isPending: isRejecting } =
     useRejectShopMutation();
+  const { mutate: suspendShop, isPending: isSuspending } =
+    useSuspendShopMutation();
+  const { mutate: unsuspendShop, isPending: isUnsuspending } =
+    useUnsuspendShopMutation();
+  const { mutate: updateCommission, isPending: isSavingCommission } =
+    useUpdateCommissionRateMutation();
   const [rejectReason, setRejectReason] = useState('');
+  const [suspendReason, setSuspendReason] = useState('');
+  const [commissionRate, setCommissionRate] = useState('');
+
+  useEffect(() => {
+    if (shop?.commissionRate !== undefined) {
+      setCommissionRate(String(Number(shop.commissionRate)));
+    }
+  }, [shop?.commissionRate]);
 
   const goBack = () =>
     navigate({
@@ -226,6 +250,54 @@ function RouteComponent() {
           </div>
         </div>
 
+        {isAdmin && (
+          <div className='rounded-2xl border border-border bg-card p-6 space-y-4'>
+            <h2 className='text-sm font-semibold flex items-center gap-2'>
+              <Percent className='w-4 h-4 text-primary' />
+              Commission
+            </h2>
+            <div className='flex items-end gap-3'>
+              <div className='space-y-2'>
+                <p className='text-xs text-muted-foreground'>
+                  Platform commission rate (%)
+                </p>
+                <Input
+                  type='number'
+                  min={0}
+                  max={100}
+                  step={0.5}
+                  className='w-32'
+                  value={commissionRate}
+                  onChange={(e) => setCommissionRate(e.target.value)}
+                />
+              </div>
+              <Button
+                variant='outline'
+                disabled={
+                  isSavingCommission ||
+                  !commissionRate ||
+                  Number(commissionRate) === Number(shop.commissionRate)
+                }
+                onClick={() =>
+                  updateCommission({
+                    shopId: shop.id,
+                    commissionRate: Number(commissionRate),
+                  })
+                }
+              >
+                {isSavingCommission && (
+                  <Loader2 className='w-3.5 h-3.5 mr-2 animate-spin' />
+                )}
+                Save
+              </Button>
+            </div>
+            <p className='text-xs text-muted-foreground'>
+              Applied to every future order item from this shop. Cannot be
+              changed by the vendor.
+            </p>
+          </div>
+        )}
+
         <div className='rounded-2xl border border-border bg-card p-6 space-y-6'>
           <h2 className='text-sm font-semibold flex items-center gap-2'>
             <Clock className='w-4 h-4 text-primary' />
@@ -249,7 +321,7 @@ function RouteComponent() {
           </div>
         </div>
 
-        {shop.status === 'PENDING' && (
+        {isAdmin && shop.status === 'PENDING' && (
           <div className='flex gap-3 pt-2'>
             <Button
               className='flex-1 rounded-xl h-11 gap-2'
@@ -306,6 +378,84 @@ function RouteComponent() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+          </div>
+        )}
+
+        {isAdmin && shop.status === 'ACTIVE' && (
+          <div className='pt-2'>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant='outline'
+                  className='w-full rounded-xl h-11 gap-2 text-destructive hover:text-destructive'
+                >
+                  <Ban className='w-4 h-4' />
+                  Suspend Shop
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent size='sm'>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Suspend &ldquo;{shop.name}&rdquo;?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    The shop will be hidden from customers and the vendor will
+                    be notified with this reason.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className='py-2'>
+                  <Input
+                    placeholder='Reason for suspension...'
+                    value={suspendReason}
+                    onChange={(e) => setSuspendReason(e.target.value)}
+                  />
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    variant='destructive'
+                    disabled={isSuspending || !suspendReason.trim()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      suspendShop({
+                        id: shop.id,
+                        reason: suspendReason.trim(),
+                      });
+                      setSuspendReason('');
+                    }}
+                  >
+                    {isSuspending && (
+                      <Loader2 className='w-3.5 h-3.5 animate-spin' />
+                    )}
+                    Suspend
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
+
+        {shop.status === 'SUSPENDED' && (
+          <div className='space-y-4 pt-2'>
+            {shop.suspendedReason && (
+              <div className='rounded-2xl border border-destructive/30 bg-destructive/5 p-4'>
+                <p className='text-xs font-semibold text-destructive mb-1'>
+                  Suspension Reason
+                </p>
+                <p className='text-sm'>{shop.suspendedReason}</p>
+              </div>
+            )}
+            {isAdmin && (
+              <Button
+                className='w-full rounded-xl h-11 gap-2'
+                disabled={isUnsuspending}
+                onClick={() => unsuspendShop(shop.id)}
+              >
+                {isUnsuspending && <Loader2 className='w-4 h-4 animate-spin' />}
+                <RotateCcw className='w-4 h-4' />
+                Reinstate Shop
+              </Button>
+            )}
           </div>
         )}
 

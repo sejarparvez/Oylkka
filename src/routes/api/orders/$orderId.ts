@@ -64,6 +64,7 @@ export const Route = createFileRoute('/api/orders/$orderId')({
             total: order.total,
             subtotal: order.subtotal,
             shippingCost: order.shippingCost,
+            tax: order.tax,
             discountAmount: order.discountAmount,
             couponDiscount: order.couponDiscount,
             couponCode: order.couponCode,

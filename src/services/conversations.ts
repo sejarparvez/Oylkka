@@ -65,6 +65,26 @@ type MessageItem = {
 
 // ─── Customer hooks ─────────────────────────────
 
+/**
+ * Polling unread count for the header badge (CUST-14). Kept on its own query
+ * key so signed-in users don't have to fetch the whole conversation list, but
+ * still under the CONVERSATIONS prefix so mark-read/send invalidate it.
+ */
+export function useUnreadMessageCount(options?: { enabled?: boolean }) {
+  return useQuery<number>({
+    queryKey: [QUERY_KEYS.CONVERSATIONS, 'unread-count'],
+    enabled: options?.enabled ?? true,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const response = await apiClient.get<{ unreadCount: number }>(
+        '/api/conversations/unread',
+      );
+      return response.data.unreadCount ?? 0;
+    },
+  });
+}
+
 export function useConversations() {
   return useQuery<{ conversations: ConversationItem[]; unreadCount: number }>({
     queryKey: [QUERY_KEYS.CONVERSATIONS],

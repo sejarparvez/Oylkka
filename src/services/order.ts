@@ -1,4 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'sonner';
 import type {
   FulfillmentStatus,
   OrderStatus,
@@ -25,7 +27,7 @@ type OrderListItem = {
   currency: string;
 };
 
-type OrderItemDetail = {
+export type OrderItemDetail = {
   id: string;
   productId: string;
   productName: string;
@@ -53,6 +55,7 @@ type OrderDetail = {
   total: number;
   subtotal: number;
   shippingCost: number;
+  tax: number;
   discountAmount: number;
   couponDiscount: number | null;
   couponCode: string | null;
@@ -107,5 +110,53 @@ export function useOrderDetail(orderId: string) {
       return response.data;
     },
     enabled: !!orderId,
+  });
+}
+
+/** Customer-initiated cancel, only valid inside the server's state window. */
+export function useCancelOrderMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      orderId,
+      reason,
+    }: {
+      orderId: string;
+      reason?: string;
+    }) => {
+      const response = await apiClient.post<{ success: boolean }>(
+        '/api/orders/cancel',
+        { orderId, reason },
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ORDERS] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to cancel order';
+      toast.error(`Error: ${message}`);
+    },
+  });
+}
+
+/** Re-open a fresh bKash checkout for a FAILED order (retry payment). */
+export function useRetryBkashPaymentMutation() {
+  return useMutation({
+    mutationFn: async (orderId: string) => {
+      const response = await apiClient.post<{ checkoutURL: string }>(
+        '/api/checkout/bkash-pay',
+        { orderId },
+      );
+      return response.data;
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to start payment retry';
+      toast.error(`Error: ${message}`);
+    },
   });
 }

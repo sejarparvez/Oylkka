@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LogIn } from 'lucide-react';
 import { motion } from 'motion/react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { RETURN_WINDOW_DAYS } from '@/lib/constants';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -23,8 +24,7 @@ export const Route = createFileRoute('/returns')({
 const sections = [
   {
     title: 'Return Policy',
-    content:
-      'We want you to be completely satisfied with your purchase. If you are not happy with an item, you may return it within 7 days of delivery for a refund or exchange, subject to the conditions below.',
+    content: `We want you to be completely satisfied with your purchase. If you are not happy with an item, you may return it within ${RETURN_WINDOW_DAYS} days of delivery for a refund or exchange, subject to the conditions below.`,
   },
   {
     title: 'Conditions for Returns',
@@ -34,7 +34,7 @@ const sections = [
       'Original packaging must be intact',
       'All tags, labels, and accessories must be included',
       'Proof of purchase (order number) is required',
-      'Return request must be submitted within 7 days of delivery',
+      `Return request must be submitted within ${RETURN_WINDOW_DAYS} days of delivery`,
     ],
   },
   {
@@ -77,6 +77,8 @@ const sections = [
 ];
 
 function ReturnsPage() {
+  const { user } = Route.useRouteContext();
+
   return (
     <div className='min-h-screen bg-background'>
       <Header />
@@ -119,6 +121,46 @@ function ReturnsPage() {
 
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24'>
         <div className='max-w-3xl space-y-16'>
+          {/* CUST-07: state the sign-in requirement before any effort. */}
+          <motion.aside
+            initial='hidden'
+            whileInView='show'
+            viewport={{ once: true, margin: '-80px' }}
+            variants={fadeUp}
+            custom={0}
+            className='flex flex-col gap-4 rounded-2xl border border-primary/30 bg-primary/5 p-5 sm:flex-row sm:items-center sm:justify-between'
+          >
+            <div className='flex items-start gap-3'>
+              <LogIn className='mt-0.5 h-5 w-5 shrink-0 text-primary' />
+              <div>
+                <p className='text-sm font-semibold'>
+                  {user
+                    ? 'Returns are requested from your account'
+                    : 'An account is required to request a return'}
+                </p>
+                <p className='text-sm text-muted-foreground mt-1'>
+                  {user
+                    ? 'Open your order from the Orders page and click Request Return.'
+                    : `Returns are self-service and tied to your order history. Sign in (or create an account) first — it only takes a moment, and you'll find Request Return on any eligible order.`}
+                </p>
+              </div>
+            </div>
+            {user ? (
+              <Button asChild size='sm' className='shrink-0'>
+                <Link to='/dashboard/orders'>Go to Orders</Link>
+              </Button>
+            ) : (
+              <div className='flex shrink-0 gap-2'>
+                <Button asChild size='sm'>
+                  <Link to='/auth/signin'>Sign In</Link>
+                </Button>
+                <Button asChild size='sm' variant='outline'>
+                  <Link to='/auth/signup'>Create Account</Link>
+                </Button>
+              </div>
+            )}
+          </motion.aside>
+
           {sections.map((section, i) => (
             <motion.section
               key={section.title}

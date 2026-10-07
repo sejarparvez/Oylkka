@@ -7,6 +7,7 @@ import { prisma } from '@/lib/db';
 import { orderCancellationHtml } from '@/lib/email-templates';
 import { sendEmail } from '@/lib/send-email';
 import { unwindUnpaidOrder } from '@/lib/stock';
+import { requireActiveVendorShop } from '@/lib/vendor-guard';
 
 export const Route = createFileRoute('/api/vendor/orders/cancel')({
   server: {
@@ -23,13 +24,9 @@ export const Route = createFileRoute('/api/vendor/orders/cancel')({
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
 
-          const shop = await prisma.shop.findUnique({
-            where: { ownerId: session.user.id },
-          });
-
-          if (!shop) {
-            return Response.json({ error: 'No shop found' }, { status: 404 });
-          }
+          const guard = await requireActiveVendorShop(session.user.id);
+          if (guard.response) return guard.response;
+          const shop = guard.shop;
 
           const body: { orderId: string; reason: string } =
             await request.json();

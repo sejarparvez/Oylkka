@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Eye, Package, Search } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -79,27 +79,23 @@ const paymentStatusBadge = (status: string) => {
 };
 
 export const Route = createFileRoute('/dashboard/orders/')({
+  validateSearch: (
+    search: Record<string, string | undefined>,
+  ): { status?: string } => ({
+    status: search.status,
+  }),
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { status: statusParam } = Route.useSearch();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('');
+  const status =
+    statusParam && STATUS_TABS.some((t) => t.value === statusParam)
+      ? statusParam
+      : '';
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-
-  useEffect(() => {
-    const handler = () => {
-      const params = new URLSearchParams(window.location.search);
-      const s = params.get('status') || '';
-      if (STATUS_TABS.some((t) => t.value === s)) {
-        setStatus(s);
-      }
-    };
-    handler();
-    window.addEventListener('popstate', handler);
-    return () => window.removeEventListener('popstate', handler);
-  }, []);
 
   const { data: orders, isLoading } = useMyOrders(
     status || undefined,
@@ -115,17 +111,10 @@ function RouteComponent() {
   };
 
   const handleStatusChange = (newStatus: string) => {
-    setStatus(newStatus);
-    const params = new URLSearchParams(window.location.search);
-    if (newStatus) {
-      params.set('status', newStatus);
-    } else {
-      params.delete('status');
-    }
-    const qs = params.toString();
     navigate({
-      to: `/dashboard/orders/${qs ? `?${qs}` : ''}`,
-    } as never);
+      to: '/dashboard/orders',
+      search: newStatus ? { status: newStatus } : {},
+    });
   };
 
   const viewOrder = (orderId: string) => {
@@ -252,7 +241,7 @@ function RouteComponent() {
                   </div>
 
                   <div className='text-sm font-bold tabular-nums'>
-                    ৳{order.total.toLocaleString('en-BD')}
+                    Ã Â§Â³{order.total.toLocaleString('en-BD')}
                   </div>
                 </div>
 

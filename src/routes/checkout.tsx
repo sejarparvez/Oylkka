@@ -162,6 +162,7 @@ function RouteComponent() {
             totalDiscount: number;
             totalShippingDiscount: number;
             freeShipping: boolean;
+            estDays: string | null;
             taxRate: number;
           }
         | { error: string }
@@ -245,6 +246,12 @@ function RouteComponent() {
 
   const total = subtotal + finalShipping + tax - totalDiscount;
 
+  // Wallet can only be used when it covers the order total (CUST-06).
+  const walletShortfall =
+    paymentMethod === 'WALLET' &&
+    walletBalance !== undefined &&
+    total > walletBalance;
+
   function toggleVoucher(voucherId: string) {
     setSelectedVoucherIds((prev) => {
       const next = new Set(prev);
@@ -301,6 +308,7 @@ function RouteComponent() {
   }
 
   async function onPlaceOrder(values: CheckoutFormValues) {
+    if (isPlacingOrder) return;
     setIsPlacingOrder(true);
 
     try {
@@ -478,6 +486,17 @@ function RouteComponent() {
                       </span>
                     </div>
 
+                    {discountPreview?.estDays && (
+                      <div className='flex justify-between'>
+                        <span className='text-muted-foreground'>
+                          Est. delivery
+                        </span>
+                        <span className='font-medium'>
+                          {discountPreview.estDays}
+                        </span>
+                      </div>
+                    )}
+
                     {freeShipping && baseShipping > 0 && (
                       <div className='flex justify-between text-green-600'>
                         <span>Shipping Discount (Free)</span>
@@ -611,6 +630,7 @@ function RouteComponent() {
                     selected={paymentMethod}
                     onSelect={setPaymentMethod}
                     walletBalance={walletBalance}
+                    orderTotal={Math.max(0, total)}
                   />
                 </Card>
 
@@ -618,7 +638,7 @@ function RouteComponent() {
                   type='submit'
                   size='lg'
                   className='w-full h-12 text-base rounded-xl'
-                  disabled={isPlacingOrder}
+                  disabled={isPlacingOrder || walletShortfall}
                 >
                   {isPlacingOrder ? (
                     <>
@@ -629,6 +649,12 @@ function RouteComponent() {
                     `Place Order${paymentMethod === 'CASH_ON_DELIVERY' ? ' (COD)' : ''}${paymentMethod === 'WALLET' ? ' (Wallet)' : ''}`
                   )}
                 </Button>
+                {walletShortfall && (
+                  <p className='text-xs text-destructive text-center'>
+                    Insufficient wallet balance. Top up your wallet or choose
+                    another payment method.
+                  </p>
+                )}
               </div>
             </div>
           </form>

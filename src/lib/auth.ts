@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { admin } from 'better-auth/plugins';
+import { admin, haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { DeleteImage } from '@/cloudinary';
 import { existingAccountHtml, welcomeHtml } from '@/lib/email-templates';
@@ -37,6 +37,24 @@ export const auth = betterAuth({
   },
 
   trustedOrigins: getTrustedOrigins(),
+
+  // AUTH-02: the admin plugin ships its own role/ban/impersonation endpoints
+  // that bypass `createAuditLog`. All privileged mutations are routed through
+  // the app's audited `/api/admin/*` handlers instead, so the plugin's
+  // mutating routes are disabled. Read-only routes are kept.
+  // The `banned` / `role` fields and their core enforcement remain active.
+  disabledPaths: [
+    '/admin/set-role',
+    '/admin/create-user',
+    '/admin/update-user',
+    '/admin/remove-user',
+    '/admin/set-user-password',
+    '/admin/ban-user',
+    '/admin/unban-user',
+    '/admin/impersonate-user',
+    '/admin/revoke-user-session',
+    '/admin/revoke-user-sessions',
+  ],
 
   databaseHooks: {
     user: {
@@ -124,7 +142,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
-    minPasswordLength: 6,
+    minPasswordLength: 10,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
       const resetUrl = new URL(url);
@@ -193,8 +211,24 @@ export const auth = betterAuth({
   plugins: [
     admin({
       defaultRole: 'USER',
+      // AUTH-10: only ADMIN is a better-auth "admin". MANAGER and
+      // CUSTOMER_SERVICE are app-level staff roles enforced by the shared
+      // helpers (`requireAdminOrManager`, `requireStaff`), and they must not
+      // be granted the plugin's own (disabled) mutation routes. The plugin
+      // rejects roles that are not declared in its `roles` config, so adding
+      // MANAGER here without an access-control definition would throw.
       adminRoles: ['ADMIN'],
       defaultAdminEmail: process.env.ADMIN_EMAIL,
+    }),
+    // AUTH-08: TOTP two-factor. Available to every account; admins can be
+    // forced to enrol once the account UI is verified in production.
+    twoFactor({
+      issuer: 'Oylkka',
+    }),
+    // AUTH-07: reject compromised passwords (HIBP k-anonymity). Only enabled
+    // in production so offline dev/test runs are not blocked by the network.
+    haveIBeenPwned({
+      enabled: process.env.NODE_ENV === 'production',
     }),
     tanstackStartCookies(),
   ],

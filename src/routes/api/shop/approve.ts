@@ -70,6 +70,14 @@ export const Route = createFileRoute('/api/shop/approve')({
                 where: { id: shop.ownerId },
                 data: { role: 'VENDOR' },
               });
+              createAuditLog({
+                actorId: session.user.id,
+                actorRole: session.user.role ?? 'ADMIN',
+                action: 'USER_ROLE_CHANGED',
+                entity: 'User',
+                entityId: shop.ownerId,
+                details: { from: owner.role, to: 'VENDOR' },
+              }).catch(() => {});
             }
 
             return [updatedShop];

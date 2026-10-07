@@ -10,10 +10,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  role       UserRole  @default(USER)
-  banned     Boolean   @default(false)
-  banReason  String?
-  banExpires DateTime?
+  role             UserRole  @default(USER)
+  banned           Boolean   @default(false)
+  banReason        String?
+  banExpires       DateTime?
+  twoFactorEnabled Boolean   @default(false)
 
   sessions           Session[]
   accounts           Account[]
@@ -36,6 +37,7 @@ model User {
   questions          ProductQuestion[]
   answeredQuestions  ProductQuestion[] @relation("answeredByUser")
   bkashTokens        BkashToken[]
+  twoFactor          TwoFactor[]
 
   @@map("user")
 }
@@ -80,4 +82,19 @@ model Account {
 
   @@index([userId])
   @@map("account")
+}
+
+model TwoFactor {
+  id          String   @id @default(cuid())
+  secret      String
+  backupCodes String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([secret])
+  @@index([userId])
+  @@map("two_factor")
 }

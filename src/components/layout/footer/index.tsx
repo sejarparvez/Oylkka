@@ -12,6 +12,7 @@ import { motion, useInView } from 'motion/react';
 import { useRef } from 'react';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
+import { RETURN_WINDOW_DAYS } from '@/lib/constants';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -32,7 +33,11 @@ const stagger = {
 const trustBadges = [
   { icon: ShieldCheck, label: 'Secure Payment', sub: 'SSL encrypted checkout' },
   { icon: BadgeCheck, label: 'Verified Vendors', sub: '100% vetted sellers' },
-  { icon: RefreshCw, label: 'Easy Returns', sub: '7-day return policy' },
+  {
+    icon: RefreshCw,
+    label: 'Easy Returns',
+    sub: `${RETURN_WINDOW_DAYS}-day return policy`,
+  },
   { icon: Truck, label: 'Fast Delivery', sub: 'Nationwide coverage' },
 ];
 

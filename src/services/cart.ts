@@ -76,18 +76,41 @@ export function useAddToCartMutation() {
       const response = await apiClient.post('/api/cart/add', input);
       return response.data;
     },
-    onMutate: () => {
+    onMutate: async (input) => {
       toast.loading('Adding to cart...', { id: 'cart-add' });
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.CART] });
+      const previous = queryClient.getQueryData<Cart>([QUERY_KEYS.CART]);
+      // Optimistically bump the matching line so rapid clicks stack instantly;
+      // brand-new lines still need the server's row, so the settled refetch
+      // below fills them in.
+      queryClient.setQueryData<Cart>([QUERY_KEYS.CART], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          items: old.items.map((item) =>
+            item.productId === input.productId &&
+            (item.variantId ?? null) === (input.variantId ?? null)
+              ? { ...item, quantity: item.quantity + input.quantity }
+              : item,
+          ),
+        };
+      });
+      return { previous };
     },
     onSuccess: () => {
       toast.success('Added to cart!', { id: 'cart-add' });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
-    onError: (error: unknown) => {
+    onError: (error: unknown, _input, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData([QUERY_KEYS.CART], context.previous);
+      }
       const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to add to cart';
       toast.error(`Error: ${message}`, { id: 'cart-add' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
   });
 }
@@ -100,14 +123,37 @@ export function useUpdateCartItemMutation() {
       const response = await apiClient.patch('/api/cart/update', input);
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.CART] });
+      const previous = queryClient.getQueryData<Cart>([QUERY_KEYS.CART]);
+      queryClient.setQueryData<Cart>([QUERY_KEYS.CART], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          items: old.items.map((item) =>
+            item.id === input.itemId
+              ? { ...item, quantity: input.quantity }
+              : item,
+          ),
+        };
+      });
+      return { previous };
     },
-    onError: (error: unknown) => {
+    onSuccess: () => {
+      // Clear any stale error toast from a previous rapid-click failure.
+      toast.dismiss('cart-update');
+    },
+    onError: (error: unknown, _input, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData([QUERY_KEYS.CART], context.previous);
+      }
       const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to update cart';
-      toast.error(`Error: ${message}`);
+      toast.error(`Error: ${message}`, { id: 'cart-update' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
   });
 }
@@ -120,18 +166,33 @@ export function useRemoveCartItemMutation() {
       const response = await apiClient.post('/api/cart/remove', { itemId });
       return response.data;
     },
-    onMutate: () => {
+    onMutate: async (itemId) => {
       toast.loading('Removing item...', { id: 'cart-remove' });
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.CART] });
+      const previous = queryClient.getQueryData<Cart>([QUERY_KEYS.CART]);
+      queryClient.setQueryData<Cart>([QUERY_KEYS.CART], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          items: old.items.filter((item) => item.id !== itemId),
+        };
+      });
+      return { previous };
     },
     onSuccess: () => {
       toast.success('Item removed', { id: 'cart-remove' });
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
-    onError: (error: unknown) => {
+    onError: (error: unknown, _itemId, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData([QUERY_KEYS.CART], context.previous);
+      }
       const message = axios.isAxiosError(error)
         ? (error.response?.data?.error ?? error.message)
         : 'Failed to remove item';
       toast.error(`Error: ${message}`, { id: 'cart-remove' });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CART] });
     },
   });
 }

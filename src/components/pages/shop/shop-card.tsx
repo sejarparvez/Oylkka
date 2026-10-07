@@ -47,10 +47,12 @@ export function ShopCard({ shop }: ShopCardProps) {
               <h3 className='text-sm font-semibold truncate group-hover:text-primary transition-colors'>
                 {shop.name}
               </h3>
-              <span className='flex items-center gap-0.5 bg-primary/10 text-primary text-[10px] font-semibold tracking-wide px-1.5 py-0.5 rounded-full shrink-0'>
-                <BadgeCheck className='w-2.5 h-2.5' />
-                <span>Verified</span>
-              </span>
+              {shop.status === 'ACTIVE' && (
+                <span className='flex items-center gap-0.5 bg-primary/10 text-primary text-[10px] font-semibold tracking-wide px-1.5 py-0.5 rounded-full shrink-0'>
+                  <BadgeCheck className='w-2.5 h-2.5' />
+                  <span>Verified</span>
+                </span>
+              )}
             </div>
             <div className='flex items-center gap-3 mt-1.5'>
               <div className='flex items-center gap-1'>

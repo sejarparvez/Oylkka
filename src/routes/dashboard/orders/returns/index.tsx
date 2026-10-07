@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RETURN_WINDOW_DAYS } from '@/lib/constants';
 import { useMyReturns } from '@/services/returns';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -89,7 +90,7 @@ function RouteComponent() {
                 <p className='text-sm font-semibold'>No return requests</p>
                 <p className='text-sm text-muted-foreground mt-1 max-w-sm'>
                   You haven&apos;t requested any returns yet. Return a delivered
-                  order within 30 days.
+                  order within {RETURN_WINDOW_DAYS} days.
                 </p>
               </div>
             ) : (

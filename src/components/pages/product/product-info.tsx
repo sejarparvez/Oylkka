@@ -86,7 +86,7 @@ export function ProductInfo({
               Free Shipping
             </span>
           )}
-          {product.shop?.id && (
+          {product.shop?.status === 'ACTIVE' && (
             <span className='inline-flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-semibold tracking-wide px-2 py-0.5 rounded-full'>
               <BadgeCheck className='w-2.5 h-2.5' />
               Verified

@@ -17,11 +17,12 @@ export const Route = createFileRoute('/api/shop/public-single')({
           }
 
           const shop = await prisma.shop.findFirst({
-            where: { slug, status: { in: ['APPROVED', 'ACTIVE'] } },
+            where: { slug, status: 'ACTIVE' },
             select: {
               id: true,
               name: true,
               slug: true,
+              status: true,
               logoUrl: true,
               bannerUrl: true,
               description: true,
@@ -34,6 +35,7 @@ export const Route = createFileRoute('/api/shop/public-single')({
               state: true,
               country: true,
               postalCode: true,
+              policies: true,
               rating: true,
               totalSales: true,
               totalReviews: true,
@@ -88,7 +90,10 @@ export const Route = createFileRoute('/api/shop/public-single')({
           }
 
           const recentReviews = await prisma.review.findMany({
-            where: { product: { shopId: shop.id }, moderationStatus: 'APPROVED' },
+            where: {
+              product: { shopId: shop.id },
+              moderationStatus: 'APPROVED',
+            },
             select: {
               id: true,
               rating: true,

@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
-type WishlistItem = {
+export type WishlistItem = {
   id: string;
   productId: string;
   variantId: string | null;
@@ -14,6 +14,7 @@ type WishlistItem = {
     slug: string;
     price: number;
     discountPrice: number | null;
+    stock: number;
     images: { imageUrl: string }[];
   };
   variant: {
@@ -21,16 +22,37 @@ type WishlistItem = {
     name: string;
     price: number;
     discountPrice: number | null;
+    stock: number;
   } | null;
 };
 
-export function useWishlist(options?: { enabled?: boolean }) {
-  return useQuery<{ items: WishlistItem[] }>({
-    queryKey: [QUERY_KEYS.WISHLIST],
+export type WishlistPage = {
+  items: WishlistItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export function useWishlist(options?: {
+  enabled?: boolean;
+  page?: number;
+  pageSize?: number;
+}) {
+  const page = options?.page ?? 1;
+  const pageSize = options?.pageSize;
+  return useQuery<WishlistPage>({
+    queryKey: [QUERY_KEYS.WISHLIST, { page, pageSize: pageSize ?? null }],
     enabled: options?.enabled,
     queryFn: async () => {
-      const response = await apiClient.get<{ items: WishlistItem[] }>(
-        '/api/wishlist/list',
+      const params = new URLSearchParams();
+      if (pageSize) {
+        params.set('page', String(page));
+        params.set('pageSize', String(pageSize));
+      }
+      const qs = params.toString();
+      const response = await apiClient.get<WishlistPage>(
+        `/api/wishlist/list${qs ? `?${qs}` : ''}`,
       );
       return response.data;
     },

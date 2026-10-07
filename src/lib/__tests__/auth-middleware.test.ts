@@ -22,6 +22,7 @@ function makeSession(role: string) {
       banned: false,
       banReason: null,
       banExpires: null,
+      twoFactorEnabled: false,
     },
     session: {
       id: 's1',

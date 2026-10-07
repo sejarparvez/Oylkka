@@ -17,7 +17,7 @@ export const Route = createFileRoute('/api/product/public-compare')({
             where: {
               id: { in: ids },
               status: 'PUBLISHED',
-              shop: { status: { in: ['APPROVED', 'ACTIVE'] } },
+              shop: { status: 'ACTIVE' },
             },
             select: {
               id: true,

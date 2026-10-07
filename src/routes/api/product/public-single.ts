@@ -20,7 +20,7 @@ export const Route = createFileRoute('/api/product/public-single')({
             where: {
               slug,
               status: 'PUBLISHED',
-              shop: { status: { in: ['APPROVED', 'ACTIVE'] } },
+              shop: { status: 'ACTIVE' },
             },
             include: {
               category: { select: { id: true, name: true, slug: true } },
@@ -88,6 +88,7 @@ export const Route = createFileRoute('/api/product/public-single')({
                   id: true,
                   name: true,
                   slug: true,
+                  status: true,
                   logoUrl: true,
                   rating: true,
                   totalReviews: true,

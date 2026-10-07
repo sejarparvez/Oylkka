@@ -4,7 +4,7 @@ import { UploadImage } from '@/cloudinary';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
-import { slugify } from '@/lib/slug';
+import { fallbackSlug, slugify } from '@/lib/slug';
 import { ShopApiSchema } from '@/schemas/shop-schema';
 
 export const Route = createFileRoute('/api/shop/apply')({
@@ -26,7 +26,8 @@ export const Route = createFileRoute('/api/shop/apply')({
             where: { ownerId: session.user.id },
           });
 
-          if (existing) {
+          const isReapply = existing?.status === 'REJECTED';
+          if (existing && !isReapply) {
             return Response.json(
               { error: 'You already own a shop' },
               { status: 409 },
@@ -64,94 +65,97 @@ export const Route = createFileRoute('/api/shop/apply')({
             );
           }
 
-          const baseSlug = slugify(parsed.data.name);
+          let baseSlug = slugify(parsed.data.name);
           if (!baseSlug) {
-            return Response.json(
-              { error: 'Invalid shop name — unable to generate slug' },
-              { status: 400 },
-            );
+            baseSlug = fallbackSlug();
           }
 
           let slug = baseSlug;
           let counter = 1;
-          while (await prisma.shop.findUnique({ where: { slug } })) {
+          for (;;) {
+            const clash = await prisma.shop.findUnique({ where: { slug } });
+            if (!clash || clash.id === existing?.id) break;
             slug = `${baseSlug}-${counter}`;
             counter++;
           }
 
-          let logoUrl: string | null = null;
-          let logoPublicId: string | null = null;
-          let bannerUrl: string | null = null;
-          let bannerPublicId: string | null = null;
-
           const logoFile = data.logo;
-          if (logoFile instanceof File && logoFile.size > 0) {
+          const bannerFile = data.banner;
+
+          const validateImage = (file: File, label: string) => {
             const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            if (!allowedTypes.includes(logoFile.type)) {
-              return Response.json(
-                { error: 'Logo must be JPEG, PNG, or WEBP' },
-                { status: 400 },
-              );
+            if (!allowedTypes.includes(file.type)) {
+              throw new Error(`${label} must be JPEG, PNG, or WEBP`);
             }
-
-            const maxSize = 512000;
-            if (logoFile.size > maxSize) {
-              return Response.json(
-                { error: 'Logo size must not exceed 500KB' },
-                { status: 400 },
-              );
+            if (file.size > 2_097_152) {
+              throw new Error(`${label} size must not exceed 2MB`);
             }
+          };
 
+          if (logoFile instanceof File && logoFile.size > 0) {
+            validateImage(logoFile, 'Logo');
+          }
+          if (bannerFile instanceof File && bannerFile.size > 0) {
+            validateImage(bannerFile, 'Banner');
+          }
+
+          let logoUrl: string | null = existing?.logoUrl ?? null;
+          let logoPublicId: string | null = existing?.logoPublicId ?? null;
+          let bannerUrl: string | null = existing?.bannerUrl ?? null;
+          let bannerPublicId: string | null = existing?.bannerPublicId ?? null;
+
+          if (logoFile instanceof File && logoFile.size > 0) {
             const result = await UploadImage(logoFile, 'shops');
             logoUrl = result.secure_url;
             logoPublicId = result.public_id;
           }
 
-          const bannerFile = data.banner;
           if (bannerFile instanceof File && bannerFile.size > 0) {
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            if (!allowedTypes.includes(bannerFile.type)) {
-              return Response.json(
-                { error: 'Banner must be JPEG, PNG, or WEBP' },
-                { status: 400 },
-              );
-            }
-
-            const maxSize = 512000;
-            if (bannerFile.size > maxSize) {
-              return Response.json(
-                { error: 'Banner size must not exceed 500KB' },
-                { status: 400 },
-              );
-            }
-
             const result = await UploadImage(bannerFile, 'shops');
             bannerUrl = result.secure_url;
             bannerPublicId = result.public_id;
           }
 
-          const shop = await prisma.shop.create({
-            data: {
-              name: parsed.data.name,
-              slug,
-              description: parsed.data.description || null,
-              email: parsed.data.email,
-              phone: parsed.data.phone || null,
-              website: parsed.data.website || null,
-              addressLine1: parsed.data.addressLine1 || null,
-              addressLine2: parsed.data.addressLine2 || null,
-              city: parsed.data.city || null,
-              state: parsed.data.state || null,
-              country: parsed.data.country || null,
-              postalCode: parsed.data.postalCode || null,
-              logoUrl,
-              logoPublicId,
-              bannerUrl,
-              bannerPublicId,
-              status: 'PENDING',
-              ownerId: session.user.id,
-            },
-          });
+          const shopFields = {
+            name: parsed.data.name,
+            slug,
+            description: parsed.data.description || null,
+            email: parsed.data.email,
+            phone: parsed.data.phone || null,
+            website: parsed.data.website || null,
+            addressLine1: parsed.data.addressLine1 || null,
+            addressLine2: parsed.data.addressLine2 || null,
+            city: parsed.data.city || null,
+            state: parsed.data.state || null,
+            country: parsed.data.country || null,
+            postalCode: parsed.data.postalCode || null,
+            logoUrl,
+            logoPublicId,
+            bannerUrl,
+            bannerPublicId,
+          };
+
+          const shop = isReapply
+            ? await prisma.shop.update({
+                where: { id: existing.id },
+                data: {
+                  ...shopFields,
+                  status: 'PENDING',
+                  rejectionReason: null,
+                  approvedAt: null,
+                  approvedBy: null,
+                  suspendedAt: null,
+                  suspendedReason: null,
+                  suspendedBy: null,
+                },
+              })
+            : await prisma.shop.create({
+                data: {
+                  ...shopFields,
+                  status: 'PENDING',
+                  ownerId: session.user.id,
+                },
+              });
 
           return Response.json(
             { message: 'Shop application submitted successfully', shop },

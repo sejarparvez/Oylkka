@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowLeft, MapPin, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Loader2, MapPin, Pencil, Plus, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -84,13 +84,14 @@ function RouteComponent() {
   };
 
   const handleSubmit = async () => {
-    if (
-      !form.name ||
-      !form.phone ||
-      !form.address ||
-      !form.upzila ||
-      !form.district
-    ) {
+    const missing: string[] = [];
+    if (!form.name) missing.push('Full Name');
+    if (!form.phone) missing.push('Phone');
+    if (!form.address) missing.push('Address');
+    if (!form.upzila) missing.push('Upzila / Thana');
+    if (!form.district) missing.push('District');
+    if (missing.length > 0) {
+      toast.error(`Please fill in: ${missing.join(', ')}`);
       return;
     }
     try {
@@ -143,7 +144,13 @@ function RouteComponent() {
                   {editing ? 'Edit Address' : 'Add Address'}
                 </DialogTitle>
               </DialogHeader>
-              <div className='space-y-3'>
+              <form
+                className='space-y-3'
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit();
+                }}
+              >
                 <div className='grid grid-cols-2 gap-3'>
                   <div>
                     <Label>Label</Label>
@@ -162,6 +169,7 @@ function RouteComponent() {
                   <div>
                     <Label>Full Name</Label>
                     <Input
+                      required
                       value={form.name}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, name: e.target.value }))
@@ -173,6 +181,7 @@ function RouteComponent() {
                   <div>
                     <Label>Phone</Label>
                     <Input
+                      required
                       value={form.phone}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, phone: e.target.value }))
@@ -182,6 +191,7 @@ function RouteComponent() {
                   <div>
                     <Label>Upzila / Thana</Label>
                     <Input
+                      required
                       value={form.upzila}
                       onChange={(e) =>
                         setForm((p) => ({ ...p, upzila: e.target.value }))
@@ -192,6 +202,7 @@ function RouteComponent() {
                 <div>
                   <Label>Address</Label>
                   <Input
+                    required
                     value={form.address}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, address: e.target.value }))
@@ -202,6 +213,7 @@ function RouteComponent() {
                   <div>
                     <Label>District</Label>
                     <select
+                      required
                       className='flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm'
                       value={form.district}
                       onChange={(e) =>
@@ -237,13 +249,23 @@ function RouteComponent() {
                 </div>
                 <div className='flex justify-end gap-2 pt-2'>
                   <DialogClose asChild>
-                    <Button variant='outline'>Cancel</Button>
+                    <Button variant='outline' type='button'>
+                      Cancel
+                    </Button>
                   </DialogClose>
-                  <Button onClick={handleSubmit}>
+                  <Button
+                    type='submit'
+                    disabled={
+                      createMutation.isPending || updateMutation.isPending
+                    }
+                  >
+                    {createMutation.isPending || updateMutation.isPending ? (
+                      <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+                    ) : null}
                     {editing ? 'Update' : 'Add'}
                   </Button>
                 </div>
-              </div>
+              </form>
             </DialogContent>
           </Dialog>
         </div>

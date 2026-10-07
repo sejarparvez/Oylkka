@@ -3,6 +3,7 @@ import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
+import { requireActiveVendorShop } from '@/lib/vendor-guard';
 
 export const Route = createFileRoute('/api/vendor/shipping/delete')({
   server: {
@@ -19,13 +20,9 @@ export const Route = createFileRoute('/api/vendor/shipping/delete')({
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
 
-          const shop = await prisma.shop.findUnique({
-            where: { ownerId: session.user.id },
-          });
-
-          if (!shop) {
-            return Response.json({ error: 'No shop found' }, { status: 404 });
-          }
+          const guard = await requireActiveVendorShop(session.user.id);
+          if (guard.response) return guard.response;
+          const shop = guard.shop;
 
           const url = new URL(request.url);
           const id = url.searchParams.get('id');

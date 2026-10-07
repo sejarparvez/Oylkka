@@ -61,6 +61,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RETURN_WINDOW_DAYS } from '@/lib/constants';
+import { trackProductView } from '@/lib/recently-viewed';
 import { cn } from '@/lib/utils';
 import { useAddToCartMutation } from '@/services/cart';
 import { usePublicProduct } from '@/services/product';
@@ -69,7 +71,6 @@ import {
   useRemoveFromWishlistMutation,
   useWishlist,
 } from '@/services/wishlist';
-import { trackProductView } from './shop.recently-viewed';
 
 export const Route = createFileRoute('/product/$slug')({
   component: RouteComponent,
@@ -169,13 +170,9 @@ function RouteComponent() {
 
   useEffect(() => {
     if (product) {
-      trackProductView({
-        id: product.id,
-        slug: product.slug,
-        name: product.productName,
-        image: product.images?.[0]?.imageUrl ?? '',
-        price: product.discountPrice ?? product.price,
-      });
+      // Only the reference is stored; price/stock are re-hydrated from the
+      // server on the recently-viewed page (CUST-16).
+      trackProductView({ id: product.id, slug: product.slug });
     }
   }, [product]);
 
@@ -246,7 +243,11 @@ function RouteComponent() {
       desc: 'SSL encrypted checkout',
     },
     { icon: MapPin, title: 'Trackable', desc: 'Real-time order tracking' },
-    { icon: RefreshCw, title: 'Easy Returns', desc: '30-day return policy' },
+    {
+      icon: RefreshCw,
+      title: 'Easy Returns',
+      desc: `${RETURN_WINDOW_DAYS}-day return policy`,
+    },
   ];
 
   return (
@@ -554,14 +555,15 @@ function RouteComponent() {
                       <div>
                         <p className='text-sm font-semibold'>Return Policy</p>
                         <p className='text-xs font-medium text-emerald-600 dark:text-emerald-400'>
-                          30-day money-back guarantee
+                          {RETURN_WINDOW_DAYS}-day money-back guarantee
                         </p>
                       </div>
                     </div>
                     <div className='space-y-3 text-sm text-muted-foreground leading-relaxed ml-13'>
                       <p>
-                        We accept returns within 30 days of delivery. Items must
-                        be unused and in their original packaging.
+                        We accept returns within {RETURN_WINDOW_DAYS} days of
+                        delivery. Items must be unused and in their original
+                        packaging.
                       </p>
                       <ul className='space-y-2'>
                         <li className='flex items-center gap-2'>

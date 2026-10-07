@@ -10,6 +10,7 @@ export const Route = createFileRoute('/dashboard/messages/')({
 });
 
 function RouteComponent() {
+  const { user } = Route.useRouteContext();
   const { data, isLoading } = useConversations();
   const conversations = data?.conversations ?? [];
 
@@ -45,7 +46,12 @@ function RouteComponent() {
         <div className='space-y-2'>
           {conversations.map((convo) => {
             const lastMsg = convo.messages?.[0];
-            const isUnread = lastMsg && !lastMsg.isRead;
+            // Only messages from the other side can mark a conversation
+            // unread for this user - your own last message stays isRead=false
+            // until the vendor opens it, which used to make the thread look
+            // permanently unread (CUST-14).
+            const isUnread =
+              lastMsg && !lastMsg.isRead && lastMsg.senderId !== user?.id;
 
             return (
               <Link

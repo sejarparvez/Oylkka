@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import {
+  Ban,
   ChevronLeft,
+  CreditCard,
   FileText,
   Loader2,
   MessageSquare,
@@ -24,7 +26,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
-import { useOrderDetail } from '@/services/order';
+import {
+  type OrderItemDetail,
+  useCancelOrderMutation,
+  useOrderDetail,
+  useRetryBkashPaymentMutation,
+} from '@/services/order';
 import { useCreateReturnMutation } from '@/services/returns';
 
 const statusBadge = (status: string) => {
@@ -140,6 +147,12 @@ function RouteComponent() {
   const activeStep = getActiveStepIndex(order.status);
   const isTerminal =
     order.status === 'CANCELLED' || order.status === 'REFUNDED';
+  // Customer cancel window: pre-fulfilment and no money moved (CUST-10).
+  const canCancel =
+    (order.status === 'PENDING' || order.status === 'CONFIRMED') &&
+    (order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED');
+  const canRetry =
+    order.paymentMethod === 'BKASH' && order.paymentStatus === 'FAILED';
 
   return (
     <div className='space-y-6'>
@@ -184,8 +197,10 @@ function RouteComponent() {
             </Button>
           )}
           {order.status === 'DELIVERED' && (
-            <RequestReturnDialog orderId={order.id} />
+            <RequestReturnDialog orderId={order.id} items={order.items} />
           )}
+          {canRetry && <RetryPaymentButton orderId={order.id} />}
+          {canCancel && <CancelOrderDialog orderId={order.id} />}
         </div>
       </div>
 
@@ -254,13 +269,14 @@ function RouteComponent() {
 
       {/* Order items, grouped per shop with per-item fulfilment tracking */}
       {(() => {
-        const grouped = order.items.reduce<
-            Record<string, typeof order.items>
-          >((acc, item) => {
+        const grouped = order.items.reduce<Record<string, typeof order.items>>(
+          (acc, item) => {
             if (!acc[item.shopId]) acc[item.shopId] = [];
             acc[item.shopId].push(item);
             return acc;
-          }, {});
+          },
+          {},
+        );
 
         return (
           <Card>
@@ -322,9 +338,10 @@ function RouteComponent() {
                                 </div>
                                 <div className='flex items-center gap-2 shrink-0'>
                                   <Badge
-                                    variant={statusBadge(
-                                      item.fulfillmentStatus,
-                                    ).variant}
+                                    variant={
+                                      statusBadge(item.fulfillmentStatus)
+                                        .variant
+                                    }
                                     className={`text-[10px] uppercase tracking-wider ${statusBadge(item.fulfillmentStatus).className}`}
                                   >
                                     {statusBadge(item.fulfillmentStatus).label}
@@ -609,22 +626,44 @@ function MessageVendorButton({
   );
 }
 
-function RequestReturnDialog({ orderId }: { orderId: string }) {
+function RequestReturnDialog({
+  orderId,
+  items,
+}: {
+  orderId: string;
+  items: OrderItemDetail[];
+}) {
   const navigate = useNavigate();
   const createMutation = useCreateReturnMutation();
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState('');
   const [details, setDetails] = useState('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const returnableItems = items.filter(
+    (i) => i.fulfillmentStatus === 'DELIVERED' && i.deliveredAt,
+  );
+
+  const toggleItem = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
 
   const handleSubmit = async () => {
     if (!reason) {
       toast.error('Please select a reason');
       return;
     }
+    if (selectedIds.length === 0) {
+      toast.error('Select at least one item to return');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('orderId', orderId);
+    formData.append('itemIds', JSON.stringify(selectedIds));
     formData.append('reason', reason);
     formData.append('details', details);
     formData.append('resolution', 'REFUND');
@@ -641,7 +680,7 @@ function RequestReturnDialog({ orderId }: { orderId: string }) {
       setOpen(false);
       navigate({ to: '/dashboard/orders/returns' });
     } catch {
-      toast.error('Failed to submit return request');
+      // Specific error toast is handled by the mutation's onError.
     }
   };
 
@@ -658,6 +697,40 @@ function RequestReturnDialog({ orderId }: { orderId: string }) {
           <DialogTitle>Request Return</DialogTitle>
         </DialogHeader>
         <div className='space-y-4'>
+          <div>
+            <Label>Items to return</Label>
+            {returnableItems.length === 0 ? (
+              <p className='text-xs text-muted-foreground mt-1'>
+                No delivered items are eligible for return.
+              </p>
+            ) : (
+              <div className='mt-2 space-y-2 max-h-48 overflow-y-auto rounded-lg border border-border p-2'>
+                {returnableItems.map((item) => (
+                  <label
+                    key={item.id}
+                    className='flex cursor-pointer items-start gap-3 rounded-md p-2 hover:bg-muted/50'
+                  >
+                    <input
+                      type='checkbox'
+                      className='mt-1'
+                      checked={selectedIds.includes(item.id)}
+                      onChange={() => toggleItem(item.id)}
+                    />
+                    <span className='min-w-0 flex-1'>
+                      <span className='block truncate text-sm font-medium'>
+                        {item.productName}
+                      </span>
+                      <span className='block text-xs text-muted-foreground'>
+                        {item.variantName ? `${item.variantName} · ` : ''}
+                        Qty {item.quantity}
+                        {item.shopName ? ` · ${item.shopName}` : ''}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
           <div>
             <Label htmlFor='returnReason'>Reason</Label>
             <select
@@ -712,5 +785,108 @@ function RequestReturnDialog({ orderId }: { orderId: string }) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function CancelOrderDialog({ orderId }: { orderId: string }) {
+  const cancelMutation = useCancelOrderMutation();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+
+  const handleSubmit = async () => {
+    try {
+      await cancelMutation.mutateAsync({ orderId, reason: reason.trim() });
+      toast.success('Order cancelled');
+      setReason('');
+      setOpen(false);
+    } catch {
+      // Specific error toast is handled by the mutation's onError.
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (cancelMutation.isPending) return;
+        setOpen(next);
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button variant='outline' size='sm' className='gap-2 text-destructive'>
+          <Ban className='w-4 h-4' />
+          Cancel Order
+        </Button>
+      </DialogTrigger>
+      <DialogContent className='sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>Cancel Order</DialogTitle>
+        </DialogHeader>
+        <div className='space-y-4'>
+          <p className='text-sm text-muted-foreground'>
+            Cancel this order before it starts fulfilment? Reserved stock will
+            be released and this cannot be undone.
+          </p>
+          <div>
+            <Label htmlFor='cancelReason'>Reason (optional)</Label>
+            <Textarea
+              id='cancelReason'
+              placeholder='Why are you cancelling this order?...'
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <div className='flex justify-end gap-2 pt-2'>
+            <Button
+              variant='outline'
+              onClick={() => setOpen(false)}
+              disabled={cancelMutation.isPending}
+            >
+              Keep Order
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={handleSubmit}
+              disabled={cancelMutation.isPending}
+            >
+              {cancelMutation.isPending && (
+                <Loader2 className='w-4 h-4 mr-2 animate-spin' />
+              )}
+              Cancel Order
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RetryPaymentButton({ orderId }: { orderId: string }) {
+  const retryMutation = useRetryBkashPaymentMutation();
+
+  return (
+    <Button
+      variant='outline'
+      size='sm'
+      className='gap-2'
+      disabled={retryMutation.isPending}
+      onClick={() =>
+        retryMutation.mutate(orderId, {
+          onSuccess: (data) => {
+            if (data.checkoutURL) {
+              window.open(data.checkoutURL, '_blank', 'noopener,noreferrer');
+            }
+          },
+        })
+      }
+    >
+      {retryMutation.isPending ? (
+        <Loader2 className='w-4 h-4 animate-spin' />
+      ) : (
+        <CreditCard className='w-4 h-4' />
+      )}
+      Retry Payment
+    </Button>
   );
 }

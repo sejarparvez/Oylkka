@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { UploadImage } from '@/cloudinary';
 import type { ReturnReason } from '@/generated/prisma/enums';
 import { auth } from '@/lib/auth';
+import { RETURN_WINDOW_DAYS } from '@/lib/constants';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { generalLimiter } from '@/lib/rate-limit';
@@ -61,7 +62,12 @@ export const Route = createFileRoute('/api/returns/create')({
           let itemIds: string[] = [];
           if (rawItemIds) {
             try {
-              itemIds = JSON.parse(rawItemIds);
+              const parsed = JSON.parse(rawItemIds);
+              if (Array.isArray(parsed)) {
+                itemIds = parsed.filter(
+                  (id): id is string => typeof id === 'string' && id.length > 0,
+                );
+              }
             } catch (error) {
               // biome-ignore lint/suspicious/noConsole: this is fine
               console.error('Failed to parse item IDs JSON:', error);
@@ -71,14 +77,19 @@ export const Route = createFileRoute('/api/returns/create')({
                 .filter(Boolean);
             }
           }
+          itemIds = [...new Set(itemIds)];
+
+          if (itemIds.length === 0) {
+            return Response.json(
+              { error: 'Select at least one item to return' },
+              { status: 400 },
+            );
+          }
 
           const order = await prisma.order.findUnique({
             where: { id: orderId },
             include: {
-              items: {
-                where: itemIds.length > 0 ? { id: { in: itemIds } } : undefined,
-                include: { shop: { select: { id: true } } },
-              },
+              items: true,
             },
           });
 
@@ -93,62 +104,69 @@ export const Route = createFileRoute('/api/returns/create')({
             );
           }
 
-          // Check 30-day return window
-          const deliveredItems = order.items.filter(
-            (i) => i.deliveredAt && i.fulfillmentStatus === 'DELIVERED',
-          );
-          if (deliveredItems.length === 0) {
+          // Every requested item must belong to this order.
+          const orderItemIds = new Set(order.items.map((i) => i.id));
+          if (itemIds.some((id) => !orderItemIds.has(id))) {
             return Response.json(
-              { error: 'No delivered items found in this order' },
+              { error: 'One or more items do not belong to this order' },
               { status: 400 },
             );
           }
 
-          const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+          // Work only with the selected items (CUST-01).
+          const selectedItems = order.items.filter((i) =>
+            itemIds.includes(i.id),
+          );
+          const deliveredItems = selectedItems.filter(
+            (i) => i.deliveredAt && i.fulfillmentStatus === 'DELIVERED',
+          );
+          if (deliveredItems.length !== selectedItems.length) {
+            return Response.json(
+              { error: 'Only delivered items can be returned' },
+              { status: 400 },
+            );
+          }
+
+          // Check return window (CUST-02: single source RETURN_WINDOW_DAYS).
+          const windowStart = new Date(
+            Date.now() - RETURN_WINDOW_DAYS * 24 * 60 * 60 * 1000,
+          );
           const allWithinWindow = deliveredItems.every(
-            (i) => i.deliveredAt && i.deliveredAt > thirtyDaysAgo,
+            (i) => i.deliveredAt && i.deliveredAt > windowStart,
           );
           if (!allWithinWindow) {
             return Response.json(
-              { error: 'Return window has expired (30 days from delivery)' },
+              {
+                error: `Return window has expired (${RETURN_WINDOW_DAYS} days from delivery)`,
+              },
               { status: 400 },
             );
           }
 
-          // Check for existing pending return on same items
-          if (itemIds.length > 0) {
-            const existing = await prisma.returnRequest.findFirst({
-              where: {
-                orderId,
-                customerId: session.user.id,
-                status: {
-                  in: [
-                    'PENDING',
-                    'APPROVED',
-                    'AWAITING_SHIPMENT',
-                    'SHIPPED',
-                    'RECEIVED',
-                  ],
-                },
-                itemIds: { hasSome: itemIds },
+          // Check for existing pending return on same items (CUST-03: no
+          // longer skipped when itemIds is empty — it can't be empty).
+          const existing = await prisma.returnRequest.findFirst({
+            where: {
+              orderId,
+              customerId: session.user.id,
+              status: {
+                in: [
+                  'PENDING',
+                  'APPROVED',
+                  'AWAITING_SHIPMENT',
+                  'SHIPPED',
+                  'RECEIVED',
+                ],
               },
-            });
-            if (existing) {
-              return Response.json(
-                {
-                  error:
-                    'A return request already exists for one of these items',
-                },
-                { status: 409 },
-              );
-            }
-          }
-
-          const shopIds = [...new Set(deliveredItems.map((i) => i.shopId))];
-          if (shopIds.length !== 1) {
+              itemIds: { hasSome: itemIds },
+            },
+          });
+          if (existing) {
             return Response.json(
-              { error: 'Return must be for items from the same shop' },
-              { status: 400 },
+              {
+                error: 'A return request already exists for one of these items',
+              },
+              { status: 409 },
             );
           }
 
@@ -162,20 +180,39 @@ export const Route = createFileRoute('/api/returns/create')({
             imageUrls.push(result.secure_url);
           }
 
-          const returnRequest = await prisma.returnRequest.create({
-            data: {
-              orderId,
-              itemIds,
-              customerId: session.user.id,
-              shopId: shopIds[0],
-              reason: reason as ReturnReason,
-              details,
-              images: imageUrls,
-              resolution,
-            },
+          // One ReturnRequest per shop — a return may span vendors (CUST-01).
+          const itemsByShop = new Map<string, { id: string }[]>();
+          for (const item of selectedItems) {
+            const group = itemsByShop.get(item.shopId) ?? [];
+            group.push({ id: item.id });
+            itemsByShop.set(item.shopId, group);
+          }
+
+          const returnRequests = await prisma.$transaction(async (tx) => {
+            const created = [];
+            for (const [shopId, items] of itemsByShop) {
+              created.push(
+                await tx.returnRequest.create({
+                  data: {
+                    orderId,
+                    itemIds: items.map((i) => i.id),
+                    customerId: session.user.id,
+                    shopId,
+                    reason: reason as ReturnReason,
+                    details,
+                    images: imageUrls,
+                    resolution,
+                  },
+                }),
+              );
+            }
+            return created;
           });
 
-          return Response.json({ returnRequest }, { status: 201 });
+          return Response.json(
+            { returnRequest: returnRequests[0], returnRequests },
+            { status: 201 },
+          );
         } catch (_error) {
           return Response.json(
             { error: 'Internal Server Error' },

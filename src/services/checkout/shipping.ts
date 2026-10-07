@@ -7,6 +7,12 @@ export interface ShippingEstimateItem {
   unitPrice: number;
 }
 
+export interface ShippingEstimate {
+  cost: number;
+  /** Zone delivery estimate (e.g. "2-4 days"), joined across shops. */
+  estDays: string | null;
+}
+
 /**
  * Zone-aware shipping calculation shared by checkout (`create.ts`) and the
  * `discount-preview` quote so the customer always sees the amount they will
@@ -18,7 +24,7 @@ export interface ShippingEstimateItem {
 export async function computeShippingEstimate(
   items: ShippingEstimateItem[],
   shippingDistrict?: string | null,
-): Promise<number> {
+): Promise<ShippingEstimate> {
   const perShop = new Map<
     string,
     { hasNonFree: boolean; itemQty: number; shopSubtotal: number }
@@ -42,7 +48,7 @@ export async function computeShippingEstimate(
   }
 
   const shopIds = [...perShop.keys()];
-  if (shopIds.length === 0) return 0;
+  if (shopIds.length === 0) return { cost: 0, estDays: null };
 
   const shops = await prisma.shop.findMany({
     where: { id: { in: shopIds } },
@@ -53,6 +59,7 @@ export async function computeShippingEstimate(
   );
 
   let total = 0;
+  const estDaysSet = new Set<string>();
 
   for (const [shopId, entry] of perShop) {
     if (!entry.hasNonFree) continue;
@@ -67,17 +74,24 @@ export async function computeShippingEstimate(
           districts: { some: { district: shippingDistrict } },
         },
         orderBy: { baseCost: 'asc' },
-        select: { baseCost: true, perItem: true, freeAbove: true },
+        select: {
+          baseCost: true,
+          perItem: true,
+          freeAbove: true,
+          estDays: true,
+        },
       });
 
       if (zone) {
-        cost =
-          Number(zone.baseCost) + Number(zone.perItem) * entry.itemQty;
+        cost = Number(zone.baseCost) + Number(zone.perItem) * entry.itemQty;
         if (
           zone.freeAbove != null &&
           entry.shopSubtotal >= Number(zone.freeAbove)
         ) {
           cost = 0;
+        }
+        if (zone.estDays) {
+          estDaysSet.add(zone.estDays);
         }
       }
     }
@@ -85,5 +99,8 @@ export async function computeShippingEstimate(
     total += cost;
   }
 
-  return total;
+  return {
+    cost: total,
+    estDays: estDaysSet.size > 0 ? [...estDaysSet].join(', ') : null,
+  };
 }

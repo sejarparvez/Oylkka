@@ -1,10 +1,18 @@
 import { getRequestHeaders } from '@tanstack/react-start/server';
 
 import { auth } from '@/lib/auth';
+import { adminLimiter } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit-guard';
 import type { UserRole } from '@/lib/roles';
 import { USER_ROLES } from '@/lib/roles';
 
 type Session = Awaited<ReturnType<typeof auth.api.getSession>>;
+
+const STAFF_ROLES: UserRole[] = [
+  USER_ROLES.ADMIN,
+  USER_ROLES.MANAGER,
+  USER_ROLES.CUSTOMER_SERVICE,
+];
 
 export async function requireAuth(): Promise<
   | { session: NonNullable<Session>; response: null }
@@ -18,6 +26,16 @@ export async function requireAuth(): Promise<
       session: null,
       response: Response.json({ error: 'Unauthorized' }, { status: 401 }),
     };
+  }
+
+  // AUTH-09: every admin/staff request is rate-limited per actor. Because all
+  // admin routes authenticate through this helper, the limiter is applied
+  // here rather than duplicated across ~29 endpoints.
+  if (STAFF_ROLES.includes(session.user.role as UserRole)) {
+    const limited = await checkRateLimit(adminLimiter, session.user.id);
+    if (limited) {
+      return { session: null, response: limited };
+    }
   }
 
   return { session: session as NonNullable<Session>, response: null };

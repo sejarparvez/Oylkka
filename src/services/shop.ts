@@ -25,12 +25,14 @@ type ShopResponse = {
   postalCode: string | null;
   status: string;
   rejectionReason: string | null;
+  suspendedReason: string | null;
   approvedAt: string | null;
   approvedBy: string | null;
   ownerId: string;
   createdAt: string;
   updatedAt: string;
   shippingCost: number;
+  commissionRate: number;
   totalSales: number;
   totalOrders: number;
   rating: number;
@@ -143,6 +145,83 @@ export function useRejectShopMutation() {
   });
 }
 
+export function useSuspendShopMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, { id: string; reason: string }>({
+    mutationFn: async ({ id, reason }) => {
+      const response = await apiClient.post('/api/shop/suspend', {
+        id,
+        reason,
+      });
+      return response.data;
+    },
+    onMutate: () => {
+      toast.loading('Suspending shop...', { id: 'shop-suspend' });
+    },
+    onSuccess: () => {
+      toast.success('Shop suspended', { id: 'shop-suspend' });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to suspend shop';
+      toast.error(`Error: ${message}`, { id: 'shop-suspend' });
+    },
+  });
+}
+
+export function useUnsuspendShopMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
+      const response = await apiClient.post('/api/shop/unsuspend', { id });
+      return response.data;
+    },
+    onMutate: () => {
+      toast.loading('Reinstating shop...', { id: 'shop-unsuspend' });
+    },
+    onSuccess: () => {
+      toast.success('Shop reinstated', { id: 'shop-unsuspend' });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to reinstate shop';
+      toast.error(`Error: ${message}`, { id: 'shop-unsuspend' });
+    },
+  });
+}
+
+export function useUpdateCommissionRateMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, { shopId: string; commissionRate: number }>({
+    mutationFn: async ({ shopId, commissionRate }) => {
+      const response = await apiClient.put(`/api/admin/shops/${shopId}`, {
+        commissionRate,
+      });
+      return response.data;
+    },
+    onMutate: () => {
+      toast.loading('Saving commission rate...', { id: 'shop-commission' });
+    },
+    onSuccess: () => {
+      toast.success('Commission rate updated', { id: 'shop-commission' });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SHOPS] });
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to update commission rate';
+      toast.error(`Error: ${message}`, { id: 'shop-commission' });
+    },
+  });
+}
+
 export function useApplyShopMutation() {
   const queryClient = useQueryClient();
 
@@ -205,6 +284,7 @@ export type PublicShopListShop = {
   id: string;
   name: string;
   slug: string;
+  status: string;
   logoUrl: string | null;
   description: string | null;
   bannerUrl: string | null;
@@ -285,6 +365,7 @@ export type PublicShopDetail = {
   id: string;
   name: string;
   slug: string;
+  status: string;
   logoUrl: string | null;
   bannerUrl: string | null;
   description: string | null;
@@ -297,6 +378,11 @@ export type PublicShopDetail = {
   state: string | null;
   country: string | null;
   postalCode: string | null;
+  policies: {
+    shippingPolicy?: string;
+    returnPolicy?: string;
+    termsAndConditions?: string;
+  } | null;
   rating: number;
   totalSales: number;
   totalReviews: number;

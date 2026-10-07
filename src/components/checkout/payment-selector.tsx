@@ -61,18 +61,39 @@ type PaymentSelectorProps = {
   selected: PaymentMethodOption;
   onSelect: (value: PaymentMethodOption) => void;
   walletBalance?: number;
+  /** Estimated order total — wallet is disabled when the balance is short. */
+  orderTotal?: number;
 };
 
 export function PaymentSelector({
   selected,
   onSelect,
   walletBalance,
+  orderTotal,
 }: PaymentSelectorProps) {
+  function isAvailable(option: PaymentOption) {
+    if (!option.available) return false;
+    if (option.value === 'WALLET') {
+      return (
+        walletBalance === undefined ||
+        orderTotal === undefined ||
+        walletBalance >= orderTotal
+      );
+    }
+    return true;
+  }
+
   function handleSelect(option: PaymentOption) {
-    if (!option.available) {
-      toast.error(`${option.label} is not available yet`, {
-        description: 'Please check back later.',
-      });
+    if (!isAvailable(option)) {
+      if (option.value === 'WALLET') {
+        toast.error('Insufficient wallet balance', {
+          description: 'Top up your wallet or choose another payment method.',
+        });
+      } else {
+        toast.error(`${option.label} is not available yet`, {
+          description: 'Please check back later.',
+        });
+      }
       return;
     }
     onSelect(option.value);
@@ -83,17 +104,22 @@ export function PaymentSelector({
       {paymentOptions.map((option) => {
         const Icon = option.icon;
         const isSelected = selected === option.value;
+        const available = isAvailable(option);
+        const walletShort =
+          option.value === 'WALLET' &&
+          walletBalance !== undefined &&
+          !available;
 
         return (
           <button
             key={option.value}
             type='button'
             onClick={() => handleSelect(option)}
-            disabled={!option.available}
+            disabled={!available}
             className={`relative flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all ${
               isSelected
                 ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
-                : option.available
+                : available
                   ? 'border-border hover:border-primary/50 hover:bg-muted/50'
                   : 'border-border cursor-not-allowed opacity-50'
             }`}
@@ -102,10 +128,16 @@ export function PaymentSelector({
             <div>
               <p className='text-sm font-medium'>{option.label}</p>
               <p className='text-xs text-muted-foreground mt-0.5'>
-                {option.available ? option.description : 'Coming soon'}
+                {!available
+                  ? option.comingSoon
+                    ? 'Coming soon'
+                    : 'Insufficient balance'
+                  : option.description}
               </p>
               {option.value === 'WALLET' && walletBalance !== undefined && (
-                <p className='text-xs font-medium text-primary mt-1'>
+                <p
+                  className={`text-xs font-medium mt-1 ${walletShort ? 'text-destructive' : 'text-primary'}`}
+                >
                   Balance: ৳
                   {walletBalance.toLocaleString('en-BD', {
                     minimumFractionDigits: 2,

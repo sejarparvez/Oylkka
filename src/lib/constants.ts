@@ -26,6 +26,7 @@ export const QUERY_KEYS = {
   VENDOR_ANALYTICS: 'vendor-analytics',
   SHIPPING_ZONES: 'shipping-zones',
   SHOP_POLICIES: 'shop-policies',
+  PAYOUT_DETAILS: 'payout-details',
   PAYOUTS: 'payouts',
   ADDRESSES: 'addresses',
   FOLLOWED_SHOPS: 'followed-shops',
@@ -35,3 +36,6 @@ export const QUERY_KEYS = {
   CONTENT_BLOCKS: 'content-blocks',
   ADMIN_GLOBAL_ATTRIBUTES: 'admin-global-attributes',
 };
+
+/** Days after delivery a customer may request a return (CUST-02). */
+export const RETURN_WINDOW_DAYS = 30;

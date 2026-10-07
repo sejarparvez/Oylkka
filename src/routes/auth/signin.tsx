@@ -60,10 +60,19 @@ function RouteComponent() {
   async function onSubmit(values: LoginFormValues) {
     setIsLoading(true);
     try {
-      const { error } = await signIn.email({
+      const { data, error } = await signIn.email({
         email: values.email,
         password: values.password,
       });
+
+      // AUTH-08: a 2FA-enabled account is not fully signed in yet. The
+      // twoFactorClient redirect handler sends the user to the verify step.
+      if (
+        !error &&
+        (data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect
+      ) {
+        return;
+      }
 
       if (error) {
         if (error.status === 401) {

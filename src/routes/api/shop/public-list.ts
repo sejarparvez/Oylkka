@@ -15,7 +15,7 @@ export const Route = createFileRoute('/api/shop/public-list')({
           const search = url.searchParams.get('search') || '';
 
           const where: Record<string, unknown> = {
-            status: { in: ['APPROVED', 'ACTIVE'] },
+            status: 'ACTIVE',
           };
           if (search) {
             where.name = { contains: search, mode: 'insensitive' };
@@ -28,6 +28,7 @@ export const Route = createFileRoute('/api/shop/public-list')({
                 id: true,
                 name: true,
                 slug: true,
+                status: true,
                 logoUrl: true,
                 description: true,
                 bannerUrl: true,
