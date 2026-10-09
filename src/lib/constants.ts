@@ -32,6 +32,8 @@ export const QUERY_KEYS = {
   FOLLOWED_SHOPS: 'followed-shops',
   AUDIT_LOGS: 'audit-logs',
   ADMIN_SETTINGS: 'admin-settings',
+  PUBLIC_SETTINGS: 'public-settings',
+  GLOBAL_ATTRIBUTES: 'global-attributes',
   ADMIN_REPORTS: 'admin-reports',
   CONTENT_BLOCKS: 'content-blocks',
   ADMIN_GLOBAL_ATTRIBUTES: 'admin-global-attributes',
@@ -40,7 +42,13 @@ export const QUERY_KEYS = {
 /** Days after delivery a customer may request a return (CUST-02). */
 export const RETURN_WINDOW_DAYS = 30;
 
-export const PRODUCT_IMAGE_MAX_BYTES = 500 * 1024;
+/**
+ * Maximum size for product and variant image uploads. FE-38: the client and
+ * the server used different limits (500KB vs 2MB) on the same field, so files
+ * between the two were rejected by the browser but not the API. The API limit
+ * is authoritative — keep both on this single value.
+ */
+export const PRODUCT_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 export const PRODUCT_IMAGE_ACCEPTED_TYPES = [
   'image/jpeg',
   'image/png',

@@ -52,7 +52,11 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
   const slugEditedRef = useRef(false);
 
   useEffect(() => {
-    slugEditedRef.current = false;
+    // FE-31: on the edit page the slug already exists on the product — treat
+    // it as deliberately set so the auto-slug effect cannot silently rewrite a
+    // stored slug that differs from `slugify(productName)`. Auto-slug remains
+    // for the create form only.
+    slugEditedRef.current = !!productId;
     lastCheckedSlug.current = '';
     setSlugStatus({ isUnique: null, suggestions: [] });
   }, [productId]);

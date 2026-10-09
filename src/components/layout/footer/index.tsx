@@ -9,10 +9,11 @@ import {
   Truck,
 } from 'lucide-react';
 import { motion, useInView } from 'motion/react';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { RETURN_WINDOW_DAYS } from '@/lib/constants';
+import { usePublicSettings } from '@/services/public-settings';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -30,16 +31,14 @@ const stagger = {
   show: { transition: { staggerChildren: 0.06 } },
 };
 
-const trustBadges = [
+// FE-20: the return-window claim is built from the public SiteSetting reader
+// in `Footer()` instead of a module-level constant, so it stays in sync with
+// the policy pages and the PDP trust block.
+const trustBadgesBase = [
   { icon: ShieldCheck, label: 'Secure Payment', sub: 'SSL encrypted checkout' },
   { icon: BadgeCheck, label: 'Verified Vendors', sub: '100% vetted sellers' },
-  {
-    icon: RefreshCw,
-    label: 'Easy Returns',
-    sub: `${RETURN_WINDOW_DAYS}-day return policy`,
-  },
   { icon: Truck, label: 'Fast Delivery', sub: 'Nationwide coverage' },
-];
+] as const;
 
 const shopLinks = [
   { label: 'All Products', to: '/products' },
@@ -154,7 +153,17 @@ function NewsletterSection({ inView }: { inView: boolean }) {
   );
 }
 
-function TrustBadgeStrip({ inView }: { inView: boolean }) {
+function TrustBadgeStrip({
+  inView,
+  trustBadges,
+}: {
+  inView: boolean;
+  trustBadges: Array<{
+    icon: React.ElementType;
+    label: string;
+    sub: string;
+  }>;
+}) {
   return (
     <div className='border-b border-border'>
       <div className='container'>
@@ -214,11 +223,27 @@ export default function Footer() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: '-80px' });
 
+  // FE-20: single source of truth for the return-window claim.
+  const { data: publicSettings } = usePublicSettings();
+  const returnWindowDays =
+    publicSettings?.return_window_days ?? String(RETURN_WINDOW_DAYS);
+  const trustBadges = useMemo(
+    () => [
+      ...trustBadgesBase,
+      {
+        icon: RefreshCw,
+        label: 'Easy Returns',
+        sub: `${returnWindowDays}-day return policy`,
+      },
+    ],
+    [returnWindowDays],
+  );
+
   return (
     <footer className='relative overflow-hidden bg-background text-foreground'>
       <div ref={sectionRef} className='relative'>
         <NewsletterSection inView={inView} />
-        <TrustBadgeStrip inView={inView} />
+        <TrustBadgeStrip inView={inView} trustBadges={trustBadges} />
       </div>
 
       <div className='relative container py-16'>
@@ -346,7 +371,7 @@ export default function Footer() {
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
               <span>Verified Vendors</span>
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
-              <span>7-Day Returns</span>
+              <span>{returnWindowDays}-Day Returns</span>
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
               <span>Nationwide Delivery</span>
             </motion.div>

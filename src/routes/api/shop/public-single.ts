@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { prisma } from '@/lib/db';
+import { getShopStatsOrDefault } from '@/lib/shop-stats';
 
 export const Route = createFileRoute('/api/shop/public-single')({
   server: {
@@ -107,8 +108,18 @@ export const Route = createFileRoute('/api/shop/public-single')({
             take: 6,
           });
 
+          const stats = await getShopStatsOrDefault(shop.id);
+
           return Response.json(
-            { ...shop, ratingBreakdown, recentReviews },
+            {
+              ...shop,
+              rating: stats.rating,
+              totalSales: stats.totalSales,
+              totalReviews: stats.totalReviews,
+              totalOrders: stats.totalOrders,
+              ratingBreakdown,
+              recentReviews,
+            },
             { status: 200 },
           );
         } catch (error) {

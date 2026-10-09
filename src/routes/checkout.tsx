@@ -28,6 +28,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import apiClient from '@/lib/api-client';
 import { BD_DISTRICTS } from '@/lib/bd-districts';
 import { QUERY_KEYS } from '@/lib/constants';
+import { formatBDT, toNumber } from '@/lib/currency';
 import { useAddresses } from '@/services/address';
 import { useCart } from '@/services/cart';
 import { useAutoApplyVouchers, useMyVouchers } from '@/services/voucher';
@@ -141,7 +142,7 @@ function RouteComponent() {
   const subtotal =
     cart?.items.reduce((sum, item) => {
       const price = item.savedPrice ?? item.product.price;
-      return sum + (price ?? 0) * item.quantity;
+      return sum + toNumber(price) * item.quantity;
     }, 0) ?? 0;
 
   const shippingDistrict = formValues.district || null;
@@ -296,7 +297,7 @@ function RouteComponent() {
         description: data.description,
       });
       toast.success(
-        `Coupon applied! You saved ৳${data.discountAmount.toLocaleString()}`,
+        `Coupon applied! You saved ৳${formatBDT(data.discountAmount)}`,
       );
     } catch {
       toast.error('Failed to validate coupon');
@@ -447,10 +448,7 @@ function RouteComponent() {
                                 </p>
                               </div>
                               <p className='text-sm font-semibold shrink-0'>
-                                ৳
-                                {(
-                                  (price ?? 0) * item.quantity
-                                ).toLocaleString()}
+                                ৳{formatBDT(toNumber(price) * item.quantity)}
                               </p>
                             </div>
                           );
@@ -465,7 +463,7 @@ function RouteComponent() {
                     <div className='flex justify-between'>
                       <span className='text-muted-foreground'>Subtotal</span>
                       <span className='font-medium'>
-                        ৳{(subtotal || 0).toLocaleString()}
+                        ৳{formatBDT(subtotal)}
                       </span>
                     </div>
 
@@ -473,7 +471,7 @@ function RouteComponent() {
                       <div className='flex justify-between text-green-600'>
                         <span>Discount</span>
                         <span className='font-medium'>
-                          -৳{totalDiscount.toLocaleString()}
+                          -৳{formatBDT(totalDiscount)}
                         </span>
                       </div>
                     )}
@@ -482,7 +480,7 @@ function RouteComponent() {
                       <span className='text-muted-foreground'>Shipping</span>
                       <span className='font-medium'>
                         {finalShipping > 0 ? (
-                          <span>৳{finalShipping.toLocaleString()}</span>
+                          <span>৳{formatBDT(finalShipping)}</span>
                         ) : (
                           <span className='text-green-600'>Free</span>
                         )}
@@ -504,7 +502,7 @@ function RouteComponent() {
                       <div className='flex justify-between text-green-600'>
                         <span>Shipping Discount (Free)</span>
                         <span className='font-medium'>
-                          -৳{baseShipping.toLocaleString()}
+                          -৳{formatBDT(baseShipping)}
                         </span>
                       </div>
                     )}
@@ -513,7 +511,7 @@ function RouteComponent() {
                       <div className='flex justify-between text-green-600'>
                         <span>Shipping Discount</span>
                         <span className='font-medium'>
-                          -৳{shippingDiscount.toLocaleString()}
+                          -৳{formatBDT(shippingDiscount)}
                         </span>
                       </div>
                     )}
@@ -521,9 +519,7 @@ function RouteComponent() {
                     {tax > 0 && (
                       <div className='flex justify-between'>
                         <span className='text-muted-foreground'>Tax</span>
-                        <span className='font-medium'>
-                          ৳{tax.toLocaleString()}
-                        </span>
+                        <span className='font-medium'>৳{formatBDT(tax)}</span>
                       </div>
                     )}
 
@@ -531,7 +527,7 @@ function RouteComponent() {
 
                     <div className='flex justify-between text-base font-semibold'>
                       <span>Total</span>
-                      <span>৳{Math.max(0, total || 0).toLocaleString()}</span>
+                      <span>৳{formatBDT(Math.max(0, total || 0))}</span>
                     </div>
                   </div>
                 </Card>

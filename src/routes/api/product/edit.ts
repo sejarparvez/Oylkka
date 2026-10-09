@@ -1,6 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DeleteImage, UploadImage } from '@/cloudinary';
 import { requireAuth } from '@/lib/auth-middleware';
+import {
+  PRODUCT_IMAGE_ACCEPTED_TYPES,
+  PRODUCT_IMAGE_MAX_BYTES,
+} from '@/lib/constants';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { logError } from '@/lib/logger';
@@ -8,8 +12,9 @@ import { slugify } from '@/lib/slug';
 import { ProductApiEditSchema } from '@/schemas/product-api-schema';
 import { SkuService } from '@/services/sku-service';
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_IMAGE_BYTES = 2_097_152;
+// FE-38: size/type constraints shared with the client form.
+const ALLOWED_IMAGE_TYPES: readonly string[] = PRODUCT_IMAGE_ACCEPTED_TYPES;
+const MAX_IMAGE_BYTES = PRODUCT_IMAGE_MAX_BYTES;
 
 export const Route = createFileRoute('/api/product/edit')({
   server: {
@@ -483,6 +488,9 @@ export const Route = createFileRoute('/api/product/edit')({
                         imagePublicId?: string | null;
                         metadata?: Record<string, unknown> | null;
                         priceModifier?: number | null;
+                        // FE-45: optional canonical mapping links
+                        globalAttributeId?: string | null;
+                        globalValueId?: string | null;
                       }>;
                       isVariantDefining?: boolean;
                       displayOrder?: number;
@@ -499,6 +507,8 @@ export const Route = createFileRoute('/api/product/edit')({
                         imageUrl: av.imageUrl ?? null,
                         imagePublicId: av.imagePublicId ?? null,
                         priceModifier: av.priceModifier ?? null,
+                        globalAttributeId: av.globalAttributeId ?? null,
+                        globalValueId: av.globalValueId ?? null,
                         ...(av.metadata != null
                           ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
                             { metadata: av.metadata as any }
@@ -515,6 +525,15 @@ export const Route = createFileRoute('/api/product/edit')({
                   };
                 },
               );
+
+              // FE-45: ProductGlobalAttributeValue rows are rebuilt from the
+              // form payload on every save (the form is the source of truth for
+              // a product's mappings). Delete-then-create keeps them consistent
+              // when a link is removed or re-pointed, inside the same
+              // transaction as the values they reference.
+              await tx.productGlobalAttributeValue.deleteMany({
+                where: { productId },
+              });
 
               for (const attr of normalizedAttributes) {
                 const option = await tx.productAttributeOption.upsert({
@@ -536,7 +555,7 @@ export const Route = createFileRoute('/api/product/edit')({
                 if (!attr.attributeValues) continue;
 
                 for (const av of attr.attributeValues) {
-                  await tx.productAttributeValue.upsert({
+                  const localValue = await tx.productAttributeValue.upsert({
                     where: {
                       optionId_slug: { optionId: option.id, slug: av.slug },
                     },
@@ -565,6 +584,19 @@ export const Route = createFileRoute('/api/product/edit')({
                         : {}),
                     },
                   });
+
+                  // FE-45: links were cleared above; recreate the mapping for
+                  // values the vendor linked to a GlobalAttributeValue.
+                  if (av.globalAttributeId && av.globalValueId) {
+                    await tx.productGlobalAttributeValue.create({
+                      data: {
+                        productId,
+                        globalAttributeId: av.globalAttributeId,
+                        localValueId: localValue.id,
+                        globalValueId: av.globalValueId,
+                      },
+                    });
+                  }
                 }
               }
             }

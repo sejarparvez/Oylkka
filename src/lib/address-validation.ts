@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { BD_DISTRICTS } from '@/lib/bd-districts';
 import { prisma } from '@/lib/db';
 
-const DISTRICTS = new Set(BD_DISTRICTS);
+const DISTRICTS = new Set<string>(BD_DISTRICTS);
 
 export const BD_PHONE_PATTERN = /^(\+?8801|01)[3-9]\d{8}$/;
 

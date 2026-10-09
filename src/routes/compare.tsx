@@ -17,6 +17,7 @@ import { QueryErrorState } from '@/components/query-state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useAddToCartMutation } from '@/services/cart';
 import { useAllProducts, useCompareProducts } from '@/services/product';
 
@@ -102,11 +103,11 @@ function ComparePage() {
         return (
           <div className='flex items-baseline gap-1.5'>
             <span className='text-lg font-bold tabular-nums'>
-              ৳{product.price.toLocaleString()}
+              ৳{formatBDT(product.price)}
             </span>
             {product.discountPrice && (
               <span className='text-sm text-muted-foreground line-through tabular-nums'>
-                ৳{product.discountPrice.toLocaleString()}
+                ৳{formatBDT(product.discountPrice)}
               </span>
             )}
           </div>
@@ -263,10 +264,7 @@ function ComparePage() {
                           {result.productName}
                         </h4>
                         <p className='text-sm font-bold tabular-nums'>
-                          ৳
-                          {(
-                            result.discountPrice ?? result.price
-                          ).toLocaleString()}
+                          ৳{formatBDT(result.discountPrice ?? result.price)}
                         </p>
                         <Button
                           size='sm'
@@ -417,21 +415,44 @@ function ComparePage() {
                             {product.productName}
                           </h3>
                         </Link>
-                        <Button
-                          size='sm'
-                          className='w-full mt-3 gap-1.5 h-8 text-xs'
-                          onClick={() =>
-                            addToCart.mutate({
-                              productId: product.id,
-                              quantity: 1,
-                              variantId: undefined,
-                            })
-                          }
-                          disabled={product.stock === 0}
-                        >
-                          <ShoppingCart className='w-3.5 h-3.5' />
-                          {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                        </Button>
+                        {/* FE-26: variant products have no resolvable
+                            default variant, so their compare button is a
+                            navigation to the PDP (same actor as
+                            product-card.tsx). Plain products add to cart. */}
+                        {product.hasVariants ? (
+                          <Button
+                            asChild
+                            size='sm'
+                            className='w-full mt-3 gap-1.5 h-8 text-xs'
+                          >
+                            <Link
+                              to='/product/$slug'
+                              params={{ slug: product.slug }}
+                              className='inline-flex items-center justify-center gap-1.5'
+                            >
+                              <ShoppingCart className='w-3.5 h-3.5' />
+                              Choose Options
+                            </Link>
+                          </Button>
+                        ) : (
+                          <Button
+                            size='sm'
+                            className='w-full mt-3 gap-1.5 h-8 text-xs'
+                            onClick={() =>
+                              addToCart.mutate({
+                                productId: product.id,
+                                quantity: 1,
+                                variantId: undefined,
+                              })
+                            }
+                            disabled={product.stock === 0}
+                          >
+                            <ShoppingCart className='w-3.5 h-3.5' />
+                            {product.stock === 0
+                              ? 'Out of Stock'
+                              : 'Add to Cart'}
+                          </Button>
+                        )}
                       </th>
                     ))}
                   </tr>

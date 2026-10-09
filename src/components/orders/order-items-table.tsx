@@ -25,6 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { formatBDT } from '@/lib/currency';
 
 type OrderItemRow = {
   id: string;
@@ -137,9 +138,9 @@ export function OrderItemsTable({
               <div className='flex items-center justify-between mt-2'>
                 <div className='flex items-center gap-3 text-xs text-muted-foreground'>
                   <span>Qty: {item.quantity}</span>
-                  <span>@ ৳{item.unitPrice.toLocaleString('en-BD')}</span>
+                  <span>@ ৳{formatBDT(item.unitPrice)}</span>
                   <span className='font-medium text-foreground'>
-                    ৳{item.total.toLocaleString('en-BD')}
+                    ৳{formatBDT(item.total)}
                   </span>
                 </div>
 

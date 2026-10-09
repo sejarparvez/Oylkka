@@ -1,13 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { prisma } from '@/lib/db';
+import { lastNDayKeys } from '@/lib/timezone';
 
-function daysAgo(n: number): Date {
-  const d = new Date();
-  d.setDate(d.getDate() - n);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const Route = createFileRoute('/api/admin/dashboard/stats')({
   server: {
@@ -19,7 +15,9 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
           const roleResponse = requireAdminOrManager(authResult.session);
           if (roleResponse) return roleResponse;
 
-          const thirtyDaysAgo = daysAgo(30);
+          // Query window for the chart: 30 days back (floored by a small
+          // margin so the earliest Dhaka bucket is fully covered).
+          const thirtyDaysAgo = new Date(Date.now() - 31 * DAY_MS);
 
           const [
             revenueAgg,
@@ -33,24 +31,42 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
             recentOrders,
           ] = await Promise.all([
             prisma.order.aggregate({
-              where: { paymentStatus: 'PAID' },
-              _sum: { total: true },
+              where: {
+                paymentStatus: 'PAID',
+                NOT: { status: 'REFUNDED' },
+              },
+              _sum: { total: true, refundAmount: true },
             }),
-            prisma.order.count(),
+            prisma.order.count({
+              where: {
+                paymentStatus: 'PAID',
+                NOT: { status: 'REFUNDED' },
+              },
+            }),
             prisma.order.count({ where: { status: 'PENDING' } }),
             prisma.order.count({ where: { status: 'PROCESSING' } }),
             prisma.product.count(),
             prisma.user.count(),
             prisma.shop.count({ where: { status: 'ACTIVE' } }),
-            prisma.order.groupBy({
-              by: ['createdAt'],
-              where: {
-                paymentStatus: 'PAID',
-                createdAt: { gte: thirtyDaysAgo },
-              },
-              _sum: { total: true },
-              orderBy: { createdAt: 'asc' },
-            }),
+            // Aggregate per Dhaka day in the database (DATA-06/DATA-08): a
+            // Prisma `groupBy` on `paidAt` returns one row per distinct
+            // timestamp, not a daily bucket, and attributes revenue to
+            // creation time rather than payment time.
+            prisma.$queryRaw<{ day: string; amount: number }[]>`
+              SELECT to_char(
+                       date_trunc(
+                         'day',
+                         o."paidAt" AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Dhaka'
+                       ),
+                       'YYYY-MM-DD'
+                     ) AS day,
+                     COALESCE(SUM(o."total"), 0)::float8 AS amount
+              FROM "order" o
+              WHERE o."paymentStatus" = 'PAID'
+                AND o."status" <> 'REFUNDED'
+                AND o."paidAt" >= ${thirtyDaysAgo}
+              GROUP BY 1
+            `,
             prisma.order.findMany({
               take: 5,
               orderBy: { createdAt: 'desc' },
@@ -60,16 +76,16 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
             }),
           ]);
 
+          // Key buckets in Asia/Dhaka (DATA-06); the previous implementation
+          // used local-midnight bounds but UTC `toISOString()` keys, shifting
+          // every bucket by a day and adding a future bucket.
           const revenueByDay: Record<string, number> = {};
-          for (let i = 0; i < 30; i++) {
-            const d = new Date(thirtyDaysAgo);
-            d.setDate(d.getDate() + i + 1);
-            revenueByDay[d.toISOString().slice(0, 10)] = 0;
+          for (const key of lastNDayKeys(30)) {
+            revenueByDay[key] = 0;
           }
           for (const r of dailyRevenue) {
-            const key = r.createdAt.toISOString().slice(0, 10);
-            if (revenueByDay[key] !== undefined) {
-              revenueByDay[key] += Number(r._sum.total ?? 0);
+            if (revenueByDay[r.day] !== undefined) {
+              revenueByDay[r.day] += Number(r.amount);
             }
           }
           const chartData = Object.entries(revenueByDay).map(
@@ -81,7 +97,11 @@ export const Route = createFileRoute('/api/admin/dashboard/stats')({
 
           return Response.json({
             stats: {
-              revenue: Number(revenueAgg._sum.total ?? 0),
+              revenue: Math.max(
+                Number(revenueAgg._sum.total ?? 0) -
+                  Number(revenueAgg._sum.refundAmount ?? 0),
+                0,
+              ),
               orders: totalOrders,
               pendingOrders,
               processingOrders,

@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils';
 
 import { ProductFormContext } from './product-form-context';
 
+const MAX_IMAGE_MB = PRODUCT_IMAGE_MAX_BYTES / (1024 * 1024);
+
 export function ProductImagesCard() {
   const { productImages, setProductImages } = useContext(ProductFormContext);
   const [isDragging, setIsDragging] = useState(false);
@@ -64,7 +66,7 @@ export function ProductImagesCard() {
       );
       if (oversizedFiles.length > 0) {
         setErrorMessage(
-          `Some images exceed the maximum size of 500KB: ${oversizedFiles
+          `Some images exceed the maximum size of ${MAX_IMAGE_MB}MB: ${oversizedFiles
             .map((f) => f.name)
             .join(', ')}`,
         );
@@ -143,8 +145,8 @@ export function ProductImagesCard() {
         <div className='flex flex-col gap-2'>
           <Label htmlFor='image-upload'>Upload Images</Label>
           <FieldDescription>
-            You can upload up to 4 images (max 500KB each). Drag images to
-            reorder.
+            You can upload up to 4 images (max {MAX_IMAGE_MB}MB each). Drag
+            images to reorder.
           </FieldDescription>
 
           <div

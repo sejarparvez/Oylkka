@@ -62,6 +62,39 @@ function RouteComponent() {
       status: product.status as 'DRAFT' | 'PUBLISHED' | 'ARCHIVED',
       featured: product.featured,
       slug: product.slug,
+      // FE-45: without this, `reset()` would wipe the product's attributes in
+      // the form (they are absent from the scalar payload), making them
+      // impossible to view or keep. Rebuild the value entries and re-attach the
+      // canonical global mapping for each local value.
+      attributes:
+        product.attributeOptions && product.attributeOptions.length > 0
+          ? Object.fromEntries(
+              product.attributeOptions.map((option) => [
+                option.name,
+                {
+                  values: option.attributeValues.map((av) => {
+                    const link = product.globalAttributeValues?.find(
+                      (g) => g.localValueId === av.id,
+                    );
+                    return {
+                      id: av.id,
+                      value: av.value,
+                      slug: av.slug,
+                      displayOrder: av.displayOrder,
+                      imageUrl: av.imageUrl,
+                      imagePublicId: av.imagePublicId,
+                      metadata: av.metadata,
+                      priceModifier: av.priceModifier ?? undefined,
+                      globalAttributeId: link?.globalAttributeId,
+                      globalValueId: link?.globalValueId,
+                    };
+                  }),
+                  isVariantDefining: option.isVariantDefining,
+                  displayOrder: option.displayOrder,
+                },
+              ]),
+            )
+          : undefined,
     };
   }, [product]);
 

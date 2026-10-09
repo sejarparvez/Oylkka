@@ -4,25 +4,37 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/api-client';
 import { QUERY_KEYS } from '@/lib/constants';
 
+/**
+ * Prisma `Decimal` columns are serialised to JSON as strings, so prices are
+ * typed as `number | string` and must be coerced via `lib/currency` before
+ * formatting or arithmetic (DATA-12).
+ */
+type Decimal = number | string;
+
 type CartItemProduct = {
   id: string;
   productName: string;
   slug: string;
-  price: number;
-  discountPrice: number | null;
+  price: Decimal;
+  discountPrice: Decimal | null;
   stock: number;
   hasVariants: boolean;
   freeShipping: boolean;
   categoryId: string | null;
   images: { imageUrl: string }[];
-  shop: { id: string; name: string; slug: string; shippingCost: number } | null;
+  shop: {
+    id: string;
+    name: string;
+    slug: string;
+    shippingCost: Decimal;
+  } | null;
 };
 
 type CartItemVariant = {
   id: string;
   name: string;
-  price: number;
-  discountPrice: number | null;
+  price: Decimal;
+  discountPrice: Decimal | null;
   stock: number;
   imageUrl: string | null;
 };
@@ -33,7 +45,7 @@ export type CartItem = {
   productId: string;
   variantId: string | null;
   quantity: number;
-  savedPrice: number | null;
+  savedPrice: Decimal | null;
   product: CartItemProduct;
   variant: CartItemVariant | null;
 };

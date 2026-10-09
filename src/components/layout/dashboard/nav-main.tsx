@@ -261,7 +261,7 @@ export function NavMain({ user }: { user: User }) {
         },
         { title: 'Shipped', url: '/dashboard/admin/orders?status=SHIPPED' },
         { title: 'Delivered', url: '/dashboard/admin/orders?status=DELIVERED' },
-        { title: 'Returns', url: '/dashboard/admin/orders?status=RETURNED' },
+        { title: 'Returns', url: '/dashboard/admin/orders?status=REFUNDED' },
         { title: 'Cancelled', url: '/dashboard/admin/orders?status=CANCELLED' },
       ],
     },

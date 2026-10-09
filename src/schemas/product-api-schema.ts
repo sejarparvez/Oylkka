@@ -103,6 +103,11 @@ export const ProductAttributeValueSchema = z.object({
   imagePublicId: z.string().optional().nullable(),
   metadata: z.record(z.string(), z.unknown()).optional().nullable(),
   priceModifier: z.number().optional().nullable(),
+  // FE-45: optional links to the canonical GlobalAttributeValue this local
+  // value maps to (persisted as ProductGlobalAttributeValue). Without these
+  // zod would strip the keys before the create/edit handlers could see them.
+  globalAttributeId: z.string().optional().nullable(),
+  globalValueId: z.string().optional().nullable(),
 });
 
 export const ExtendedAttributeOptionSchema = z.object({

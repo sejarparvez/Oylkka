@@ -28,6 +28,12 @@ export const Route = createFileRoute('/api/vendor/payouts/pending')({
               shopId: shop.id,
               fulfillmentStatus: 'DELIVERED',
               payoutItem: null,
+              order: {
+                paymentStatus: 'PAID',
+                NOT: {
+                  status: 'REFUNDED',
+                },
+              },
             },
             select: {
               id: true,

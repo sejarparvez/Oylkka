@@ -26,14 +26,17 @@ import {
 
 const statusBadge = (status: string) => {
   switch (status) {
+    case 'PUBLISHED':
     case 'ACTIVE':
-      return { variant: 'default' as const, label: 'Active' };
+      return { variant: 'default' as const, label: 'Published' };
     case 'DRAFT':
       return { variant: 'secondary' as const, label: 'Draft' };
     case 'ARCHIVED':
       return { variant: 'outline' as const, label: 'Archived' };
     case 'OUT_OF_STOCK':
       return { variant: 'destructive' as const, label: 'Out of Stock' };
+    case 'REJECTED':
+      return { variant: 'destructive' as const, label: 'Rejected' };
     default:
       return { variant: 'outline' as const, label: status };
   }

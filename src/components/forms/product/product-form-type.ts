@@ -40,19 +40,24 @@ const DimensionsSchema = z
   .partial()
   .refine(
     (data) => {
-      if (Object.values(data).some((val) => val !== undefined)) {
-        return (
-          data.length !== undefined &&
-          data.width !== undefined &&
-          data.height !== undefined &&
-          data.unit !== undefined
-        );
-      }
-      return true;
+      // FE-33: `unit` must not count towards the presence check — the edit
+      // form always supplies it (defaults to 'cm'), so a product without
+      // dimensions would otherwise fail validation on every save.
+      const { unit: _unit, ...dimensions } = data;
+      const hasAnyDimension = Object.values(dimensions).some(
+        (val) => val !== undefined,
+      );
+      if (!hasAnyDimension) return true;
+      return (
+        dimensions.length !== undefined &&
+        dimensions.width !== undefined &&
+        dimensions.height !== undefined
+      );
     },
     {
       message:
-        'All dimension fields (length, width, height, unit) must be provided together or not at all',
+        'All dimension fields (length, width, height) must be provided together or not at all',
+      path: ['dimensions'],
     },
   );
 
@@ -68,6 +73,11 @@ const ProductAttributeValueSchema = z.object({
   imagePublicId: z.string().optional().nullable(),
   metadata: z.record(z.string(), z.unknown()).optional().nullable(),
   priceModifier: z.number().optional().nullable(),
+  // FE-45: optional links to the canonical GlobalAttributeValue this local
+  // value maps to (persisted as ProductGlobalAttributeValue). Kept by zod so
+  // the round-trip through validation and `reset()` does not drop them.
+  globalAttributeId: z.string().optional().nullable(),
+  globalValueId: z.string().optional().nullable(),
 });
 
 const ExtendedAttributeOptionSchema = z.object({

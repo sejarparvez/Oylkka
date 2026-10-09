@@ -1,5 +1,5 @@
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   createRootRoute,
@@ -9,7 +9,7 @@ import {
   useRouter,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Toaster } from '#/components/ui/sonner';
 import { TooltipProvider } from '#/components/ui/tooltip';
 import { ThemeProvider } from '#/context/theme-provider';
@@ -63,9 +63,12 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  const [queryClient] = useState(() => new QueryClient());
   const router = useRouter();
   const handlingUnauthorized = useRef(false);
+  // FE-05: the QueryClient is created per-request in `getRouter()` and exposed
+  // through the router's Wrap — there is no separate client instance here, so
+  // server-dehydrated data lands in the same cache the app reads from.
+  const queryClient = useQueryClient();
 
   // FE-24: a 401 must clear all cached auth-scoped data and bounce to sign-in
   // instead of leaving a stale session rendering private data.
@@ -88,10 +91,10 @@ function RootComponent() {
   }, [queryClient, router]);
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <Outlet />
       <ReactQueryDevtools buttonPosition='bottom-left' />
-    </QueryClientProvider>
+    </>
   );
 }
 

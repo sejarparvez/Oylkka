@@ -39,7 +39,15 @@ export const Route = createFileRoute('/api/vendor/orders/list')({
           };
 
           if (status) {
-            where.fulfillmentStatus = status;
+            if (status === 'CONFIRMED') {
+              // `CONFIRMED` is an OrderStatus, not a FulfillmentStatus.
+              // A confirmed order is one that is paid but not yet processed,
+              // which at the item level is `PENDING` on a PAID order (DATA-14).
+              where.fulfillmentStatus = 'PENDING';
+              where.order = { paymentStatus: 'PAID' };
+            } else {
+              where.fulfillmentStatus = status;
+            }
           }
 
           if (search) {

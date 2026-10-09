@@ -2,7 +2,7 @@ import { Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { useFormContext } from 'react-hook-form';
-
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardDescription, CardTitle } from '@/components/ui/card';
 import {
@@ -21,6 +21,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { useGlobalAttributes } from '@/services/global-attributes';
 
 import type { ProductFormValues } from './product-form-type';
 
@@ -97,6 +98,10 @@ type AttributeValueEntry = {
   slug: string;
   displayOrder: number;
   priceModifier?: number | null;
+  // FE-45: links to the canonical GlobalAttributeValue this local value maps
+  // to, if one was matched when the value was added (or hydrated on edit).
+  globalAttributeId?: string | null;
+  globalValueId?: string | null;
 };
 
 function getEntryValues(entry: unknown): Array<AttributeValueEntry> {
@@ -136,6 +141,48 @@ export function ProductAttributes() {
 
   const rawAttributes = watch('attributes');
   const attributesRecord = useMemo(() => rawAttributes ?? {}, [rawAttributes]);
+
+  // FE-45: the GlobalAttribute taxonomy this form links local values to. Empty
+  // while loading or unavailable — matching is best-effort and additive, never
+  // required for a value to be saved.
+  const { data: globalAttributes = [] } = useGlobalAttributes();
+
+  const findGlobalMapping = (
+    attrType: string,
+    value: string,
+  ): { globalAttributeId: string; globalValueId: string } | undefined => {
+    const attrKey = attrType.toLowerCase();
+    const attrKeyPlural = `${attrKey}s`;
+    const target = value.toLowerCase();
+
+    for (const ga of globalAttributes) {
+      const name = ga.name.toLowerCase();
+      const slug = ga.slug.toLowerCase();
+      if (
+        name !== attrKey &&
+        name !== attrKeyPlural &&
+        slug !== attrKey &&
+        slug !== attrKeyPlural
+      ) {
+        continue;
+      }
+      const direct = ga.values.find(
+        (v) =>
+          v.value.toLowerCase() === target || v.slug.toLowerCase() === target,
+      );
+      if (direct) return { globalAttributeId: ga.id, globalValueId: direct.id };
+      // Color values are stored as hex in this form ('#ff0000'), so also match
+      // the global value's metadata.hex when one is set.
+      if (attrKey === 'color') {
+        const byHex = ga.values.find((v) => {
+          const hex = (v.metadata as Record<string, unknown> | null)?.hex;
+          return typeof hex === 'string' && hex.toLowerCase() === target;
+        });
+        if (byHex) return { globalAttributeId: ga.id, globalValueId: byHex.id };
+      }
+    }
+    return undefined;
+  };
 
   function mergeEntry(
     entry: unknown,
@@ -221,6 +268,8 @@ export function ProductAttributes() {
     const currentValues = getEntryValues(currentEntry);
     if (currentValues.some((v) => v.value === finalValue)) return;
 
+    const mapping = findGlobalMapping(attrType, finalValue);
+
     setValue(
       'attributes',
       {
@@ -232,6 +281,7 @@ export function ProductAttributes() {
             slug: toSlug(finalValue),
             displayOrder: currentValues.length,
             priceModifier: undefined,
+            ...(mapping ?? {}),
           },
         ]),
       },
@@ -253,12 +303,22 @@ export function ProductAttributes() {
     if (newVals.length === 0) return;
 
     const startOrder = currentValues.length;
-    const newValueObjects = newVals.map((val, i) => ({
-      value: val,
-      slug: toSlug(val),
-      displayOrder: startOrder + i,
-      priceModifier: undefined,
-    }));
+    const newValueObjects = newVals.map((val, i) => {
+      let finalValue = val;
+      if (attrType.toLowerCase() === 'color') {
+        finalValue =
+          COLOR_NAME_TO_HEX[val as keyof typeof COLOR_NAME_TO_HEX] ||
+          (val.startsWith('#') ? val : `#${val}`);
+      }
+      const mapping = findGlobalMapping(attrType, finalValue);
+      return {
+        value: finalValue,
+        slug: toSlug(finalValue),
+        displayOrder: startOrder + i,
+        priceModifier: undefined,
+        ...(mapping ?? {}),
+      };
+    });
 
     setValue(
       'attributes',
@@ -371,6 +431,18 @@ export function ProductAttributes() {
             ? `${getColorName(item.value) || item.value} (${item.value})`
             : item.value}
         </span>
+
+        {/* FE-45: this local value is mapped to a canonical global value and
+            persists as a ProductGlobalAttributeValue on save. */}
+        {item.globalAttributeId && item.globalValueId && (
+          <Badge
+            variant='outline'
+            className='px-1.5 py-0 text-[10px] font-normal text-muted-foreground'
+            title='Mapped to a global attribute value'
+          >
+            Global
+          </Badge>
+        )}
 
         {/* Price modifier input (Phase 6 — Matrix Pricing) */}
         <div className='flex items-center gap-1'>

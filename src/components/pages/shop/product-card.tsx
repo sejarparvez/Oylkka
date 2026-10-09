@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { cn } from '@/lib/utils';
 import { Route as RootRoute } from '@/routes/__root';
 import { useAddToCartMutation } from '@/services/cart';
@@ -127,11 +128,11 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <div className='flex items-baseline gap-2'>
             <span className='text-base font-bold tabular-nums'>
-              ৳{(product.discountPrice ?? product.price).toLocaleString()}
+              ৳{formatBDT(product.discountPrice ?? product.price)}
             </span>
             {product.discountPrice && (
               <span className='text-sm text-muted-foreground line-through tabular-nums'>
-                ৳{product.price.toLocaleString()}
+                ৳{formatBDT(product.price)}
               </span>
             )}
           </div>

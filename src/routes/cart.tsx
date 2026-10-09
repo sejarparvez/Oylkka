@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT, toNumber } from '@/lib/currency';
 import {
   type CartItem,
   useCart,
@@ -39,7 +40,7 @@ function RouteComponent() {
 
   const subtotal = cart.items.reduce((sum, item) => {
     const price = item.savedPrice ?? item.product.price;
-    return sum + (price ?? 0) * item.quantity;
+    return sum + toNumber(price) * item.quantity;
   }, 0);
 
   const groupedByShop = cart.items.reduce<
@@ -125,7 +126,7 @@ function RouteComponent() {
                           </p>
                         )}
                         <p className='text-sm font-semibold mt-1'>
-                          ৳{price.toLocaleString()}
+                          ৳{formatBDT(price)}
                         </p>
                       </div>
 
@@ -174,7 +175,7 @@ function RouteComponent() {
                         )}
 
                         <p className='text-sm font-semibold w-20 text-right tabular-nums'>
-                          ৳ {((price ?? 0) * item.quantity).toLocaleString()}
+                          ৳ {formatBDT(toNumber(price) * item.quantity)}
                         </p>
 
                         <Button
@@ -197,7 +198,7 @@ function RouteComponent() {
             <div className='flex items-center justify-between text-base'>
               <span className='font-medium'>Subtotal</span>
               <span className='font-semibold tabular-nums'>
-                ৳{subtotal.toLocaleString()}
+                ৳{formatBDT(subtotal)}
               </span>
             </div>
             <Separator className='my-4' />

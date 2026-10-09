@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { prisma } from '@/lib/db';
+import { getShopStats } from '@/lib/shop-stats';
 
 export const Route = createFileRoute('/api/shop/public-list')({
   server: {
@@ -40,16 +41,31 @@ export const Route = createFileRoute('/api/shop/public-list')({
                 createdAt: true,
                 _count: { select: { products: true } },
               },
-              orderBy: { rating: 'desc' },
+              orderBy: { createdAt: 'desc' },
               skip: (page - 1) * limit,
               take: limit,
             }),
             prisma.shop.count({ where }),
           ]);
 
+          // Shop rating/totalSales/totalReviews are never persisted (DATA-01),
+          // so derive them live and sort the page by real rating.
+          const stats = await getShopStats(shops.map((s) => s.id));
+          const withStats = shops
+            .map((s) => ({
+              ...s,
+              rating: stats.get(s.id)?.rating ?? 0,
+              totalSales: stats.get(s.id)?.totalSales ?? 0,
+              totalReviews: stats.get(s.id)?.totalReviews ?? 0,
+              totalOrders: stats.get(s.id)?.totalOrders ?? 0,
+            }))
+            .sort(
+              (a, b) => b.rating - a.rating || b.totalReviews - a.totalReviews,
+            );
+
           return Response.json(
             {
-              shops,
+              shops: withStats,
               total,
               page,
               limit,

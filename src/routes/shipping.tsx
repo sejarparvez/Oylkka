@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useMemo } from 'react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { usePublicSettings } from '@/services/public-settings';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -20,54 +22,81 @@ export const Route = createFileRoute('/shipping')({
   component: ShippingPage,
 });
 
-const sections = [
-  {
-    title: 'Shipping Zones',
-    content:
-      'We deliver across all 64 districts of Bangladesh. Delivery times vary by zone: Metro cities (3-5 business days), Urban areas (5-7 business days), and Rural areas (7-10 business days).',
-  },
-  {
-    title: 'Shipping Rates',
-    isList: true,
-    items: [
-      ['Standard Delivery', '৳60 — 5-7 business days'],
-      ['Express Delivery', '৳150 — 2-3 business days'],
-      ['Free Shipping', 'On orders over ৳2,000'],
-    ],
-  },
-  {
-    title: 'Processing Time',
-    content:
-      'Orders are processed within 24 hours of placement (excluding weekends and holidays). During peak seasons, processing may take up to 48 hours. You will receive a confirmation email once your order ships.',
-  },
-  {
-    title: 'Order Tracking',
-    content:
-      'Every shipment includes a tracking number sent to your registered email. You can also track your order in real-time from your Account Dashboard under Orders.',
-  },
-  {
-    title: 'Shipping Restrictions',
-    isList: true,
-    items: [
-      'Certain oversized items may have additional shipping charges',
-      'Fragile items are shipped with extra packaging — signature may be required',
-      'Some remote areas may experience extended delivery times',
-      'Cash on Delivery is available in select zones only',
-    ],
-  },
-  {
-    title: 'Lost or Damaged Shipments',
-    content:
-      'If your package arrives damaged or is lost in transit, please contact our support team within 48 hours of the expected delivery date. We will initiate an investigation and provide a resolution within 5-7 business days.',
-  },
-  {
-    title: 'International Shipping',
-    content:
-      'We currently do not offer international shipping. We are working on expanding our services globally and will announce updates when available.',
-  },
-];
-
 function ShippingPage() {
+  const { data: publicSettings } = usePublicSettings();
+
+  // FE-20 (CONTENT-08): the rates and windows below must match the PDP trust
+  // block and the footer — derive them from the public SiteSetting reader.
+  const standardDeliveryFee = publicSettings?.standard_delivery_fee ?? '60';
+  const expressDeliveryFee = publicSettings?.express_delivery_fee ?? '150';
+  const freeShippingThreshold =
+    publicSettings?.free_shipping_threshold ?? '500';
+  const processingDays = publicSettings?.processing_days ?? '1-2';
+  const standardDeliveryDays = publicSettings?.standard_delivery_days ?? '5-7';
+  const expressDeliveryDays = publicSettings?.express_delivery_days ?? '2-3';
+
+  const sections = useMemo(
+    () => [
+      {
+        title: 'Shipping Zones',
+        content:
+          'We deliver across all 64 districts of Bangladesh. Delivery times vary by zone: Metro cities (3-5 business days), Urban areas (5-7 business days), and Rural areas (7-10 business days).',
+      },
+      {
+        title: 'Shipping Rates',
+        isList: true,
+        items: [
+          [
+            'Standard Delivery',
+            `৳${standardDeliveryFee} — ${standardDeliveryDays} business days`,
+          ],
+          [
+            'Express Delivery',
+            `৳${expressDeliveryFee} — ${expressDeliveryDays} business days`,
+          ],
+          ['Free Shipping', `On orders over ৳${freeShippingThreshold}`],
+        ],
+      },
+      {
+        title: 'Processing Time',
+        content: `Orders are processed within ${processingDays} business days (excluding weekends and holidays). During peak seasons, processing may take longer. You will receive a confirmation email once your order ships.`,
+      },
+      {
+        title: 'Order Tracking',
+        content:
+          'Every shipment includes a tracking number sent to your registered email. You can also track your order in real-time from your Account Dashboard under Orders.',
+      },
+      {
+        title: 'Shipping Restrictions',
+        isList: true,
+        items: [
+          'Certain oversized items may have additional shipping charges',
+          'Fragile items are shipped with extra packaging — signature may be required',
+          'Some remote areas may experience extended delivery times',
+          'Cash on Delivery is available in select zones only',
+        ],
+      },
+      {
+        title: 'Lost or Damaged Shipments',
+        content:
+          'If your package arrives damaged or is lost in transit, please contact our support team within 48 hours of the expected delivery date. We will initiate an investigation and provide a resolution within 5-7 business days.',
+      },
+      {
+        title: 'International Shipping',
+        content:
+          'We currently do not offer international shipping. We are working on expanding our services globally and will announce updates when available.',
+      },
+    ],
+    [
+      standardDeliveryFee,
+      expressDeliveryFee,
+      freeShippingThreshold,
+      processingDays,
+      standardDeliveryDays,
+      expressDeliveryDays,
+    ],
+  );
+
   return (
     <div className='min-h-screen bg-background'>
       <Header />

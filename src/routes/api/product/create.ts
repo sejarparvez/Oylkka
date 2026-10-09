@@ -1,6 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DeleteImage, UploadImage } from '@/cloudinary';
 import { requireAuth } from '@/lib/auth-middleware';
+import {
+  PRODUCT_IMAGE_ACCEPTED_TYPES,
+  PRODUCT_IMAGE_MAX_BYTES,
+} from '@/lib/constants';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { logError } from '@/lib/logger';
@@ -226,8 +230,10 @@ export const Route = createFileRoute('/api/product/create')({
           // cannot join the Prisma transaction — so every public id is tracked
           // and the catch block deletes them if the write fails (MONEY-50).
           // ------------------------------------------------------------------
-          const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-          const MAX_IMAGE_BYTES = 2_097_152;
+          // FE-38: size/type constraints shared with the client form.
+          const ALLOWED_IMAGE_TYPES: readonly string[] =
+            PRODUCT_IMAGE_ACCEPTED_TYPES;
+          const MAX_IMAGE_BYTES = PRODUCT_IMAGE_MAX_BYTES;
 
           const productImageFiles = data.productImages as File[] | undefined;
           const attributes = v.attributes;
@@ -324,6 +330,9 @@ export const Route = createFileRoute('/api/product/create')({
                       imagePublicId?: string | null;
                       metadata?: Record<string, unknown> | null;
                       priceModifier?: number | null;
+                      // FE-45: optional canonical mapping links
+                      globalAttributeId?: string | null;
+                      globalValueId?: string | null;
                     }>;
                     isVariantDefining?: boolean;
                     displayOrder?: number;
@@ -340,6 +349,8 @@ export const Route = createFileRoute('/api/product/create')({
                       imageUrl: v.imageUrl ?? null,
                       imagePublicId: v.imagePublicId ?? null,
                       priceModifier: v.priceModifier ?? null,
+                      globalAttributeId: v.globalAttributeId ?? null,
+                      globalValueId: v.globalValueId ?? null,
                       ...(v.metadata != null
                         ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict
                           { metadata: v.metadata as any }
@@ -478,23 +489,48 @@ export const Route = createFileRoute('/api/product/create')({
             // Create attribute options with dual-write (separate from product create for clarity)
             if (normalizedAttributes.length > 0) {
               for (const attr of normalizedAttributes) {
-                await tx.productAttributeOption.create({
+                const option = await tx.productAttributeOption.create({
                   data: {
                     productId: product.id,
                     name: attr.name,
                     values: attr.values,
                     isVariantDefining: attr.isVariantDefining,
                     displayOrder: attr.displayOrder,
-                    ...(attr.attributeValues
-                      ? {
-                          attributeValues: {
-                            // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict; the shape is correct
-                            create: attr.attributeValues as any,
-                          },
-                        }
-                      : {}),
                   },
                 });
+
+                if (attr.attributeValues && attr.attributeValues.length > 0) {
+                  for (const av of attr.attributeValues) {
+                    const localValue = await tx.productAttributeValue.create({
+                      data: {
+                        optionId: option.id,
+                        value: av.value,
+                        slug: av.slug,
+                        displayOrder: av.displayOrder ?? 0,
+                        imageUrl: av.imageUrl ?? null,
+                        imagePublicId: av.imagePublicId ?? null,
+                        priceModifier: av.priceModifier ?? null,
+                        ...(av.metadata != null
+                          ? // biome-ignore lint/suspicious/noExplicitAny: Prisma JSON types are strict; the shape is correct
+                            { metadata: av.metadata as any }
+                          : {}),
+                      },
+                    });
+
+                    // FE-45: persist the canonical mapping when the vendor's
+                    // local value was linked to a GlobalAttributeValue.
+                    if (av.globalAttributeId && av.globalValueId) {
+                      await tx.productGlobalAttributeValue.create({
+                        data: {
+                          productId: product.id,
+                          globalAttributeId: av.globalAttributeId,
+                          localValueId: localValue.id,
+                          globalValueId: av.globalValueId,
+                        },
+                      });
+                    }
+                  }
+                }
               }
             }
 

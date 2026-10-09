@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { prisma } from '@/lib/db';
+import { getShopStatsOrDefault } from '@/lib/shop-stats';
 
 export const Route = createFileRoute('/api/product/public-single')({
   server: {
@@ -132,8 +133,16 @@ export const Route = createFileRoute('/api/product/public-single')({
               )
             : null;
 
+          // Shop aggregates are never persisted (DATA-01); derive live.
+          const shop = product.shop
+            ? {
+                ...product.shop,
+                ...(await getShopStatsOrDefault(product.shop.id)),
+              }
+            : null;
+
           return Response.json(
-            { ...product, discountPercent, ratingBreakdown },
+            { ...product, shop, discountPercent, ratingBreakdown },
             { status: 200 },
           );
         } catch (error) {

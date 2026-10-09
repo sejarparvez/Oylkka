@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { formatBDT } from '@/lib/currency';
 import { cn } from '@/lib/utils';
 import { ColorSwatch } from './color-swatch';
 import { StockStatus } from './stock-status';
@@ -264,11 +265,11 @@ export function ProductVariantPicker({
           <p className='text-xs text-muted-foreground mb-1'>Price</p>
           <div className='flex items-baseline gap-2'>
             <span className='text-lg font-bold tabular-nums'>
-              ৳{displayPrice.toLocaleString()}
+              ৳{formatBDT(displayPrice)}
             </span>
             {displayOriginalPrice !== null && (
               <span className='text-sm text-muted-foreground line-through tabular-nums'>
-                ৳{displayOriginalPrice.toLocaleString()}
+                ৳{formatBDT(displayOriginalPrice)}
               </span>
             )}
           </div>

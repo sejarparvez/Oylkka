@@ -1,7 +1,7 @@
 import { BD_DISTRICTS } from '@/lib/bd-districts';
 import { prisma } from '@/lib/db';
 
-const VALID_DISTRICTS = new Set(BD_DISTRICTS);
+const VALID_DISTRICTS = new Set<string>(BD_DISTRICTS);
 
 /**
  * Validates a `districts` payload against the trusted list of Bangladesh

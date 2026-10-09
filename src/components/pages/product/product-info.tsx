@@ -1,6 +1,7 @@
 import { BadgeCheck, Ruler, Tag, Truck, Weight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { formatBDT } from '@/lib/currency';
 import { getInitials } from '@/lib/utils';
 import type { PublicProduct } from '@/services/product';
 import { RatingDisplay } from './rating-display';
@@ -119,11 +120,11 @@ export function ProductInfo({
       {/* ── Price ── */}
       <div className='flex items-baseline gap-3'>
         <span className='text-2xl font-bold tabular-nums'>
-          ৳{displayPrice.toLocaleString()}
+          ৳{formatBDT(displayPrice)}
         </span>
         {displayOriginalPrice !== null && (
           <span className='text-lg text-muted-foreground line-through tabular-nums'>
-            ৳{displayOriginalPrice.toLocaleString()}
+            ৳{formatBDT(displayOriginalPrice)}
           </span>
         )}
         {displayDiscountPercent && (

@@ -26,6 +26,12 @@ export const Route = createFileRoute('/api/admin/payouts/pending')({
               where: {
                 fulfillmentStatus: 'DELIVERED',
                 payoutItem: null,
+                order: {
+                  paymentStatus: 'PAID',
+                  NOT: {
+                    status: 'REFUNDED',
+                  },
+                },
               },
               _count: { _all: true },
               _sum: { vendorAmount: true },
@@ -37,6 +43,12 @@ export const Route = createFileRoute('/api/admin/payouts/pending')({
               where: {
                 fulfillmentStatus: 'DELIVERED',
                 payoutItem: null,
+                order: {
+                  paymentStatus: 'PAID',
+                  NOT: {
+                    status: 'REFUNDED',
+                  },
+                },
               },
             }),
           ]);

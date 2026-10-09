@@ -24,6 +24,7 @@ export const BD_DISTRICTS = [
   'Jhalokati',
   'Jhenaidah',
   'Joypurhat',
+  'Chapai Nawabganj',
   'Khagrachari',
   'Khulna',
   'Kishoreganj',

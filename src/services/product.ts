@@ -84,6 +84,34 @@ export type VendorProduct = {
       };
     }>;
   }>;
+
+  // FE-45: hydrated by /api/product/get-single so the edit form can show the
+  // product's existing attributes and their canonical global mappings.
+  attributeOptions?: Array<{
+    id: string;
+    name: string;
+    values: string[];
+    isVariantDefining: boolean;
+    displayOrder: number;
+    attributeValues: Array<{
+      id: string;
+      value: string;
+      slug: string;
+      displayOrder: number;
+      imageUrl: string | null;
+      imagePublicId: string | null;
+      metadata: Record<string, unknown> | null;
+      priceModifier?: number | null;
+    }>;
+  }>;
+  globalAttributeValues?: Array<{
+    id: string;
+    globalAttributeId: string;
+    globalValueId: string;
+    localValueId: string;
+    globalAttribute: { id: string; name: string };
+    globalValue: { id: string; value: string };
+  }>;
 };
 
 type VendorCategory = {

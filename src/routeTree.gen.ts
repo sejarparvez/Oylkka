@@ -61,6 +61,7 @@ import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/ord
 import { Route as DashboardMessagesIndexRouteImport } from './routes/dashboard/messages/index'
 import { Route as DashboardBecomeVendorIndexRouteImport } from './routes/dashboard/become-vendor/index'
 import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
+import { Route as ApiGlobalAttributesIndexRouteImport } from './routes/api/global-attributes/index'
 import { Route as ProductsCategorySlugRouteImport } from './routes/products/category.$slug'
 import { Route as DashboardOrdersOrderIdRouteImport } from './routes/dashboard/orders/$orderId'
 import { Route as DashboardMessagesIdRouteImport } from './routes/dashboard/messages/$id'
@@ -91,6 +92,7 @@ import { Route as ApiShopGetSingleRouteImport } from './routes/api/shop/get-sing
 import { Route as ApiShopApproveRouteImport } from './routes/api/shop/approve'
 import { Route as ApiShopApplyRouteImport } from './routes/api/shop/apply'
 import { Route as ApiShopAdminListRouteImport } from './routes/api/shop/admin-list'
+import { Route as ApiSettingsPublicRouteImport } from './routes/api/settings/public'
 import { Route as ApiReturnsListRouteImport } from './routes/api/returns/list'
 import { Route as ApiReturnsCreateRouteImport } from './routes/api/returns/create'
 import { Route as ApiReturnsReturnIdRouteImport } from './routes/api/returns/$returnId'
@@ -522,6 +524,12 @@ const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardAdminRouteRoute,
 } as any)
+const ApiGlobalAttributesIndexRoute =
+  ApiGlobalAttributesIndexRouteImport.update({
+    id: '/api/global-attributes/',
+    path: '/api/global-attributes/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ProductsCategorySlugRoute = ProductsCategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -673,6 +681,11 @@ const ApiShopApplyRoute = ApiShopApplyRouteImport.update({
 const ApiShopAdminListRoute = ApiShopAdminListRouteImport.update({
   id: '/api/shop/admin-list',
   path: '/api/shop/admin-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSettingsPublicRoute = ApiSettingsPublicRouteImport.update({
+  id: '/api/settings/public',
+  path: '/api/settings/public',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiReturnsListRoute = ApiReturnsListRouteImport.update({
@@ -1707,6 +1720,7 @@ export interface FileRoutesByFullPath {
   '/api/returns/$returnId': typeof ApiReturnsReturnIdRoute
   '/api/returns/create': typeof ApiReturnsCreateRoute
   '/api/returns/list': typeof ApiReturnsListRoute
+  '/api/settings/public': typeof ApiSettingsPublicRoute
   '/api/shop/admin-list': typeof ApiShopAdminListRoute
   '/api/shop/apply': typeof ApiShopApplyRoute
   '/api/shop/approve': typeof ApiShopApproveRoute
@@ -1737,6 +1751,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/messages/$id': typeof DashboardMessagesIdRoute
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
+  '/api/global-attributes/': typeof ApiGlobalAttributesIndexRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/become-vendor/': typeof DashboardBecomeVendorIndexRoute
   '/dashboard/messages/': typeof DashboardMessagesIndexRoute
@@ -1949,6 +1964,7 @@ export interface FileRoutesByTo {
   '/api/returns/$returnId': typeof ApiReturnsReturnIdRoute
   '/api/returns/create': typeof ApiReturnsCreateRoute
   '/api/returns/list': typeof ApiReturnsListRoute
+  '/api/settings/public': typeof ApiSettingsPublicRoute
   '/api/shop/admin-list': typeof ApiShopAdminListRoute
   '/api/shop/apply': typeof ApiShopApplyRoute
   '/api/shop/approve': typeof ApiShopApproveRoute
@@ -1979,6 +1995,7 @@ export interface FileRoutesByTo {
   '/dashboard/messages/$id': typeof DashboardMessagesIdRoute
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
+  '/api/global-attributes': typeof ApiGlobalAttributesIndexRoute
   '/dashboard/admin': typeof DashboardAdminIndexRoute
   '/dashboard/become-vendor': typeof DashboardBecomeVendorIndexRoute
   '/dashboard/messages': typeof DashboardMessagesIndexRoute
@@ -2202,6 +2219,7 @@ export interface FileRoutesById {
   '/api/returns/$returnId': typeof ApiReturnsReturnIdRoute
   '/api/returns/create': typeof ApiReturnsCreateRoute
   '/api/returns/list': typeof ApiReturnsListRoute
+  '/api/settings/public': typeof ApiSettingsPublicRoute
   '/api/shop/admin-list': typeof ApiShopAdminListRoute
   '/api/shop/apply': typeof ApiShopApplyRoute
   '/api/shop/approve': typeof ApiShopApproveRoute
@@ -2232,6 +2250,7 @@ export interface FileRoutesById {
   '/dashboard/messages/$id': typeof DashboardMessagesIdRoute
   '/dashboard/orders/$orderId': typeof DashboardOrdersOrderIdRoute
   '/products/category/$slug': typeof ProductsCategorySlugRoute
+  '/api/global-attributes/': typeof ApiGlobalAttributesIndexRoute
   '/dashboard/admin/': typeof DashboardAdminIndexRoute
   '/dashboard/become-vendor/': typeof DashboardBecomeVendorIndexRoute
   '/dashboard/messages/': typeof DashboardMessagesIndexRoute
@@ -2456,6 +2475,7 @@ export interface FileRouteTypes {
     | '/api/returns/$returnId'
     | '/api/returns/create'
     | '/api/returns/list'
+    | '/api/settings/public'
     | '/api/shop/admin-list'
     | '/api/shop/apply'
     | '/api/shop/approve'
@@ -2486,6 +2506,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages/$id'
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
+    | '/api/global-attributes/'
     | '/dashboard/admin/'
     | '/dashboard/become-vendor/'
     | '/dashboard/messages/'
@@ -2698,6 +2719,7 @@ export interface FileRouteTypes {
     | '/api/returns/$returnId'
     | '/api/returns/create'
     | '/api/returns/list'
+    | '/api/settings/public'
     | '/api/shop/admin-list'
     | '/api/shop/apply'
     | '/api/shop/approve'
@@ -2728,6 +2750,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages/$id'
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
+    | '/api/global-attributes'
     | '/dashboard/admin'
     | '/dashboard/become-vendor'
     | '/dashboard/messages'
@@ -2950,6 +2973,7 @@ export interface FileRouteTypes {
     | '/api/returns/$returnId'
     | '/api/returns/create'
     | '/api/returns/list'
+    | '/api/settings/public'
     | '/api/shop/admin-list'
     | '/api/shop/apply'
     | '/api/shop/approve'
@@ -2980,6 +3004,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages/$id'
     | '/dashboard/orders/$orderId'
     | '/products/category/$slug'
+    | '/api/global-attributes/'
     | '/dashboard/admin/'
     | '/dashboard/become-vendor/'
     | '/dashboard/messages/'
@@ -3186,6 +3211,7 @@ export interface RootRouteChildren {
   ApiReturnsReturnIdRoute: typeof ApiReturnsReturnIdRoute
   ApiReturnsCreateRoute: typeof ApiReturnsCreateRoute
   ApiReturnsListRoute: typeof ApiReturnsListRoute
+  ApiSettingsPublicRoute: typeof ApiSettingsPublicRoute
   ApiShopAdminListRoute: typeof ApiShopAdminListRoute
   ApiShopApplyRoute: typeof ApiShopApplyRoute
   ApiShopApproveRoute: typeof ApiShopApproveRoute
@@ -3211,6 +3237,7 @@ export interface RootRouteChildren {
   ApiWishlistAddRoute: typeof ApiWishlistAddRoute
   ApiWishlistListRoute: typeof ApiWishlistListRoute
   ApiWishlistRemoveRoute: typeof ApiWishlistRemoveRoute
+  ApiGlobalAttributesIndexRoute: typeof ApiGlobalAttributesIndexRoute
   ApiAdminContentListRoute: typeof ApiAdminContentListRoute
   ApiAdminContentSaveRoute: typeof ApiAdminContentSaveRoute
   ApiAdminConversationsConversationIdRoute: typeof ApiAdminConversationsConversationIdRoute
@@ -3631,6 +3658,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminIndexRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
+    '/api/global-attributes/': {
+      id: '/api/global-attributes/'
+      path: '/api/global-attributes'
+      fullPath: '/api/global-attributes/'
+      preLoaderRoute: typeof ApiGlobalAttributesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/category/$slug': {
       id: '/products/category/$slug'
       path: '/category/$slug'
@@ -3839,6 +3873,13 @@ declare module '@tanstack/react-router' {
       path: '/api/shop/admin-list'
       fullPath: '/api/shop/admin-list'
       preLoaderRoute: typeof ApiShopAdminListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/settings/public': {
+      id: '/api/settings/public'
+      path: '/api/settings/public'
+      fullPath: '/api/settings/public'
+      preLoaderRoute: typeof ApiSettingsPublicRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/returns/list': {
@@ -5412,6 +5453,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiReturnsReturnIdRoute: ApiReturnsReturnIdRoute,
   ApiReturnsCreateRoute: ApiReturnsCreateRoute,
   ApiReturnsListRoute: ApiReturnsListRoute,
+  ApiSettingsPublicRoute: ApiSettingsPublicRoute,
   ApiShopAdminListRoute: ApiShopAdminListRoute,
   ApiShopApplyRoute: ApiShopApplyRoute,
   ApiShopApproveRoute: ApiShopApproveRoute,
@@ -5437,6 +5479,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiWishlistAddRoute: ApiWishlistAddRoute,
   ApiWishlistListRoute: ApiWishlistListRoute,
   ApiWishlistRemoveRoute: ApiWishlistRemoveRoute,
+  ApiGlobalAttributesIndexRoute: ApiGlobalAttributesIndexRoute,
   ApiAdminContentListRoute: ApiAdminContentListRoute,
   ApiAdminContentSaveRoute: ApiAdminContentSaveRoute,
   ApiAdminConversationsConversationIdRoute:

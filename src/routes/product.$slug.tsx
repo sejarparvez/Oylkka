@@ -66,34 +66,18 @@ import { trackProductView } from '@/lib/recently-viewed';
 import { cn } from '@/lib/utils';
 import { useAddToCartMutation } from '@/services/cart';
 import { usePublicProduct } from '@/services/product';
+import { usePublicSettings } from '@/services/public-settings';
 import {
   useAddToWishlistMutation,
   useRemoveFromWishlistMutation,
   useWishlist,
 } from '@/services/wishlist';
 
-// FE-20 (CONTENT-08): these trust/shipping claims are hardcoded and currently
-// contradict shipping.tsx, returns.tsx and the footer (free-shipping
-// threshold, processing/delivery windows). No public SiteSetting/policy
-// reader exists client-side, so they cannot be derived from a settings source
-// yet — keep them in this single place until one is wired up.
-const trustItems = [
-  { icon: Truck, title: 'Free Shipping', desc: 'On orders over ৳500' },
-  {
-    icon: ShieldCheck,
-    title: 'Secure Payment',
-    desc: 'SSL encrypted checkout',
-  },
-  { icon: MapPin, title: 'Trackable', desc: 'Real-time order tracking' },
-  {
-    icon: RefreshCw,
-    title: 'Easy Returns',
-    desc: `${RETURN_WINDOW_DAYS}-day return policy`,
-  },
-];
-
-const shippingProcessingNote =
-  'Orders are processed within 1-2 business days. Standard shipping takes 5-7 business days. Express shipping is available at checkout for an additional fee.';
+// FE-20 (CONTENT-08): the trust/shipping claims used to be hardcoded here,
+// which let them drift out of sync with shipping.tsx, returns.tsx and the
+// footer. They now derive from the public SiteSetting reader
+// (`/api/settings/public` via `usePublicSettings`), with the defaults below as
+// the fallback while the request is in flight or the table is unreachable.
 
 export const Route = createFileRoute('/product/$slug')({
   component: RouteComponent,
@@ -147,6 +131,9 @@ function RouteComponent() {
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
 
+  // Reset the chosen quantity whenever the variant changes. `selectedVariant`
+  // is deliberately the trigger even though the body only calls `setQuantity`.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reset on variant change
   useEffect(() => {
     setQuantity(1);
   }, [selectedVariant]);
@@ -157,6 +144,41 @@ function RouteComponent() {
   const { data: wishlistData } = useWishlist({
     enabled: !!user,
   });
+
+  // FE-20: single source of truth for the trust/shipping claims on this page
+  // — the public SiteSetting reader, falling back to the same values the
+  // endpoint defaults to.
+  const { data: publicSettings } = usePublicSettings();
+  const freeShippingThreshold =
+    publicSettings?.free_shipping_threshold ?? '500';
+  const returnWindowDays =
+    publicSettings?.return_window_days ?? String(RETURN_WINDOW_DAYS);
+  const processingDays = publicSettings?.processing_days ?? '1-2';
+  const standardDeliveryDays = publicSettings?.standard_delivery_days ?? '5-7';
+
+  const trustItems = useMemo(
+    () => [
+      {
+        icon: Truck,
+        title: 'Free Shipping',
+        desc: `On orders over ৳${freeShippingThreshold}`,
+      },
+      {
+        icon: ShieldCheck,
+        title: 'Secure Payment',
+        desc: 'SSL encrypted checkout',
+      },
+      { icon: MapPin, title: 'Trackable', desc: 'Real-time order tracking' },
+      {
+        icon: RefreshCw,
+        title: 'Easy Returns',
+        desc: `${returnWindowDays}-day return policy`,
+      },
+    ],
+    [freeShippingThreshold, returnWindowDays],
+  );
+
+  const shippingProcessingNote = `Orders are processed within ${processingDays} business days. Standard shipping takes ${standardDeliveryDays} business days. Express shipping is available at checkout for an additional fee.`;
 
   // Phase 4 — Image inheritance resolution
   const displayedImages = useMemo(() => {

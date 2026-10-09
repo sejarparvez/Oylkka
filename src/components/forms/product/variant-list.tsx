@@ -1,6 +1,6 @@
 import colorNamer from 'color-namer';
 import { ImagePlus, TrashIcon, X } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -73,6 +73,31 @@ export default function VariantList({
   basePrice = 0,
   priceModifierMap = {},
 }: VariantListProps) {
+  // FE-36 (residual): the single-slot preview asks for `URL.createObjectURL`
+  // on every render, and render-time URLs were never revoked — a leak per
+  // keystroke that touches the field. Memoize one URL per File for the life
+  // of the component and release them all on unmount.
+  const objectUrlCacheRef = useRef<Map<File, string>>(new Map());
+
+  useEffect(() => {
+    const cache = objectUrlCacheRef.current;
+    return () => {
+      for (const url of cache.values()) {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {}
+      }
+      cache.clear();
+    };
+  }, []);
+
+  const previewFor = (file: File) => {
+    const cached = objectUrlCacheRef.current.get(file);
+    if (cached) return cached;
+    const url = URL.createObjectURL(file);
+    objectUrlCacheRef.current.set(file, url);
+    return url;
+  };
   const handleVariantImageUpload = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
@@ -258,7 +283,7 @@ export default function VariantList({
               // the variant's persisted VariantImage rows (FE-43).
               const imageSrc =
                 variant.image instanceof File
-                  ? URL.createObjectURL(variant.image)
+                  ? previewFor(variant.image)
                   : typeof variant.image === 'string' && variant.image !== ''
                     ? variant.image
                     : (variant.variantImages?.[0]?.imageUrl ?? null);

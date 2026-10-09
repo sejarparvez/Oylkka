@@ -16,6 +16,22 @@ const SETTING_VALIDATORS: Record<string, z.ZodType<string>> = {
       message: 'default_commission must be between 0 and 100',
     }),
   max_shipping: z.string().regex(/^\d+(\.\d+)?$/),
+  // FE-20: public policy claims surfaced on the PDP, /shipping, /returns and
+  // the footer. Keep them validatable here so `/api/settings/public` can serve
+  // them straight from the table.
+  free_shipping_threshold: z
+    .string()
+    .regex(/^\d+(\.\d+)?$/, 'must be a number'),
+  return_window_days: z
+    .string()
+    .regex(/^\d+$/, 'must be a whole number of days'),
+  standard_delivery_fee: z.string().regex(/^\d+(\.\d+)?$/, 'must be a number'),
+  express_delivery_fee: z.string().regex(/^\d+(\.\d+)?$/, 'must be a number'),
+  processing_days: z.string().regex(/^\d+(-\d+)?$/, 'must be like "1-2"'),
+  standard_delivery_days: z
+    .string()
+    .regex(/^\d+(-\d+)?$/, 'must be like "5-7"'),
+  express_delivery_days: z.string().regex(/^\d+(-\d+)?$/, 'must be like "2-3"'),
 };
 
 export const Route = createFileRoute('/api/admin/settings/update')({

@@ -28,6 +28,10 @@ export function ProductDimensions() {
   } = useFormContext<ProductFormValues>();
   const weightUnit = watch('weightUnit');
   const dimUnit = watch('dimensions.unit');
+  // FE-33: the all-or-none refine is an object-level error — surface it at the
+  // object root instead of dropping it (see product-form-type.ts).
+  const dimensionError =
+    errors.dimensions?.root?.message ?? errors.dimensions?.message;
 
   return (
     <Card>
@@ -44,7 +48,14 @@ export function ProductDimensions() {
                 type='number'
                 placeholder='Product weight'
                 step='0.01'
-                {...register('weight', { valueAsNumber: true })}
+                // FE-32: `valueAsNumber` turned a cleared input into NaN, so
+                // the optional field could not be blanked. Map '' to undefined.
+                {...register('weight', {
+                  setValueAs: (v) =>
+                    v === '' || v === undefined || v === null
+                      ? undefined
+                      : Number(v),
+                })}
               />
               {errors.weight && (
                 <FieldError>{errors.weight.message}</FieldError>
@@ -101,7 +112,13 @@ export function ProductDimensions() {
                 type='number'
                 placeholder='Length'
                 step='0.1'
-                {...register('dimensions.length', { valueAsNumber: true })}
+                // FE-32: same '' → undefined mapping as `weight`.
+                {...register('dimensions.length', {
+                  setValueAs: (v) =>
+                    v === '' || v === undefined || v === null
+                      ? undefined
+                      : Number(v),
+                })}
               />
               {errors.dimensions?.length && (
                 <FieldError>{errors.dimensions.length.message}</FieldError>
@@ -113,7 +130,12 @@ export function ProductDimensions() {
                 type='number'
                 placeholder='Width'
                 step='0.1'
-                {...register('dimensions.width', { valueAsNumber: true })}
+                {...register('dimensions.width', {
+                  setValueAs: (v) =>
+                    v === '' || v === undefined || v === null
+                      ? undefined
+                      : Number(v),
+                })}
               />
               {errors.dimensions?.width && (
                 <FieldError>{errors.dimensions.width.message}</FieldError>
@@ -125,13 +147,24 @@ export function ProductDimensions() {
                 type='number'
                 placeholder='Height'
                 step='0.1'
-                {...register('dimensions.height', { valueAsNumber: true })}
+                {...register('dimensions.height', {
+                  setValueAs: (v) =>
+                    v === '' || v === undefined || v === null
+                      ? undefined
+                      : Number(v),
+                })}
               />
               {errors.dimensions?.height && (
                 <FieldError>{errors.dimensions.height.message}</FieldError>
               )}
             </Field>
           </div>
+
+          {dimensionError && (
+            <p role='alert' className='text-destructive text-sm'>
+              {dimensionError}
+            </p>
+          )}
         </div>
 
         <Field>
