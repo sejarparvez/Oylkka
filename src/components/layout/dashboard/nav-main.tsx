@@ -1,12 +1,11 @@
+import { Link } from '@tanstack/react-router';
 import {
   BadgePercent,
   BarChart2,
   ChevronRight,
   ClipboardCheck,
   ClipboardList,
-  FileText,
   LayoutDashboard,
-  MessageSquare,
   Package,
   Settings,
   Shield,
@@ -14,7 +13,6 @@ import {
   ShoppingCart,
   Store,
   Truck,
-  UserSearch,
   Users,
   Wallet,
   Wrench,
@@ -40,13 +38,13 @@ import type { User } from './types';
 
 interface SubItem {
   title: string;
-  url: string;
+  to: string;
+  search?: Record<string, string>;
   roles?: UserRole[];
 }
 
 interface NavItem {
   title: string;
-  url: string;
   icon: React.ComponentType;
   isActive?: boolean;
   roles?: UserRole[];
@@ -62,31 +60,30 @@ export function NavMain({ user }: { user: User }) {
   const userNavItems: NavItem[] = [
     {
       title: 'Shopping',
-      url: '/shop',
       isActive: userRole === 'USER',
       icon: ShoppingCart,
       roles: ['USER', 'VENDOR'],
       items: [
-        { title: 'Browse Products', url: '/shop' },
-        { title: 'My Cart', url: '/cart' },
-        { title: 'My Orders', url: '/dashboard/orders' },
-        { title: 'Returns & Refunds', url: '/dashboard/orders/returns' },
-        { title: 'My Wishlist', url: '/dashboard/wishlist' },
-        { title: 'Followed Shops', url: '/dashboard/followed-shops' },
-        { title: 'My Reviews', url: '/dashboard/reviews' },
-        { title: 'Recently Viewed', url: '/recently-viewed' },
+        { title: 'Browse Products', to: '/shops' },
+        { title: 'My Cart', to: '/cart' },
+        { title: 'My Orders', to: '/dashboard/orders' },
+        { title: 'Returns & Refunds', to: '/dashboard/orders/returns' },
+        { title: 'My Wishlist', to: '/dashboard/wishlist' },
+        { title: 'Followed Shops', to: '/dashboard/followed-shops' },
+        { title: 'My Reviews', to: '/dashboard/reviews' },
+        { title: 'Recently Viewed', to: '/recently-viewed' },
+        { title: 'Wallet', to: '/dashboard/wallet' },
       ],
     },
     {
       title: 'Sell',
-      url: '/dashboard/sell',
       icon: Store,
       roles: ['USER'],
       isActive: userRole === 'USER',
       items: [
-        // This route should check if user already has a shop
-        // and show status (pending/rejected) or the apply form
-        { title: 'Open a Shop', url: '/dashboard/become-vendor/apply' },
+        // This route checks whether the user already has a shop and shows
+        // status (pending/rejected) or the apply form.
+        { title: 'Open a Shop', to: '/dashboard/become-vendor/apply' },
       ],
     },
   ];
@@ -94,17 +91,13 @@ export function NavMain({ user }: { user: User }) {
   const userAccountNavItems: NavItem[] = [
     {
       title: 'Account',
-      url: '/dashboard/my-account',
       icon: Settings,
       roles: ['USER'],
       items: [
-        { title: 'My Profile', url: '/dashboard/my-account' },
-        { title: 'Addresses', url: '/dashboard/addresses' },
-        { title: 'Payment Methods', url: '/dashboard/payment-methods' },
-        { title: 'Vouchers & Coupons', url: '/dashboard/vouchers' },
-        { title: 'Notifications', url: '/dashboard/notifications' },
-        { title: 'Messages', url: '/dashboard/messages' },
-        { title: 'Help & Support', url: '/support' },
+        { title: 'My Profile', to: '/dashboard/my-account' },
+        { title: 'Addresses', to: '/dashboard/addresses' },
+        { title: 'Messages', to: '/dashboard/messages' },
+        { title: 'Help & Support', to: '/help' },
       ],
     },
   ];
@@ -115,97 +108,90 @@ export function NavMain({ user }: { user: User }) {
   const vendorNavItems: NavItem[] = [
     {
       title: 'Dashboard',
-      url: '/dashboard/vendor',
       icon: BarChart2,
       isActive: userRole === 'VENDOR',
       roles: ['VENDOR'],
       items: [
-        { title: 'Overview', url: '/dashboard/vendor' },
-        { title: 'Sales Analytics', url: '/dashboard/vendor/sales' },
-        { title: 'Inventory', url: '/dashboard/vendor/inventory' },
-        { title: 'Earnings', url: '/dashboard/vendor/earnings' },
+        { title: 'Overview', to: '/dashboard/vendor' },
+        { title: 'Sales Analytics', to: '/dashboard/vendor/sales' },
       ],
     },
     {
       title: 'Products',
-      url: '/dashboard/vendor/products',
       icon: ShoppingBag,
       roles: ['VENDOR'],
       items: [
-        { title: 'All Products', url: '/dashboard/vendor/products' },
-        { title: 'Add Product', url: '/dashboard/vendor/products/add' },
-        { title: 'Reviews', url: '/dashboard/vendor/products/reviews' },
+        { title: 'All Products', to: '/dashboard/vendor/products' },
+        { title: 'Add Product', to: '/dashboard/vendor/products/add' },
       ],
     },
     {
       title: 'Orders',
-      url: '/dashboard/vendor/orders',
       icon: ClipboardList,
       roles: ['VENDOR'],
       items: [
-        { title: 'All Orders', url: '/dashboard/vendor/orders' },
-        { title: 'Pending', url: '/dashboard/vendor/orders?status=PENDING' },
+        { title: 'All Orders', to: '/dashboard/vendor/orders' },
+        {
+          title: 'Pending',
+          to: '/dashboard/vendor/orders',
+          search: { status: 'PENDING' },
+        },
         {
           title: 'Processing',
-          url: '/dashboard/vendor/orders?status=PROCESSING',
+          to: '/dashboard/vendor/orders',
+          search: { status: 'PROCESSING' },
         },
-        { title: 'Shipped', url: '/dashboard/vendor/orders?status=SHIPPED' },
+        {
+          title: 'Shipped',
+          to: '/dashboard/vendor/orders',
+          search: { status: 'SHIPPED' },
+        },
         {
           title: 'Delivered',
-          url: '/dashboard/vendor/orders?status=DELIVERED',
+          to: '/dashboard/vendor/orders',
+          search: { status: 'DELIVERED' },
         },
-        { title: 'Returns', url: '/dashboard/vendor/orders?status=REFUNDED' },
+        {
+          title: 'Returns',
+          to: '/dashboard/vendor/orders',
+          search: { status: 'REFUNDED' },
+        },
         {
           title: 'Cancelled',
-          url: '/dashboard/vendor/orders?status=CANCELLED',
+          to: '/dashboard/vendor/orders',
+          search: { status: 'CANCELLED' },
         },
       ],
     },
     {
       title: 'Shipping',
-      url: '/dashboard/vendor/shipping',
       icon: Truck,
       roles: ['VENDOR'],
       items: [
-        { title: 'Settings', url: '/dashboard/vendor/shipping' },
-        { title: 'Print Labels', url: '/dashboard/vendor/shipping/labels' },
-        {
-          title: 'Track Shipments',
-          url: '/dashboard/vendor/shipping/tracking',
-        },
-      ],
-    },
-    {
-      title: 'Promotions',
-      url: '/dashboard/vendor/promotions',
-      icon: BadgePercent,
-      roles: ['VENDOR'],
-      items: [
-        { title: 'Coupons', url: '/dashboard/vendor/promotions/coupons' },
-        { title: 'Discounts', url: '/dashboard/vendor/promotions/discounts' },
+        { title: 'Settings', to: '/dashboard/vendor/shipping' },
+        { title: 'Print Labels', to: '/dashboard/vendor/shipping/labels' },
+        { title: 'Track Shipments', to: '/dashboard/vendor/shipping/tracking' },
       ],
     },
     {
       title: 'Payouts',
-      url: '/dashboard/vendor/payouts',
       icon: Wallet,
       roles: ['VENDOR'],
       items: [
-        { title: 'Balance & History', url: '/dashboard/vendor/payouts' },
-        { title: 'Payout Schedule', url: '/dashboard/vendor/payouts/schedule' },
+        { title: 'Balance & History', to: '/dashboard/vendor/payouts' },
+        { title: 'Payout Schedule', to: '/dashboard/vendor/payouts/schedule' },
       ],
     },
     {
       title: 'My Shop',
-      url: '/dashboard/vendor/shop',
       icon: Store,
       roles: ['VENDOR'],
       items: [
-        { title: 'Shop Profile', url: '/dashboard/vendor/shop' },
-        { title: 'Branding', url: '/dashboard/vendor/shop/branding' },
-        { title: 'Policies', url: '/dashboard/vendor/shop/policies' },
-        { title: 'Payout Details', url: '/dashboard/vendor/shop/payout' },
-        { title: 'Messages', url: '/dashboard/vendor/shop/messages' },
+        { title: 'Shop Profile', to: '/dashboard/vendor/shop' },
+        { title: 'Branding', to: '/dashboard/vendor/shop/branding' },
+        { title: 'Policies', to: '/dashboard/vendor/shop/policies' },
+        { title: 'Payout Details', to: '/dashboard/vendor/shop/payout' },
+        { title: 'Messages', to: '/dashboard/vendor/shop/messages' },
       ],
     },
   ];
@@ -216,254 +202,119 @@ export function NavMain({ user }: { user: User }) {
   const adminNavItems: NavItem[] = [
     {
       title: 'Dashboard',
-      url: '/dashboard/admin',
       icon: LayoutDashboard,
       isActive: userRole === 'ADMIN' || userRole === 'MANAGER',
       roles: ['ADMIN', 'MANAGER'],
-      items: [
-        { title: 'Overview', url: '/dashboard/admin' },
-        { title: 'Sales', url: '/dashboard/admin/sales' },
-        { title: 'Inventory', url: '/dashboard/admin/inventory' },
-        {
-          title: 'Financial Reports',
-          url: '/dashboard/admin/financial',
-          roles: ['ADMIN'],
-        },
-      ],
+      items: [{ title: 'Overview', to: '/dashboard/admin' }],
     },
     {
       title: 'Catalog',
-      url: '/dashboard/admin/products',
       icon: Package,
       roles: ['ADMIN', 'MANAGER'],
       items: [
-        { title: 'All Products', url: '/dashboard/admin/products' },
-        { title: 'Categories', url: '/dashboard/admin/category/all' },
-        { title: 'Reviews', url: '/dashboard/admin/reviews' },
+        { title: 'Categories', to: '/dashboard/admin/category/all' },
+        { title: 'Reviews', to: '/dashboard/admin/reviews' },
         {
-          title: 'Bulk Upload',
-          url: '/dashboard/admin/products/bulk',
+          title: 'Global Attributes',
+          to: '/dashboard/admin/global-attributes',
+        },
+        {
+          title: 'Content',
+          to: '/dashboard/admin/content',
           roles: ['ADMIN'],
         },
       ],
     },
     {
       title: 'Orders',
-      url: '/dashboard/admin/orders',
       icon: ShoppingCart,
       roles: ['ADMIN', 'MANAGER'],
       items: [
-        { title: 'All Orders', url: '/dashboard/admin/orders' },
-        { title: 'Pending', url: '/dashboard/admin/orders?status=PENDING' },
+        { title: 'All Orders', to: '/dashboard/admin/orders' },
+        {
+          title: 'Pending',
+          to: '/dashboard/admin/orders',
+          search: { status: 'PENDING' },
+        },
         {
           title: 'Processing',
-          url: '/dashboard/admin/orders?status=PROCESSING',
+          to: '/dashboard/admin/orders',
+          search: { status: 'PROCESSING' },
         },
-        { title: 'Shipped', url: '/dashboard/admin/orders?status=SHIPPED' },
-        { title: 'Delivered', url: '/dashboard/admin/orders?status=DELIVERED' },
-        { title: 'Returns', url: '/dashboard/admin/orders?status=REFUNDED' },
-        { title: 'Cancelled', url: '/dashboard/admin/orders?status=CANCELLED' },
+        {
+          title: 'Shipped',
+          to: '/dashboard/admin/orders',
+          search: { status: 'SHIPPED' },
+        },
+        {
+          title: 'Delivered',
+          to: '/dashboard/admin/orders',
+          search: { status: 'DELIVERED' },
+        },
+        {
+          title: 'Returns',
+          to: '/dashboard/admin/orders',
+          search: { status: 'REFUNDED' },
+        },
+        {
+          title: 'Cancelled',
+          to: '/dashboard/admin/orders',
+          search: { status: 'CANCELLED' },
+        },
       ],
     },
     {
       title: 'Customers',
-      url: '/dashboard/admin/customers',
       icon: Users,
       roles: ['ADMIN', 'MANAGER'],
-      items: [
-        { title: 'All Customers', url: '/dashboard/admin/customers' },
-        { title: 'Support Tickets', url: '/dashboard/admin/tickets' },
-      ],
+      items: [{ title: 'All Customers', to: '/dashboard/admin/customers' }],
     },
     {
       title: 'Vendors',
-      url: '/dashboard/admin/vendors',
       icon: Store,
       roles: ['ADMIN', 'MANAGER'],
       items: [
-        { title: 'All Vendors', url: '/dashboard/admin/vendors' },
-        { title: 'Shop Approvals', url: '/dashboard/admin/vendors/approvals' },
-        { title: 'Suspended Shops', url: '/dashboard/admin/vendors/suspended' },
-        { title: 'Verified Badges', url: '/dashboard/admin/vendors/verified' },
-        { title: 'Performance', url: '/dashboard/admin/vendors/performance' },
+        { title: 'All Vendors', to: '/dashboard/admin/vendors' },
         {
           title: 'Payouts',
-          url: '/dashboard/admin/vendors/payouts',
-          roles: ['ADMIN'],
-        },
-        {
-          title: 'Commission Rules',
-          url: '/dashboard/admin/vendors/commissions',
+          to: '/dashboard/admin/vendors/payouts',
           roles: ['ADMIN'],
         },
       ],
     },
     {
       title: 'Marketing',
-      url: '/dashboard/admin/banner/list',
       icon: BadgePercent,
       roles: ['ADMIN', 'MANAGER'],
       items: [
-        { title: 'Banners', url: '/dashboard/admin/banner/list' },
+        { title: 'Banners', to: '/dashboard/admin/banner/list' },
         {
           title: 'Coupons & Discounts',
-          url: '/dashboard/admin/coupons',
-          roles: ['ADMIN'],
-        },
-        {
-          title: 'SEO',
-          url: '/dashboard/admin/seo',
+          to: '/dashboard/admin/coupons',
           roles: ['ADMIN'],
         },
       ],
     },
     {
       title: 'Moderation',
-      url: '/dashboard/admin/moderation',
       icon: ClipboardCheck,
       roles: ['ADMIN', 'MANAGER'],
-      items: [
-        {
-          title: 'Flagged Products',
-          url: '/dashboard/admin/moderation/products',
-        },
-        {
-          title: 'Flagged Reviews',
-          url: '/dashboard/admin/moderation/reviews',
-        },
-        {
-          title: 'Conversations',
-          url: '/dashboard/admin/messages',
-        },
-      ],
+      items: [{ title: 'Conversations', to: '/dashboard/admin/messages' }],
     },
     {
       title: 'Staff',
-      url: '/dashboard/admin/staff',
       icon: Shield,
       roles: ['ADMIN'],
       items: [
-        { title: 'All Staff', url: '/dashboard/admin/staff' },
-        { title: 'Roles & Permissions', url: '/dashboard/admin/staff/roles' },
-        { title: 'Audit Logs', url: '/dashboard/admin/staff/audit-logs' },
+        { title: 'All Staff', to: '/dashboard/admin/staff' },
+        { title: 'Audit Logs', to: '/dashboard/admin/staff/audit-logs' },
       ],
     },
     {
       title: 'Platform Settings',
-      url: '/dashboard/admin/settings',
       icon: Wrench,
       roles: ['ADMIN'],
-      items: [
-        { title: 'General', url: '/dashboard/admin/settings' },
-        {
-          title: 'Payment Gateways',
-          url: '/dashboard/admin/settings/payments',
-        },
-        { title: 'Tax Configuration', url: '/dashboard/admin/settings/tax' },
-        { title: 'Email Templates', url: '/dashboard/admin/settings/emails' },
-      ],
-    },
-    {
-      // Each user (including admin) can only open one shop.
-      // This route should check if the admin already has a shop
-      // and redirect to shop status/management instead of apply form.
-      title: 'Sell',
-      url: '/dashboard/sell',
-      icon: ShoppingBag,
-      roles: ['ADMIN', 'MANAGER'],
-      items: [{ title: 'My Shop', url: '/dashboard/sell' }],
-    },
-  ];
-
-  // ─────────────────────────────────────────────
-  // CUSTOMER SERVICE
-  // ─────────────────────────────────────────────
-  const customerServiceNavItems: NavItem[] = [
-    {
-      title: 'Dashboard',
-      url: '/dashboard/customer-service',
-      icon: BarChart2,
-      isActive: userRole === 'CUSTOMER_SERVICE',
-      roles: ['CUSTOMER_SERVICE'],
-      items: [
-        { title: 'Overview', url: '/dashboard/customer-service' },
-        { title: 'My Metrics', url: '/dashboard/customer-service/metrics' },
-      ],
-    },
-    {
-      title: 'Tickets',
-      url: '/dashboard/customer-service/tickets',
-      icon: MessageSquare,
-      roles: ['CUSTOMER_SERVICE'],
-      items: [
-        {
-          title: 'Open Tickets',
-          url: '/dashboard/customer-service/tickets?status=OPEN',
-        },
-        {
-          title: 'Pending Tickets',
-          url: '/dashboard/customer-service/tickets?status=PENDING',
-        },
-        {
-          title: 'Resolved Tickets',
-          url: '/dashboard/customer-service/tickets?status=RESOLVED',
-        },
-        {
-          title: 'Create Ticket',
-          url: '/dashboard/customer-service/tickets/create',
-        },
-      ],
-    },
-    {
-      title: 'Orders',
-      url: '/dashboard/customer-service/orders',
-      icon: ClipboardList,
-      roles: ['CUSTOMER_SERVICE'],
-      items: [
-        { title: 'Order Lookup', url: '/dashboard/customer-service/orders' },
-        {
-          title: 'Process Return',
-          url: '/dashboard/customer-service/orders/returns',
-        },
-        {
-          title: 'Refund Requests',
-          url: '/dashboard/customer-service/orders/refunds',
-        },
-        {
-          title: 'Modify Order',
-          url: '/dashboard/customer-service/orders/modify',
-        },
-      ],
-    },
-    {
-      title: 'Customers',
-      url: '/dashboard/customer-service/customers',
-      icon: UserSearch,
-      roles: ['CUSTOMER_SERVICE'],
-      items: [
-        {
-          title: 'Customer Lookup',
-          url: '/dashboard/customer-service/customers',
-        },
-      ],
-    },
-    {
-      title: 'Knowledge Base',
-      url: '/dashboard/customer-service/kb',
-      icon: FileText,
-      roles: ['CUSTOMER_SERVICE'],
-      items: [
-        {
-          title: 'Product Info',
-          url: '/dashboard/customer-service/kb/products',
-        },
-        { title: 'Policies', url: '/dashboard/customer-service/kb/policies' },
-        {
-          title: 'Common Issues',
-          url: '/dashboard/customer-service/kb/issues',
-        },
-        { title: 'FAQ Templates', url: '/dashboard/customer-service/kb/faq' },
-      ],
+      items: [{ title: 'General', to: '/dashboard/admin/settings' }],
     },
   ];
 
@@ -473,13 +324,12 @@ export function NavMain({ user }: { user: User }) {
   const accountNavItems: NavItem[] = [
     {
       title: 'Account',
-      url: '/dashboard/my-account',
       icon: Settings,
       roles: ['ADMIN', 'MANAGER', 'VENDOR', 'CUSTOMER_SERVICE'],
       items: [
-        { title: 'Profile', url: '/dashboard/my-account' },
-        { title: 'Notifications', url: '/dashboard/notifications' },
-        { title: 'Messages', url: '/dashboard/messages' },
+        { title: 'Profile', to: '/dashboard/my-account' },
+        { title: 'Messages', to: '/dashboard/messages' },
+        { title: 'Help & Support', to: '/help' },
       ],
     },
   ];
@@ -534,10 +384,9 @@ export function NavMain({ user }: { user: User }) {
       ];
       break;
     case 'CUSTOMER_SERVICE':
-      navItems = [
-        ...filterItemsByRole(customerServiceNavItems),
-        ...filterItemsByRole(accountNavItems),
-      ];
+      // All customer-service destinations were dead links and have been
+      // removed; the role now only has its account section.
+      navItems = [...filterItemsByRole(accountNavItems)];
       break;
     default:
       navItems = [
@@ -571,9 +420,12 @@ export function NavMain({ user }: { user: User }) {
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
+                          <Link
+                            to={subItem.to as never}
+                            search={(subItem.search ?? {}) as never}
+                          >
                             <span>{subItem.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}

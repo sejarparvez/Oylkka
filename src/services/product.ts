@@ -290,6 +290,20 @@ export function useAllProducts(
   });
 }
 
+export function useBestsellers(limit = 20) {
+  return useQuery<CategoryProduct[]>({
+    queryKey: [QUERY_KEYS.PUBLIC_PRODUCTS, 'bestsellers', limit],
+    queryFn: async () => {
+      const response = await apiClient.get<{ products: CategoryProduct[] }>(
+        '/api/product/public-bestsellers',
+        { params: { limit } },
+      );
+      return response.data.products;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 type CompareProduct = CategoryProduct & {
   description: string;
   sku: string;

@@ -1,12 +1,7 @@
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { ChevronsUpDown, Heart, Package, Settings } from 'lucide-react';
 import { getInitials } from '#/lib/utils';
+import { SignOut } from '@/components/layout/header/signout';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -34,7 +29,6 @@ export function NavUserDropdown({ user }: NavUserDropdownProps) {
   const { isMobile } = useSidebar();
 
   if (!user) {
-    // Optionally, render a placeholder or nothing if there is no user.
     return null;
   }
 
@@ -80,31 +74,36 @@ export function NavUserDropdown({ user }: NavUserDropdownProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+              <DropdownMenuItem asChild>
+                <Link
+                  to='/dashboard/my-account'
+                  className='flex w-full cursor-pointer items-center'
+                >
+                  <Settings className='text-primary/70 mr-2 h-4 w-4' />
+                  Account
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  to='/dashboard/orders'
+                  className='flex w-full cursor-pointer items-center'
+                >
+                  <Package className='text-primary/70 mr-2 h-4 w-4' />
+                  Orders
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link
+                  to='/dashboard/wishlist'
+                  className='flex w-full cursor-pointer items-center'
+                >
+                  <Heart className='text-primary/70 mr-2 h-4 w-4' />
+                  Wishlist
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
+            <SignOut />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

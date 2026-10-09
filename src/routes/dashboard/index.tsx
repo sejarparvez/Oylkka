@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMyOrders } from '@/services/order';
+import { useMyReturns } from '@/services/returns';
 import { useWishlist } from '@/services/wishlist';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -96,12 +97,19 @@ function DashboardHome() {
     isError: wishlistError,
     refetch: refetchWishlist,
   } = useWishlist();
+  const {
+    data: returns,
+    isLoading: returnsLoading,
+    isError: returnsError,
+    refetch: refetchReturns,
+  } = useMyReturns();
 
   const recentOrders = orders?.slice(0, 5) ?? [];
   const wishlistCount = wishlist?.items?.length ?? 0;
   const orderCount = orders?.length ?? 0;
 
-  const pendingReturns = 0;
+  const pendingReturns =
+    returns?.filter((request) => request.status === 'PENDING').length ?? 0;
 
   return (
     <motion.div
@@ -124,7 +132,7 @@ function DashboardHome() {
         custom={1}
         className='grid grid-cols-1 sm:grid-cols-3 gap-4'
       >
-        {ordersLoading || wishlistLoading ? (
+        {ordersLoading || wishlistLoading || returnsLoading ? (
           [1, 2, 3].map((i) => (
             <Card key={i}>
               <CardHeader className='pb-2'>
@@ -135,12 +143,13 @@ function DashboardHome() {
               </CardContent>
             </Card>
           ))
-        ) : ordersError || wishlistError ? (
+        ) : ordersError || wishlistError || returnsError ? (
           <QueryErrorState
             title='Failed to load your summary'
             onRetry={() => {
               refetchOrders();
               refetchWishlist();
+              refetchReturns();
             }}
           />
         ) : (

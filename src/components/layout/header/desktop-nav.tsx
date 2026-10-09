@@ -2,18 +2,13 @@ import { Link, useLocation } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
-type NavItem = {
-  label: string;
-  href: string; // We'll map this to the 'to' prop
-};
-
-const navItems: NavItem[] = [
+const navItems = [
   { label: 'Home', href: '/' },
   { label: 'Products', href: '/products' },
   { label: 'Shop', href: '/shops' },
-  { label: 'Sale', href: '/sale' },
+  { label: 'Sale', href: '/deals' },
   { label: 'About', href: '/about' },
-];
+] as const;
 
 export default function Navigation() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -110,8 +105,6 @@ export default function Navigation() {
             <Link
               key={item.href}
               to={item.href}
-              params={{} as never}
-              search={{} as never}
               className={cn(
                 'focus-visible:ring-primary rounded-full outline-none focus-visible:ring-2',
                 'transition-colors duration-300',

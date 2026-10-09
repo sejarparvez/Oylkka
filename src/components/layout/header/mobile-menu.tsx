@@ -2,14 +2,11 @@ import { Link } from '@tanstack/react-router';
 import {
   BadgeCheck,
   ChevronDown,
-  Grid3x3,
   Heart,
   House,
-  Layers,
   LayoutDashboard,
   LifeBuoy,
   LogIn,
-  LogOut,
   Mail,
   Menu,
   Package,
@@ -37,7 +34,9 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { Route as RootRoute } from '@/routes/__root';
+import { usePublicCategories } from '@/services/category';
 import SearchBar from './searchbar';
+import { SignOut } from './signout';
 import { ModeToggle } from './theme-switcher';
 
 function NavLink({
@@ -153,6 +152,7 @@ function SectionEyebrow({ label }: { label: string }) {
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = RootRoute.useRouteContext();
+  const { data: categories } = usePublicCategories();
   const closeSheet = () => setIsOpen(false);
 
   return (
@@ -224,81 +224,20 @@ export default function MobileMenu() {
             {/* Shop */}
             <SectionEyebrow label='Shop' />
             <div className='space-y-0.5'>
-              <CollapsibleSection label='Products' icon={Tags}>
+              <CollapsibleSection label='Categories' icon={Tags} defaultOpen>
                 <SubLink to='/products' onClick={closeSheet}>
-                  All
+                  All Products
                 </SubLink>
-                <SubLink
-                  to='/products/category/$slug'
-                  params={{ slug: 'clothing' }}
-                  onClick={closeSheet}
-                >
-                  Clothing
-                </SubLink>
-                <SubLink
-                  to='/products/category/$slug'
-                  params={{ slug: 'accessories' }}
-                  onClick={closeSheet}
-                >
-                  Accessories
-                </SubLink>
-                <SubLink
-                  to='/products/category/$slug'
-                  params={{ slug: 'footwear' }}
-                  onClick={closeSheet}
-                >
-                  Footwear
-                </SubLink>
-                <SubLink
-                  to='/products/category/$slug'
-                  params={{ slug: 'jewelry' }}
-                  onClick={closeSheet}
-                >
-                  Jewelry
-                </SubLink>
-                <SubLink
-                  to='/products/category/$slug'
-                  params={{ slug: 'watches' }}
-                  onClick={closeSheet}
-                >
-                  Watches
-                </SubLink>
-              </CollapsibleSection>
-
-              <CollapsibleSection label='Collections' icon={Layers}>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Summer
-                </SubLink>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Winter
-                </SubLink>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Spring
-                </SubLink>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Fall
-                </SubLink>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Festival
-                </SubLink>
-              </CollapsibleSection>
-
-              <CollapsibleSection label='Categories' icon={Grid3x3}>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Men
-                </SubLink>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Women
-                </SubLink>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Kids
-                </SubLink>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Unisex
-                </SubLink>
-                <SubLink to='/products' onClick={closeSheet}>
-                  Plus Size
-                </SubLink>
+                {(categories ?? []).map((category) => (
+                  <SubLink
+                    key={category.slug}
+                    to='/products/category/$slug'
+                    params={{ slug: category.slug }}
+                    onClick={closeSheet}
+                  >
+                    {category.name}
+                  </SubLink>
+                ))}
               </CollapsibleSection>
             </div>
 
@@ -352,9 +291,7 @@ export default function MobileMenu() {
                   >
                     Settings
                   </NavLink>
-                  <NavLink to='/' icon={LogOut} onClick={closeSheet}>
-                    Sign Out
-                  </NavLink>
+                  <SignOut className='px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-primary/5 hover:text-primary' />
                 </>
               ) : (
                 <>

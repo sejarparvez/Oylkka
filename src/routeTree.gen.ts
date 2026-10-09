@@ -105,6 +105,7 @@ import { Route as ApiProductPublicQuestionsRouteImport } from './routes/api/prod
 import { Route as ApiProductPublicListRouteImport } from './routes/api/product/public-list'
 import { Route as ApiProductPublicCompareRouteImport } from './routes/api/product/public-compare'
 import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/product/public-by-category'
+import { Route as ApiProductPublicBestsellersRouteImport } from './routes/api/product/public-bestsellers'
 import { Route as ApiProductHelpfulVoteRouteImport } from './routes/api/product/helpful-vote'
 import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/get-single'
 import { Route as ApiProductEditRouteImport } from './routes/api/product/edit'
@@ -121,6 +122,7 @@ import { Route as ApiOrdersAdminListRouteImport } from './routes/api/orders/admi
 import { Route as ApiOrdersAdminFulfillRouteImport } from './routes/api/orders/admin-fulfill'
 import { Route as ApiOrdersAdminCancelRouteImport } from './routes/api/orders/admin-cancel'
 import { Route as ApiOrdersOrderIdRouteImport } from './routes/api/orders/$orderId'
+import { Route as ApiNewsletterSubscribeRouteImport } from './routes/api/newsletter/subscribe'
 import { Route as ApiMessagesListRouteImport } from './routes/api/messages/list'
 import { Route as ApiMessagesCreateRouteImport } from './routes/api/messages/create'
 import { Route as ApiMessagesContactVendorRouteImport } from './routes/api/messages/contact-vendor'
@@ -751,6 +753,12 @@ const ApiProductPublicByCategoryRoute =
     path: '/api/product/public-by-category',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiProductPublicBestsellersRoute =
+  ApiProductPublicBestsellersRouteImport.update({
+    id: '/api/product/public-bestsellers',
+    path: '/api/product/public-bestsellers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiProductHelpfulVoteRoute = ApiProductHelpfulVoteRouteImport.update({
   id: '/api/product/helpful-vote',
   path: '/api/product/helpful-vote',
@@ -830,6 +838,11 @@ const ApiOrdersAdminCancelRoute = ApiOrdersAdminCancelRouteImport.update({
 const ApiOrdersOrderIdRoute = ApiOrdersOrderIdRouteImport.update({
   id: '/api/orders/$orderId',
   path: '/api/orders/$orderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiNewsletterSubscribeRoute = ApiNewsletterSubscribeRouteImport.update({
+  id: '/api/newsletter/subscribe',
+  path: '/api/newsletter/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiMessagesListRoute = ApiMessagesListRouteImport.update({
@@ -1692,6 +1705,7 @@ export interface FileRoutesByFullPath {
   '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/messages/create': typeof ApiMessagesCreateRoute
   '/api/messages/list': typeof ApiMessagesListRoute
+  '/api/newsletter/subscribe': typeof ApiNewsletterSubscribeRoute
   '/api/orders/$orderId': typeof ApiOrdersOrderIdRoute
   '/api/orders/admin-cancel': typeof ApiOrdersAdminCancelRoute
   '/api/orders/admin-fulfill': typeof ApiOrdersAdminFulfillRoute
@@ -1708,6 +1722,7 @@ export interface FileRoutesByFullPath {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
+  '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
@@ -1936,6 +1951,7 @@ export interface FileRoutesByTo {
   '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/messages/create': typeof ApiMessagesCreateRoute
   '/api/messages/list': typeof ApiMessagesListRoute
+  '/api/newsletter/subscribe': typeof ApiNewsletterSubscribeRoute
   '/api/orders/$orderId': typeof ApiOrdersOrderIdRoute
   '/api/orders/admin-cancel': typeof ApiOrdersAdminCancelRoute
   '/api/orders/admin-fulfill': typeof ApiOrdersAdminFulfillRoute
@@ -1952,6 +1968,7 @@ export interface FileRoutesByTo {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
+  '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
@@ -2191,6 +2208,7 @@ export interface FileRoutesById {
   '/api/messages/contact-vendor': typeof ApiMessagesContactVendorRoute
   '/api/messages/create': typeof ApiMessagesCreateRoute
   '/api/messages/list': typeof ApiMessagesListRoute
+  '/api/newsletter/subscribe': typeof ApiNewsletterSubscribeRoute
   '/api/orders/$orderId': typeof ApiOrdersOrderIdRoute
   '/api/orders/admin-cancel': typeof ApiOrdersAdminCancelRoute
   '/api/orders/admin-fulfill': typeof ApiOrdersAdminFulfillRoute
@@ -2207,6 +2225,7 @@ export interface FileRoutesById {
   '/api/product/edit': typeof ApiProductEditRoute
   '/api/product/get-single': typeof ApiProductGetSingleRoute
   '/api/product/helpful-vote': typeof ApiProductHelpfulVoteRoute
+  '/api/product/public-bestsellers': typeof ApiProductPublicBestsellersRoute
   '/api/product/public-by-category': typeof ApiProductPublicByCategoryRoute
   '/api/product/public-compare': typeof ApiProductPublicCompareRoute
   '/api/product/public-list': typeof ApiProductPublicListRoute
@@ -2447,6 +2466,7 @@ export interface FileRouteTypes {
     | '/api/messages/contact-vendor'
     | '/api/messages/create'
     | '/api/messages/list'
+    | '/api/newsletter/subscribe'
     | '/api/orders/$orderId'
     | '/api/orders/admin-cancel'
     | '/api/orders/admin-fulfill'
@@ -2463,6 +2483,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/helpful-vote'
+    | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
     | '/api/product/public-compare'
     | '/api/product/public-list'
@@ -2691,6 +2712,7 @@ export interface FileRouteTypes {
     | '/api/messages/contact-vendor'
     | '/api/messages/create'
     | '/api/messages/list'
+    | '/api/newsletter/subscribe'
     | '/api/orders/$orderId'
     | '/api/orders/admin-cancel'
     | '/api/orders/admin-fulfill'
@@ -2707,6 +2729,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/helpful-vote'
+    | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
     | '/api/product/public-compare'
     | '/api/product/public-list'
@@ -2945,6 +2968,7 @@ export interface FileRouteTypes {
     | '/api/messages/contact-vendor'
     | '/api/messages/create'
     | '/api/messages/list'
+    | '/api/newsletter/subscribe'
     | '/api/orders/$orderId'
     | '/api/orders/admin-cancel'
     | '/api/orders/admin-fulfill'
@@ -2961,6 +2985,7 @@ export interface FileRouteTypes {
     | '/api/product/edit'
     | '/api/product/get-single'
     | '/api/product/helpful-vote'
+    | '/api/product/public-bestsellers'
     | '/api/product/public-by-category'
     | '/api/product/public-compare'
     | '/api/product/public-list'
@@ -3183,6 +3208,7 @@ export interface RootRouteChildren {
   ApiMessagesContactVendorRoute: typeof ApiMessagesContactVendorRoute
   ApiMessagesCreateRoute: typeof ApiMessagesCreateRoute
   ApiMessagesListRoute: typeof ApiMessagesListRoute
+  ApiNewsletterSubscribeRoute: typeof ApiNewsletterSubscribeRoute
   ApiOrdersOrderIdRoute: typeof ApiOrdersOrderIdRoute
   ApiOrdersAdminCancelRoute: typeof ApiOrdersAdminCancelRoute
   ApiOrdersAdminFulfillRoute: typeof ApiOrdersAdminFulfillRoute
@@ -3199,6 +3225,7 @@ export interface RootRouteChildren {
   ApiProductEditRoute: typeof ApiProductEditRoute
   ApiProductGetSingleRoute: typeof ApiProductGetSingleRoute
   ApiProductHelpfulVoteRoute: typeof ApiProductHelpfulVoteRoute
+  ApiProductPublicBestsellersRoute: typeof ApiProductPublicBestsellersRoute
   ApiProductPublicByCategoryRoute: typeof ApiProductPublicByCategoryRoute
   ApiProductPublicCompareRoute: typeof ApiProductPublicCompareRoute
   ApiProductPublicListRoute: typeof ApiProductPublicListRoute
@@ -3966,6 +3993,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiProductPublicByCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/product/public-bestsellers': {
+      id: '/api/product/public-bestsellers'
+      path: '/api/product/public-bestsellers'
+      fullPath: '/api/product/public-bestsellers'
+      preLoaderRoute: typeof ApiProductPublicBestsellersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/product/helpful-vote': {
       id: '/api/product/helpful-vote'
       path: '/api/product/helpful-vote'
@@ -4076,6 +4110,13 @@ declare module '@tanstack/react-router' {
       path: '/api/orders/$orderId'
       fullPath: '/api/orders/$orderId'
       preLoaderRoute: typeof ApiOrdersOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/newsletter/subscribe': {
+      id: '/api/newsletter/subscribe'
+      path: '/api/newsletter/subscribe'
+      fullPath: '/api/newsletter/subscribe'
+      preLoaderRoute: typeof ApiNewsletterSubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/messages/list': {
@@ -5425,6 +5466,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiMessagesContactVendorRoute: ApiMessagesContactVendorRoute,
   ApiMessagesCreateRoute: ApiMessagesCreateRoute,
   ApiMessagesListRoute: ApiMessagesListRoute,
+  ApiNewsletterSubscribeRoute: ApiNewsletterSubscribeRoute,
   ApiOrdersOrderIdRoute: ApiOrdersOrderIdRoute,
   ApiOrdersAdminCancelRoute: ApiOrdersAdminCancelRoute,
   ApiOrdersAdminFulfillRoute: ApiOrdersAdminFulfillRoute,
@@ -5441,6 +5483,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiProductEditRoute: ApiProductEditRoute,
   ApiProductGetSingleRoute: ApiProductGetSingleRoute,
   ApiProductHelpfulVoteRoute: ApiProductHelpfulVoteRoute,
+  ApiProductPublicBestsellersRoute: ApiProductPublicBestsellersRoute,
   ApiProductPublicByCategoryRoute: ApiProductPublicByCategoryRoute,
   ApiProductPublicCompareRoute: ApiProductPublicCompareRoute,
   ApiProductPublicListRoute: ApiProductPublicListRoute,
@@ -5540,12 +5583,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

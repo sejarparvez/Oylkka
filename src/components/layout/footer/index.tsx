@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import axios from 'axios';
 import {
   BadgeCheck,
   ChevronRight,
@@ -9,10 +10,12 @@ import {
   Truck,
 } from 'lucide-react';
 import { motion, useInView } from 'motion/react';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '#/components/ui/button';
 import { Input } from '#/components/ui/input';
 import { RETURN_WINDOW_DAYS } from '@/lib/constants';
+import { useSubscribeMutation } from '@/services/newsletter';
 import { usePublicSettings } from '@/services/public-settings';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -53,7 +56,6 @@ const companyLinks = [
   { label: 'About Us', to: '/about' },
   { label: 'Contact', to: '/contact' },
   { label: 'Blog', to: '/blog' },
-  { label: 'Careers', to: '/careers' },
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },
 ];
@@ -63,7 +65,6 @@ const supportLinks = [
   { label: 'Shipping Info', to: '/shipping' },
   { label: 'Returns & Exchanges', to: '/returns' },
   { label: 'Order Tracking', to: '/tracking' },
-  { label: 'Size Guide', to: '/size-guide' },
 ];
 
 const NavLinks = ({ links }: { links: { label: string; to: string }[] }) => (
@@ -102,6 +103,59 @@ const EyebrowHeader = ({
   </div>
 );
 
+function NewsletterForm() {
+  const [email, setEmail] = useState('');
+  const subscribe = useSubscribeMutation();
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = email.trim();
+    if (!trimmed) return;
+
+    subscribe.mutate(
+      { email: trimmed },
+      {
+        onSuccess: () => {
+          toast.success('Subscribed! Watch your inbox for the best deals.');
+          setEmail('');
+        },
+        onError: (error) => {
+          const message = axios.isAxiosError(error)
+            ? (error.response?.data?.error ?? error.message)
+            : 'Failed to subscribe';
+          toast.error(message);
+        },
+      },
+    );
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='flex gap-2 md:gap-3 flex-row'>
+      <div className='group relative flex-1'>
+        <Input
+          type='email'
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder='your@email.com'
+          aria-label='Email address'
+          className='h-11 rounded-xl transition-all duration-200 focus:ring-2 focus:ring-primary/30 focus:border-primary/50'
+        />
+      </div>
+      <Button
+        type='submit'
+        disabled={subscribe.isPending}
+        className='h-11 gap-2 whitespace-nowrap px-6 transition-transform duration-200 hover:scale-[1.02]'
+      >
+        <Send className='h-4 w-4' />
+        <span className='hidden md:block'>
+          {subscribe.isPending ? 'Subscribing…' : 'Subscribe'}
+        </span>
+      </Button>
+    </form>
+  );
+}
+
 function NewsletterSection({ inView }: { inView: boolean }) {
   return (
     <div className='relative border-b border-border'>
@@ -130,22 +184,7 @@ function NewsletterSection({ inView }: { inView: boolean }) {
             </p>
           </motion.div>
           <motion.div variants={fadeUp} custom={0.08}>
-            <div className='flex gap-2 md:gap-3 flex-row'>
-              <div className='group relative flex-1'>
-                <Input
-                  type='email'
-                  placeholder='your@email.com'
-                  className='h-11 rounded-xl transition-all duration-200 focus:ring-2 focus:ring-primary/30 focus:border-primary/50'
-                />
-              </div>
-              <Button
-                type='submit'
-                className='h-11 gap-2 whitespace-nowrap px-6 transition-transform duration-200 hover:scale-[1.02]'
-              >
-                <Send className='h-4 w-4' />
-                <span className='hidden md:block'>Subscribe</span>
-              </Button>
-            </div>
+            <NewsletterForm />
           </motion.div>
         </motion.div>
       </div>

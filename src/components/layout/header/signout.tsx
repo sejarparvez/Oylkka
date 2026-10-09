@@ -14,8 +14,9 @@ import {
 import { Button } from '@/components/ui/button';
 // 1. Import the server function you showed me
 import { signOut } from '@/lib/auth.functions';
+import { cn } from '@/lib/utils';
 
-export function SignOut() {
+export function SignOut({ className }: { className?: string }) {
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -39,7 +40,12 @@ export function SignOut() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <div className='w-full flex items-center gap-2 px-2 py-1.5 text-sm group cursor-pointer hover:bg-destructive hover:text-white rounded-sm transition-colors'>
+        <div
+          className={cn(
+            'w-full flex items-center gap-2 px-2 py-1.5 text-sm group cursor-pointer hover:bg-destructive hover:text-white rounded-sm transition-colors',
+            className,
+          )}
+        >
           <Power className='mr-2 h-4 w-4 text-destructive group-hover:text-white' />
           Sign Out
         </div>
