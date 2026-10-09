@@ -87,6 +87,10 @@ function RouteComponent() {
             <img
               src={conversation.shop.logoUrl}
               alt={conversation.shop.name}
+              width={36}
+              height={36}
+              loading='lazy'
+              decoding='async'
               className='w-full h-full object-cover'
             />
           ) : (
@@ -158,6 +162,8 @@ function RouteComponent() {
                       <img
                         src={msg.imageUrl}
                         alt='Attached'
+                        loading='lazy'
+                        decoding='async'
                         className='max-w-full h-auto rounded-lg'
                       />
                     </a>

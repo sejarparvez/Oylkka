@@ -28,7 +28,6 @@ export function ReviewCard({ review }: ReviewCardProps) {
               width={40}
               height={40}
               alt={review.user.name}
-              layout='fixed'
               className='object-cover w-full h-full'
             />
           ) : (
@@ -90,7 +89,6 @@ export function ReviewCard({ review }: ReviewCardProps) {
                 width={80}
                 height={80}
                 alt='Review image'
-                layout='fixed'
                 className='object-cover w-full h-full'
               />
             </div>

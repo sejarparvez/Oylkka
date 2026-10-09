@@ -251,6 +251,10 @@ function ComparePage() {
                           <img
                             src={result.images[0].imageUrl}
                             alt={result.productName}
+                            width={400}
+                            height={400}
+                            loading='lazy'
+                            decoding='async'
                             className='object-cover w-full h-full'
                           />
                         ) : (
@@ -403,6 +407,10 @@ function ComparePage() {
                               <img
                                 src={product.images[0].imageUrl}
                                 alt={product.productName}
+                                width={400}
+                                height={400}
+                                loading='lazy'
+                                decoding='async'
                                 className='object-cover w-full h-full'
                               />
                             ) : (
@@ -460,9 +468,12 @@ function ComparePage() {
                 <tbody>
                   {specs.map((spec) => (
                     <tr key={spec.key} className='border-t border-border'>
-                      <td className='p-4 text-xs font-semibold tracking-[0.08em] uppercase text-muted-foreground'>
+                      <th
+                        scope='row'
+                        className='p-4 text-xs font-semibold tracking-[0.08em] uppercase text-muted-foreground'
+                      >
                         {spec.label}
-                      </td>
+                      </th>
                       {products.map((product) => (
                         <td key={product.id} className='p-4 text-sm'>
                           {getValue(product, spec.key)}

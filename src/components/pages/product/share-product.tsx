@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -48,6 +49,9 @@ export function ShareProduct({ slug }: ShareProductProps) {
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Share Product</DialogTitle>
+          <DialogDescription className='sr-only'>
+            Share this product with others.
+          </DialogDescription>
         </DialogHeader>
         <Tabs defaultValue='link'>
           <TabsList className='grid w-full grid-cols-2'>

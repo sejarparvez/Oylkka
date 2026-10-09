@@ -121,3 +121,33 @@ export function useFulfillItemMutation(orderId: string) {
     },
   });
 }
+
+export function useCancelVendorOrderMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    { success: true },
+    Error,
+    { orderId: string; reason: string }
+  >({
+    mutationFn: async (payload) => {
+      const response = await apiClient.post<{ success: true }>(
+        '/api/vendor/orders/cancel',
+        payload,
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.VENDOR_ORDERS],
+      });
+      toast.success('Order cancelled');
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError(error)
+        ? (error.response?.data?.error ?? error.message)
+        : 'Failed to cancel order';
+      toast.error(`Error: ${message}`);
+    },
+  });
+}

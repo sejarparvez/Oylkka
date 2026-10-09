@@ -9,7 +9,7 @@ import {
   X,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { type Resolver, useForm } from 'react-hook-form';
 import type * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -93,7 +93,7 @@ export function ShopForm(props: ShopFormProps) {
     reset,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema) as never,
+    resolver: zodResolver(schema) as Resolver<FormValues>,
     defaultValues: (isEdit
       ? props.defaultValues
       : {
@@ -506,6 +506,10 @@ export function ShopForm(props: ShopFormProps) {
                         <img
                           src={logoPreview}
                           alt='Shop logo preview'
+                          width={400}
+                          height={400}
+                          loading='lazy'
+                          decoding='async'
                           className='max-h-full max-w-full object-contain'
                         />
                       ) : (
@@ -581,6 +585,10 @@ export function ShopForm(props: ShopFormProps) {
                         <img
                           src={bannerPreview}
                           alt='Shop banner preview'
+                          width={1200}
+                          height={300}
+                          loading='lazy'
+                          decoding='async'
                           className='max-h-full max-w-full object-contain'
                         />
                       ) : (

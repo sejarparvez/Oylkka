@@ -17,6 +17,7 @@ import {
   reserveStock,
   StockError,
 } from '@/lib/stock';
+import { consumeVouchers, VoucherCapError } from '@/lib/voucher-consumption';
 import { checkCouponEligibility } from '@/services/checkout/coupon-validator';
 import { getCheckoutSettings } from '@/services/checkout/platform-settings';
 import { computeShippingEstimate } from '@/services/checkout/shipping';
@@ -710,44 +711,30 @@ export const Route = createFileRoute('/api/checkout/create')({
                   where: { cartId: cart.id },
                 });
 
-                // Create CouponUsage + mark UserVoucher used
-                for (const v of selectedVouchers) {
-                  await tx.couponUsage.create({
-                    data: {
-                      couponId: v.couponId,
-                      userId: session.user.id,
+                // Consume vouchers/coupons for WALLET only (the money moves
+                // here). COD is collected at the door, so an unpaid order that
+                // is later cancelled must not eat the customer's voucher —
+                // settlement happens when the item is delivered (MONEY-23).
+                if (parsed.data.paymentMethod === 'WALLET') {
+                  try {
+                    await consumeVouchers({
+                      tx,
                       orderId: created.id,
-                    },
-                  });
-
-                  // Enforce the usage cap in the database instead of trusting
-                  // the eligibility read earlier in the request: two concurrent
-                  // checkouts can both pass that check. `maxUses: 0` means
-                  // unlimited. Nothing is charged yet at this point, so failing
-                  // here is safe (MONEY-38).
-                  if (v.maxUses > 0) {
-                    const { count } = await tx.coupon.updateMany({
-                      where: { id: v.couponId, usedCount: { lt: v.maxUses } },
-                      data: { usedCount: { increment: 1 } },
+                      customerId: session.user.id,
+                      appliedVouchers: selectedVouchers.map((v) => ({
+                        couponId: v.couponId,
+                        userVoucherId: v.id,
+                        code: v.code,
+                        maxUses: v.maxUses,
+                      })),
+                      strict: true,
                     });
-
-                    if (count === 0) {
-                      throw new CheckoutError(
-                        `Coupon ${v.code} has reached its usage limit`,
-                        409,
-                      );
+                  } catch (error) {
+                    if (error instanceof VoucherCapError) {
+                      throw new CheckoutError(error.message, 409);
                     }
-                  } else {
-                    await tx.coupon.update({
-                      where: { id: v.couponId },
-                      data: { usedCount: { increment: 1 } },
-                    });
+                    throw error;
                   }
-
-                  await tx.userVoucher.update({
-                    where: { id: v.id },
-                    data: { usedAt: now, orderId: created.id },
-                  });
                 }
 
                 // Handle cashback. Only credit it once the order is actually

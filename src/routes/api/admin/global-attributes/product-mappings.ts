@@ -16,6 +16,61 @@ export const Route = createFileRoute(
 
           const url = new URL(request.url);
           const productId = url.searchParams.get('productId');
+          const attributeId = url.searchParams.get('attributeId');
+
+          if (!productId && !attributeId) {
+            return Response.json(
+              {
+                error: 'productId or attributeId query parameter is required',
+              },
+              { status: 400 },
+            );
+          }
+
+          // Attribute-scoped listing: every product value mapped to this global
+          // attribute. Powers the admin "Product Mappings" tab (DEAD-03).
+          if (attributeId && !productId) {
+            const mappings = await prisma.productGlobalAttributeValue.findMany({
+              where: { globalAttributeId: attributeId },
+              include: {
+                product: {
+                  select: { id: true, productName: true, slug: true },
+                },
+                globalAttribute: {
+                  select: { id: true, name: true, slug: true },
+                },
+                globalValue: {
+                  select: { id: true, value: true, slug: true, metadata: true },
+                },
+              },
+              orderBy: { productId: 'asc' },
+            });
+
+            // `localValueId` has no Prisma relation, so resolve the local values
+            // in one follow-up query and join in memory.
+            const localValueIds = [
+              ...new Set(mappings.map((m) => m.localValueId)),
+            ];
+            const localValues =
+              localValueIds.length > 0
+                ? await prisma.productAttributeValue.findMany({
+                    where: { id: { in: localValueIds } },
+                    select: {
+                      id: true,
+                      value: true,
+                      option: { select: { id: true, name: true } },
+                    },
+                  })
+                : [];
+            const localValueMap = new Map(localValues.map((v) => [v.id, v]));
+
+            return Response.json({
+              mappings: mappings.map((m) => ({
+                ...m,
+                localValue: localValueMap.get(m.localValueId) ?? null,
+              })),
+            });
+          }
 
           if (!productId) {
             return Response.json(

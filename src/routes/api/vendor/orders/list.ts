@@ -72,6 +72,7 @@ export const Route = createFileRoute('/api/vendor/orders/list')({
                     createdAt: true,
                     shippingName: true,
                     shippingPhone: true,
+                    paymentStatus: true,
                   },
                 },
               },
@@ -88,7 +89,12 @@ export const Route = createFileRoute('/api/vendor/orders/list')({
             orderNumber: item.order.orderNumber,
             orderDate: item.order.createdAt.toISOString(),
             customerName: item.order.shippingName,
-            customerPhone: item.order.shippingPhone,
+            // AUTH-05: buyer contact data is only visible once the order was
+            // actually paid — the same PII gate the detail endpoint uses.
+            customerPhone:
+              item.order.paymentStatus === 'PAID'
+                ? item.order.shippingPhone
+                : null,
             productId: item.productId,
             productName: item.productName,
             variantName: item.variantName,

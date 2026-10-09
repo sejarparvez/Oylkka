@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { changePassword, updateUser } from '@/lib/auth-client';
+import { useUploadAvatarMutation } from '@/services/user';
 
 export const Route = createFileRoute('/dashboard/my-account')({
   component: MyAccountPage,
@@ -31,6 +32,7 @@ function MyAccountPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadAvatar = useUploadAvatarMutation();
 
   async function handleSave() {
     const trimmed = name.trim();
@@ -116,6 +118,10 @@ function MyAccountPage() {
                   <img
                     src={user.image}
                     alt={user.name}
+                    width={64}
+                    height={64}
+                    loading='lazy'
+                    decoding='async'
                     className='h-full w-full object-cover'
                   />
                 ) : (
@@ -150,17 +156,7 @@ function MyAccountPage() {
 
                   setIsUploadingAvatar(true);
                   try {
-                    const formData = new FormData();
-                    formData.append('image', file);
-                    const res = await fetch('/api/upload/avatar', {
-                      method: 'POST',
-                      body: formData,
-                    });
-                    if (!res.ok) {
-                      const err = await res.json();
-                      throw new Error(err.error ?? 'Upload failed');
-                    }
-                    const { imageUrl } = await res.json();
+                    const { imageUrl } = await uploadAvatar.mutateAsync(file);
                     const { error } = await updateUser({ image: imageUrl });
                     if (error) throw new Error(error.message);
                     toast.success('Avatar updated');

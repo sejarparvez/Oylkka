@@ -92,6 +92,27 @@ type ProductMappingsResponse = {
   } | null;
 };
 
+export type GlobalAttributeProductMapping = {
+  id: string;
+  productId: string;
+  globalAttributeId: string;
+  localValueId: string;
+  globalValueId: string;
+  product: { id: string; productName: string; slug: string };
+  globalAttribute: { id: string; name: string; slug: string };
+  globalValue: {
+    id: string;
+    value: string;
+    slug: string;
+    metadata: Record<string, unknown> | null;
+  };
+  localValue: {
+    id: string;
+    value: string;
+    option: { id: string; name: string };
+  } | null;
+};
+
 export function useAdminGlobalAttributes(filters: GlobalAttributeFilters = {}) {
   const params = new URLSearchParams();
   if (filters.search) params.set('search', filters.search);
@@ -239,6 +260,25 @@ export function useProductGlobalAttributeMappings(productId: string) {
   });
 }
 
+export function useGlobalAttributeProducts(attributeId: string) {
+  return useQuery<{ mappings: GlobalAttributeProductMapping[] }>({
+    queryKey: [
+      QUERY_KEYS.ADMIN_GLOBAL_ATTRIBUTES,
+      'attribute-mappings',
+      attributeId,
+    ],
+    queryFn: async () => {
+      const r = await apiClient.get<{
+        mappings: GlobalAttributeProductMapping[];
+      }>('/api/admin/global-attributes/product-mappings', {
+        params: { attributeId },
+      });
+      return r.data;
+    },
+    enabled: !!attributeId,
+  });
+}
+
 export function useMapProductAttributeMutation() {
   const queryClient = useQueryClient();
 
@@ -269,6 +309,13 @@ export function useMapProductAttributeMutation() {
           QUERY_KEYS.ADMIN_GLOBAL_ATTRIBUTES,
           'mappings',
           variables.productId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          QUERY_KEYS.ADMIN_GLOBAL_ATTRIBUTES,
+          'attribute-mappings',
+          variables.globalAttributeId,
         ],
       });
     },
@@ -304,6 +351,13 @@ export function useUnmapProductAttributeMutation() {
           QUERY_KEYS.ADMIN_GLOBAL_ATTRIBUTES,
           'mappings',
           variables.productId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          QUERY_KEYS.ADMIN_GLOBAL_ATTRIBUTES,
+          'attribute-mappings',
+          variables.globalAttributeId,
         ],
       });
     },

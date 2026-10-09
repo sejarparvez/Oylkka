@@ -11,6 +11,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -143,6 +144,9 @@ function RouteComponent() {
                 <DialogTitle>
                   {editing ? 'Edit Address' : 'Add Address'}
                 </DialogTitle>
+                <DialogDescription className='sr-only'>
+                  Enter the address details.
+                </DialogDescription>
               </DialogHeader>
               <form
                 className='space-y-3'

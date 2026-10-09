@@ -28,4 +28,40 @@ describe('returns service API calls', () => {
     expect(post).toHaveBeenCalledWith('/api/returns/create', payload);
     expect(response.data.message).toBe('Return request created!');
   });
+
+  it('fetches vendor returns', async () => {
+    const get = spyOn(apiClient, 'get').mockResolvedValue({
+      data: { returns: [] },
+    });
+
+    const response = await apiClient.get('/api/vendor/returns/list');
+    expect(get).toHaveBeenCalledWith('/api/vendor/returns/list');
+    expect(Array.isArray(response.data.returns)).toBe(true);
+  });
+
+  it('fetches admin returns with status filter', async () => {
+    const get = spyOn(apiClient, 'get').mockResolvedValue({
+      data: { returns: [] },
+    });
+
+    await apiClient.get('/api/admin/returns/list?status=PENDING');
+    expect(get).toHaveBeenCalledWith('/api/admin/returns/list?status=PENDING');
+  });
+
+  it('processes a return as admin', async () => {
+    const post = spyOn(apiClient, 'post').mockResolvedValue({
+      data: { return: { id: 'r1' } },
+    });
+
+    await apiClient.post('/api/admin/returns/review', {
+      returnId: 'r1',
+      status: 'APPROVED',
+      refundAmount: 100,
+    });
+    expect(post).toHaveBeenCalledWith('/api/admin/returns/review', {
+      returnId: 'r1',
+      status: 'APPROVED',
+      refundAmount: 100,
+    });
+  });
 });

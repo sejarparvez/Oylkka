@@ -10,6 +10,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -19,6 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { BD_DISTRICTS } from '@/lib/bd-districts';
+import { formatBDT } from '@/lib/currency';
 import { useMyShop, useUpdateShopMutation } from '@/services/shop';
 import type { ShippingZone } from '@/services/vendor-shipping';
 import {
@@ -213,6 +215,9 @@ function RouteComponent() {
               <DialogTitle>
                 {editingZone ? 'Edit Shipping Zone' : 'Add Shipping Zone'}
               </DialogTitle>
+              <DialogDescription className='sr-only'>
+                Enter the shipping zone details.
+              </DialogDescription>
             </DialogHeader>
             <form
               className='space-y-4'
@@ -385,13 +390,15 @@ function RouteComponent() {
                       </Badge>
                     </div>
                     <div className='text-right text-sm'>
-                      BDT {zone.baseCost}
+                      ৳{formatBDT(zone.baseCost)}
                     </div>
                     <div className='text-right text-sm text-muted-foreground'>
-                      {zone.perItem > 0 ? `BDT ${zone.perItem}` : '-'}
+                      {zone.perItem > 0 ? `৳${formatBDT(zone.perItem)}` : '-'}
                     </div>
                     <div className='text-right text-sm text-muted-foreground'>
-                      {zone.freeAbove != null ? `BDT ${zone.freeAbove}` : '-'}
+                      {zone.freeAbove != null
+                        ? `৳${formatBDT(zone.freeAbove)}`
+                        : '-'}
                     </div>
                     <div className='text-center text-sm text-muted-foreground'>
                       {zone.estDays ?? '-'}

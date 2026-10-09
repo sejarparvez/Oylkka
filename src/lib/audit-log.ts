@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/db';
 
+type PrismaTx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
+
 type AuditAction =
   | 'ORDER_CANCELLED'
   | 'ORDER_REFUNDED'
@@ -34,6 +36,7 @@ export async function createAuditLog({
   entityId,
   details,
   ipAddress,
+  tx,
 }: {
   actorId: string;
   actorRole: string;
@@ -42,8 +45,11 @@ export async function createAuditLog({
   entityId: string;
   details?: Record<string, unknown>;
   ipAddress?: string;
+  /** When supplied the audit row is written inside this transaction (AUTH-04). */
+  tx?: PrismaTx;
 }) {
-  await prisma.auditLog.create({
+  const client = tx ?? prisma;
+  await client.auditLog.create({
     data: {
       actorId,
       actorRole,

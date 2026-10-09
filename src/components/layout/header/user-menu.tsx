@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   Settings,
+  Ticket,
   UserIcon,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -109,6 +110,16 @@ export default function UserDropDown({ user }: UserDropDownProps) {
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </Badge>
               )}
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link
+              to='/dashboard/vouchers'
+              className='flex w-full cursor-pointer items-center'
+            >
+              <Ticket className='text-primary/70 mr-2 h-4 w-4' />
+              My Vouchers
             </Link>
           </DropdownMenuItem>
 

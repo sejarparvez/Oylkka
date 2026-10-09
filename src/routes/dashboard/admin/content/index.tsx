@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { FileText, Loader2, Plus } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +9,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -19,7 +19,10 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import apiClient from '@/lib/api-client';
+import {
+  useAdminContentBlocks,
+  useSaveContentBlockMutation,
+} from '@/services/admin-content';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -39,39 +42,23 @@ export const Route = createFileRoute('/dashboard/admin/content/')({
 });
 
 function RouteComponent() {
-  const [blocks, setBlocks] = useState<(typeof emptyForm)[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
-  const load = useCallback(() => {
-    setLoading(true);
-    apiClient
-      .get<{ blocks: (typeof emptyForm)[] }>('/api/admin/content/list')
-      .then((r) => setBlocks(r.data.blocks))
-      .catch(() => toast.error('Failed to load'))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data, isLoading: loading } = useAdminContentBlocks();
+  const saveMutation = useSaveContentBlockMutation();
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  const blocks = data?.blocks ?? [];
+  const saving = saveMutation.isPending;
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!form.slug || !form.title || !form.content) return;
-    setSaving(true);
-    try {
-      await apiClient.post('/api/admin/content/save', form);
-      toast.success('Content saved');
-      setOpen(false);
-      setForm(emptyForm);
-      load();
-    } catch {
-      toast.error('Failed to save');
-    } finally {
-      setSaving(false);
-    }
+    saveMutation.mutate(form, {
+      onSuccess: () => {
+        setOpen(false);
+        setForm(emptyForm);
+      },
+    });
   };
 
   const openEdit = (b: typeof emptyForm) => {
@@ -115,6 +102,9 @@ function RouteComponent() {
                 <DialogTitle>
                   {form.slug ? 'Edit Page' : 'Add Page'}
                 </DialogTitle>
+                <DialogDescription className='sr-only'>
+                  Enter the page content details.
+                </DialogDescription>
               </DialogHeader>
               <div className='space-y-3'>
                 <div>

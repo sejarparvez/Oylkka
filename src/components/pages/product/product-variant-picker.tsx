@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -311,6 +312,9 @@ function SizeGuideDialog() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Size Guide</DialogTitle>
+          <DialogDescription className='sr-only'>
+            Size guide for this product.
+          </DialogDescription>
         </DialogHeader>
         <div className='grid grid-cols-4 gap-3 py-4'>
           <div className='text-xs font-semibold text-muted-foreground'>

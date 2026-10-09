@@ -19,6 +19,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useVendorAnalytics } from '@/services/vendor-analytics';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -137,7 +138,7 @@ function RouteComponent() {
                   <CardContent>
                     <div className='text-2xl font-bold tabular-nums'>
                       {card.key === 'revenue'
-                        ? `BDT ${value.toLocaleString()}`
+                        ? `৳${formatBDT(value)}`
                         : value.toLocaleString()}
                     </div>
                     <p className='text-xs text-muted-foreground mt-1'>
@@ -204,7 +205,7 @@ function RouteComponent() {
                     />
                     <Tooltip
                       formatter={(...args: unknown[]) => [
-                        `BDT ${Number(args[0] || 0).toLocaleString()}`,
+                        `৳${formatBDT(args[0])}`,
                         'Revenue',
                       ]}
                       labelFormatter={(label) => {
@@ -274,7 +275,7 @@ function RouteComponent() {
                           {product.quantity} sold
                         </span>
                         <span className='font-bold tabular-nums'>
-                          BDT {product.revenue.toLocaleString()}
+                          ৳{formatBDT(product.revenue)}
                         </span>
                       </div>
                     </div>
@@ -319,7 +320,7 @@ function RouteComponent() {
                         </div>
                         <div className='flex items-center gap-3 ml-3'>
                           <span className='font-bold tabular-nums'>
-                            BDT {order.total.toLocaleString()}
+                            ৳{formatBDT(order.total)}
                           </span>
                           <Badge
                             variant={badge.variant}

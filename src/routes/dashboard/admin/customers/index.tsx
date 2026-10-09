@@ -203,6 +203,10 @@ function RouteComponent() {
                                 <img
                                   src={customer.imageUrl}
                                   alt=''
+                                  width={28}
+                                  height={28}
+                                  loading='lazy'
+                                  decoding='async'
                                   className='w-7 h-7 rounded-full object-cover'
                                 />
                               )}

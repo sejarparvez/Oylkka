@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useMyOrders } from '@/services/order';
 import { useMyReturns } from '@/services/returns';
 import { useWishlist } from '@/services/wishlist';
@@ -254,7 +255,7 @@ function DashboardHome() {
                         </div>
                         <div className='flex items-center gap-3 ml-3'>
                           <span className='text-sm font-bold tabular-nums'>
-                            BDT {order.total.toLocaleString()}
+                            ৳{formatBDT(order.total)}
                           </span>
                           <Badge
                             variant={badge.variant}
@@ -285,8 +286,6 @@ function DashboardHome() {
                     <Link
                       key={link.to}
                       to={link.to}
-                      params={{} as never}
-                      search={{} as never}
                       className='flex items-center gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors'
                     >
                       <div className='w-10 h-10 rounded-lg bg-muted flex items-center justify-center'>

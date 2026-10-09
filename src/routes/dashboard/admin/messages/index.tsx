@@ -58,6 +58,10 @@ function RouteComponent() {
                       <img
                         src={convo.shop.logoUrl}
                         alt={convo.shop.name}
+                        width={36}
+                        height={36}
+                        loading='lazy'
+                        decoding='async'
                         className='w-full h-full object-cover'
                       />
                     ) : (
@@ -69,6 +73,10 @@ function RouteComponent() {
                       <img
                         src={convo.customer.imageUrl}
                         alt={convo.customer.name}
+                        width={20}
+                        height={20}
+                        loading='lazy'
+                        decoding='async'
                         className='w-full h-full object-cover'
                       />
                     ) : (

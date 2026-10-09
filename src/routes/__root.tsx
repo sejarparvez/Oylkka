@@ -9,6 +9,7 @@ import {
   useRouter,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 import { useEffect, useRef } from 'react';
 import { Toaster } from '#/components/ui/sonner';
 import { TooltipProvider } from '#/components/ui/tooltip';
@@ -18,10 +19,26 @@ import { NotFound } from '@/components/not-found';
 import { getSession, signOut } from '@/lib/auth.functions';
 import appCss from '../styles.css?url';
 
-// CONTENT-19: set VITE_SITE_URL per deployment so the canonical URL matches the
-// host actually serving the app; falls back to the production domain.
-const siteUrl =
-  (import.meta.env.VITE_SITE_URL as string | undefined) ?? 'https://oylkka.com';
+// CONTENT-19: derive the canonical origin from the request actually serving the
+// page — the host header on the server, `window.location.origin` on the client —
+// rather than a hardcoded domain. VITE_SITE_URL and the production domain are
+// only deployment/local fallbacks.
+function getSiteUrl(): string {
+  if (typeof window !== 'undefined') {
+    return (
+      (import.meta.env.VITE_SITE_URL as string | undefined) ??
+      window.location.origin
+    );
+  }
+
+  const headers = getRequestHeaders();
+  const host = headers.get('x-forwarded-host') ?? headers.get('host');
+  if (host) return `https://${host}`;
+  return (
+    (import.meta.env.VITE_SITE_URL as string | undefined) ??
+    'https://oylkka.com'
+  );
+}
 
 export const Route = createRootRoute({
   beforeLoad: async () => {
@@ -56,7 +73,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
-      { rel: 'canonical', href: siteUrl },
+      { rel: 'canonical', href: getSiteUrl() },
       { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
     ],
   }),

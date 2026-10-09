@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, type LinkProps } from '@tanstack/react-router';
 import {
   BadgePercent,
   BarChart2,
@@ -38,8 +38,8 @@ import type { User } from './types';
 
 interface SubItem {
   title: string;
-  to: string;
-  search?: Record<string, string>;
+  to: LinkProps['to'];
+  search?: LinkProps['search'];
   roles?: UserRole[];
 }
 
@@ -73,6 +73,7 @@ export function NavMain({ user }: { user: User }) {
         { title: 'My Reviews', to: '/dashboard/reviews' },
         { title: 'Recently Viewed', to: '/recently-viewed' },
         { title: 'Wallet', to: '/dashboard/wallet' },
+        { title: 'My Vouchers', to: '/dashboard/vouchers' },
       ],
     },
     {
@@ -123,6 +124,7 @@ export function NavMain({ user }: { user: User }) {
       items: [
         { title: 'All Products', to: '/dashboard/vendor/products' },
         { title: 'Add Product', to: '/dashboard/vendor/products/add' },
+        { title: 'Questions', to: '/dashboard/vendor/questions' },
       ],
     },
     {
@@ -153,8 +155,7 @@ export function NavMain({ user }: { user: User }) {
         },
         {
           title: 'Returns',
-          to: '/dashboard/vendor/orders',
-          search: { status: 'REFUNDED' },
+          to: '/dashboard/vendor/returns',
         },
         {
           title: 'Cancelled',
@@ -253,8 +254,7 @@ export function NavMain({ user }: { user: User }) {
         },
         {
           title: 'Returns',
-          to: '/dashboard/admin/orders',
-          search: { status: 'REFUNDED' },
+          to: '/dashboard/admin/returns',
         },
         {
           title: 'Cancelled',
@@ -420,10 +420,7 @@ export function NavMain({ user }: { user: User }) {
                     {item.items.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <Link
-                            to={subItem.to as never}
-                            search={(subItem.search ?? {}) as never}
-                          >
+                          <Link to={subItem.to} search={subItem.search}>
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>

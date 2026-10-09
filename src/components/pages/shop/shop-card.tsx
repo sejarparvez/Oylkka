@@ -33,7 +33,6 @@ export function ShopCard({ shop }: ShopCardProps) {
                 width={80}
                 height={80}
                 alt={shop.name}
-                layout='fixed'
                 className='object-cover w-full h-full'
               />
             ) : (

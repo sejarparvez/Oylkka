@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ImageIcon, Layers, Tag, Upload, X } from 'lucide-react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { type Resolver, useForm } from 'react-hook-form';
 import type * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -99,7 +99,9 @@ export function CategoryForm(props: CategoryFormProps) {
     reset,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema) as never,
+    // Two schemas (create/edit) share one form; the resolver union can't be
+    // narrowed to FormValues, so assert the resolver rather than the form.
+    resolver: zodResolver(schema) as Resolver<FormValues>,
     defaultValues: (isEdit
       ? props.defaultValues
       : {
@@ -398,6 +400,10 @@ export function CategoryForm(props: CategoryFormProps) {
                       <img
                         src={imagePreview}
                         alt='Category preview'
+                        width={600}
+                        height={600}
+                        loading='lazy'
+                        decoding='async'
                         className='max-h-full max-w-full object-contain'
                       />
                     ) : (

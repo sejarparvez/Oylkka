@@ -78,8 +78,6 @@ const NavLinks = ({ links }: { links: { label: string; to: string }[] }) => (
       <li key={link.label}>
         <Link
           to={link.to}
-          params={{} as never}
-          search={{} as never}
           className='relative flex group text-sm text-muted-foreground transition-colors duration-200 hover:text-primary'
         >
           <ChevronRight className='mr-2 h-4 w-0 opacity-0 transition-all group-hover:w-4 group-hover:opacity-100' />{' '}

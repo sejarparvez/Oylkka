@@ -71,19 +71,6 @@ export function useAdminReviews(filters: ReviewFilters = {}) {
   });
 }
 
-export function useAdminReview(id: string) {
-  return useQuery<{ review: AdminReview }>({
-    queryKey: [QUERY_KEYS.ADMIN_REVIEWS, id],
-    queryFn: async () => {
-      const r = await apiClient.get<{ review: AdminReview }>(
-        `/api/admin/reviews/${id}`,
-      );
-      return r.data;
-    },
-    enabled: !!id,
-  });
-}
-
 export function useModerateReviewMutation() {
   const queryClient = useQueryClient();
 

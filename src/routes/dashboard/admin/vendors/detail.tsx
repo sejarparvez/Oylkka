@@ -95,11 +95,7 @@ function RouteComponent() {
     }
   }, [shop?.commissionRate]);
 
-  const goBack = () =>
-    navigate({
-      to: '/dashboard/admin/vendors/',
-      // biome-ignore lint/suspicious/noExplicitAny: navigate type limitations with index routes
-    } as any);
+  const goBack = () => navigate({ to: '/dashboard/admin/vendors' });
 
   if (!vendorSlug) {
     return (

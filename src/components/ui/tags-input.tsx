@@ -16,6 +16,10 @@ interface TagsInputProps extends React.HTMLAttributes<HTMLDivElement> {
   placeholder?: string;
   maxItems?: number;
   minItems?: number;
+  /** id applied to the inner text input, so an external `<label htmlFor>` works. */
+  inputId?: string;
+  /** Accessible name for the inner text input. */
+  inputAriaLabel?: string;
 }
 
 interface TagsInputContextProps {
@@ -37,6 +41,8 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
       placeholder,
       maxItems,
       minItems,
+      inputId,
+      inputAriaLabel,
       className,
       dir,
       ...props
@@ -262,8 +268,9 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
             </Badge>
           ))}
           <Input
+            id={inputId}
             tabIndex={0}
-            aria-label='input tag'
+            aria-label={inputAriaLabel ?? 'input tag'}
             disabled={disableInput}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}

@@ -6,6 +6,7 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { logError } from '@/lib/logger';
 import { requireActiveVendorShop } from '@/lib/vendor-guard';
+import { settleCodDeliveredVouchers } from '@/lib/voucher-consumption';
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   PENDING: ['PROCESSING'],
@@ -251,6 +252,12 @@ export const Route = createFileRoute('/api/vendor/orders/$orderId')({
             where: { id: body.itemId },
             data: updateData,
           });
+
+          // COD is collected at the door — settle the order's vouchers once an
+          // item is delivered instead of at checkout (MONEY-23).
+          if (body.fulfillmentStatus === 'DELIVERED') {
+            await settleCodDeliveredVouchers(orderId);
+          }
 
           // Fire-and-forget: send shipping notification email
           if (body.fulfillmentStatus === 'SHIPPED') {

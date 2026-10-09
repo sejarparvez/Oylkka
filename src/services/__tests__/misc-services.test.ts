@@ -57,18 +57,6 @@ describe('extra service API calls', () => {
       shopId: 's1',
     });
   });
-
-  it('reports a product', async () => {
-    const post = spyOn(apiClient, 'post').mockResolvedValue({ data: {} });
-    await apiClient.post('/api/product/report/create', {
-      productId: 'p1',
-      reason: 'Spam',
-    });
-    expect(post).toHaveBeenCalledWith('/api/product/report/create', {
-      productId: 'p1',
-      reason: 'Spam',
-    });
-  });
 });
 
 describe('address service API calls', () => {

@@ -57,8 +57,9 @@ src/
 ├── routes/          # TanStack Start file-based routes + API
 │   ├── api/         # Server API handlers
 │   ├── auth/        # Auth pages
-│   ├── vendor/      # Vendor dashboard
-│   └── dashboard/   # Admin dashboard
+│   └── dashboard/   # Customer dashboard
+│       ├── vendor/  # Vendor dashboard
+│       └── admin/   # Admin dashboard
 ├── schemas/         # Zod validation schemas
 ├── services/        # Business logic services
 ├── types/           # Shared TypeScript types
@@ -75,7 +76,6 @@ src/
 - **Admin panel** for managing shops, orders, payouts, and content
 - **Coupon & voucher system** with tiered discounts and BOGO
 - **Email notifications** for orders, shipping, refunds, and more
-- **Bengali language support** (partial)
 
 ## Scripts
 
@@ -88,6 +88,11 @@ src/
 | `bun run test:components` | Run component tests (jsdom) |
 | `bun run upstash:keepalive` | Write the Upstash keepalive key (CI uses this) |
 | `bun run check` | Lint and format with Biome |
+| `bun run typecheck` | Regenerate the Prisma client and typecheck with `tsc` |
+
+`src/generated` (the Prisma client) is gitignored and `tsconfig.json` excludes it from
+the root file set, so run `bun run typecheck` (or `prisma generate`) before a bare
+`tsc --noEmit` on a fresh clone.
 
 ## Rate Limiting
 

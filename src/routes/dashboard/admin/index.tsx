@@ -22,6 +22,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useAdminDashboardStats } from '@/services/admin-dashboard';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -141,7 +142,7 @@ function RouteComponent() {
 
   const formatValue = (key: string, value: number) => {
     if (key === 'revenue') {
-      return `BDT ${value.toLocaleString()}`;
+      return `৳${formatBDT(value)}`;
     }
     return value.toLocaleString();
   };
@@ -237,7 +238,7 @@ function RouteComponent() {
                     />
                     <Tooltip
                       formatter={(...args: unknown[]) => [
-                        `BDT ${Number(args[0] || 0).toLocaleString()}`,
+                        `৳${formatBDT(args[0])}`,
                         'Revenue',
                       ]}
                       labelFormatter={(label) => {
@@ -301,7 +302,7 @@ function RouteComponent() {
                         </div>
                         <div className='flex items-center gap-3 ml-3'>
                           <span className='text-sm font-bold tabular-nums'>
-                            BDT {order.total.toLocaleString()}
+                            ৳{formatBDT(order.total)}
                           </span>
                           <Badge
                             variant={badge.variant}

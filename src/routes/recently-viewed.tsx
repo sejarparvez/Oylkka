@@ -9,6 +9,7 @@ import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import apiClient from '@/lib/api-client';
+import { formatBDT } from '@/lib/currency';
 import {
   clearRecentProducts,
   getRecentProductRefs,
@@ -226,6 +227,10 @@ function RouteComponent() {
                           <img
                             src={item.image}
                             alt={item.productName}
+                            width={600}
+                            height={600}
+                            loading='lazy'
+                            decoding='async'
                             className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
                           />
                         ) : (
@@ -245,11 +250,11 @@ function RouteComponent() {
                         </h3>
                         <div className='flex items-center gap-2 mt-2'>
                           <p className='text-lg font-bold tabular-nums'>
-                            BDT {currentPrice.toLocaleString()}
+                            ৳{formatBDT(currentPrice)}
                           </p>
                           {onSale && (
                             <p className='text-xs text-muted-foreground line-through tabular-nums'>
-                              {item.price.toLocaleString()}
+                              ৳{formatBDT(item.price)}
                             </p>
                           )}
                         </div>

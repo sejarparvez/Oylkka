@@ -103,6 +103,10 @@ export function OrderItemsTable({
                 <img
                   src={item.imageUrl}
                   alt={item.productName}
+                  width={56}
+                  height={56}
+                  loading='lazy'
+                  decoding='async'
                   className='object-cover w-full h-full'
                 />
               ) : (

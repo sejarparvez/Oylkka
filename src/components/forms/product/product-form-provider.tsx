@@ -72,6 +72,7 @@ export function ProductFormProvider({
   }, [defaultValues]);
 
   const resetKey = productId ?? 'new';
+  // biome-ignore lint/correctness/useExhaustiveDependencies: resetKey is an intentional trigger so the form resets when switching products; the values themselves are read from the ref to avoid discarding edits on background refetches (FE-03).
   useEffect(() => {
     const values = defaultValuesRef.current;
     if (values && Object.keys(values).length > 0) {

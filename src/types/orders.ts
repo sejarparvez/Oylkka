@@ -24,4 +24,9 @@ export type OrderMetadata = {
   bkashPaymentID?: string;
   bkashTrxID?: string;
   bkashRefundTrxID?: string;
+  /**
+   * Set once a COD order's vouchers/cashback side-effects have been settled
+   * while marking an item delivered (MONEY-23).
+   */
+  vouchersSettledAt?: string;
 };

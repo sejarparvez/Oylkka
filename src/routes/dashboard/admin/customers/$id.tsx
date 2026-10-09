@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { formatBDT } from '@/lib/currency';
 import {
   useAdminCustomer,
   useBanCustomerMutation,
@@ -205,6 +206,10 @@ function RouteComponent() {
                   <img
                     src={customer.imageUrl}
                     alt=''
+                    width={48}
+                    height={48}
+                    loading='lazy'
+                    decoding='async'
                     className='w-12 h-12 rounded-full object-cover'
                   />
                 ) : (
@@ -271,7 +276,7 @@ function RouteComponent() {
                 <div>
                   <p className='text-xs text-muted-foreground'>Total Spent</p>
                   <p className='text-sm font-medium mt-1 tabular-nums'>
-                    BDT {totalSpent.toLocaleString()}
+                    ৳{formatBDT(totalSpent)}
                   </p>
                 </div>
               </div>
@@ -439,7 +444,7 @@ function RouteComponent() {
                         </div>
                         <div className='flex items-center gap-3'>
                           <span className='text-sm font-bold tabular-nums'>
-                            BDT {order.total.toLocaleString()}
+                            ৳{formatBDT(order.total)}
                           </span>
                           <Badge
                             variant={badge.variant}

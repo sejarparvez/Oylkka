@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Clock, Search } from 'lucide-react';
@@ -6,18 +5,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import apiClient from '@/lib/api-client';
-
-type AuditLogEntry = {
-  id: string;
-  actorId: string;
-  actorRole: string;
-  action: string;
-  entity: string;
-  entityId: string;
-  details: Record<string, unknown> | null;
-  createdAt: string;
-};
+import { useAdminAuditLogs } from '@/services/admin-audit-logs';
 
 const actionBadge = (action: string) => {
   if (action.startsWith('ORDER')) {
@@ -36,15 +24,7 @@ export const Route = createFileRoute('/dashboard/admin/staff/audit-logs')({
 function AuditLogsPage() {
   const [search, setSearch] = useState('');
 
-  const { data, isLoading } = useQuery<{ logs: AuditLogEntry[] }>({
-    queryKey: ['audit-logs'],
-    queryFn: async () => {
-      const response = await apiClient.get<{ logs: AuditLogEntry[] }>(
-        '/api/admin/audit-logs',
-      );
-      return response.data;
-    },
-  });
+  const { data, isLoading } = useAdminAuditLogs();
 
   const logs = data?.logs ?? [];
 
@@ -129,7 +109,7 @@ function AuditLogsPage() {
                         #{log.entityId.slice(0, 8)}
                       </span>
                     </div>
-                    {log.details && (
+                    {!!log.details && (
                       <p className='text-xs text-muted-foreground mt-1.5 line-clamp-1'>
                         {JSON.stringify(log.details)}
                       </p>

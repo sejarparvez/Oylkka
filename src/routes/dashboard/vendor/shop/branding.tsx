@@ -159,6 +159,10 @@ function RouteComponent() {
                   <img
                     src={logoUrl}
                     alt='Shop logo'
+                    width={400}
+                    height={400}
+                    loading='lazy'
+                    decoding='async'
                     className='max-h-full max-w-full object-contain p-4'
                   />
                 ) : (
@@ -215,6 +219,10 @@ function RouteComponent() {
                   <img
                     src={bannerUrl}
                     alt='Shop banner'
+                    width={1200}
+                    height={300}
+                    loading='lazy'
+                    decoding='async'
                     className='w-full h-full object-cover'
                   />
                 ) : (

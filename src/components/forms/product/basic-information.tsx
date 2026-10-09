@@ -219,7 +219,7 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
 
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6'>
           <Field data-invalid={!!errors.category}>
-            <FieldLabel>Category *</FieldLabel>
+            <FieldLabel htmlFor='productCategory'>Category *</FieldLabel>
             {isPending ? (
               <Skeleton className='h-8 w-full' />
             ) : isError ? (
@@ -229,7 +229,7 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
                 onValueChange={(val) => setValue('category', val)}
                 value={category}
               >
-                <SelectTrigger>
+                <SelectTrigger id='productCategory'>
                   <SelectValue placeholder='Select your product category' />
                 </SelectTrigger>
                 <SelectContent>
@@ -269,8 +269,10 @@ export function BasicInformationCard({ productId }: BasicInformationCardProps) {
         </div>
 
         <Field data-invalid={!!errors.tags}>
-          <FieldLabel>Enter your product tags.</FieldLabel>
+          <FieldLabel htmlFor='productTags'>Tags</FieldLabel>
           <TagsInput
+            inputId='productTags'
+            inputAriaLabel='Product tags'
             value={tags}
             onValueChange={(val) =>
               setValue('tags', val, { shouldValidate: true })

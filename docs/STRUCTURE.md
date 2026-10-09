@@ -135,38 +135,35 @@ oylkka/
 │   │   ├── audit-log.ts        # Audit log creation
 │   │   └── cart-cleanup.ts     # Stale cart cleanup
 │   │
+│   ├── router.tsx              # Router factory (createRouter + routeTree)
+│   │
 │   ├── routes/                 # All application routes (file-based)
 │   │   ├── __root.tsx          # Root layout — QueryClient, ThemeProvider, Toaster, devtools
 │   │   ├── routeTree.gen.ts    # Auto-generated route tree
-│   │   ├── router.tsx          # Router factory
 │   │   │
 │   │   ├── index.tsx           # /
 │   │   ├── about.tsx           # /about
-│   │   ├── bestsellers.tsx     # /bestsellers
-│   │   ├── blog.tsx            # /blog
-│   │   ├── blog.$slug.tsx      # /blog/:slug
-│   │   ├── careers.tsx         # /careers
+│   │   ├── bestsellers.tsx     # /bestsellers (built)
 │   │   ├── cart.tsx            # /cart
-│   │   ├── categories.tsx      # /categories
+│   │   ├── categories.tsx      # /categories (built)
 │   │   ├── checkout.tsx        # /checkout
 │   │   ├── checkout/confirmation.tsx  # /checkout/confirmation
 │   │   ├── compare.tsx         # /compare
 │   │   ├── contact.tsx         # /contact
 │   │   ├── deals.tsx           # /deals
 │   │   ├── faq.tsx             # /faq
-│   │   ├── help.tsx            # /help
-│   │   ├── new-arrivals.tsx    # /new-arrivals
+│   │   ├── help.tsx            # /help (built)
+│   │   ├── new-arrivals.tsx    # /new-arrivals (built)
 │   │   ├── privacy.tsx         # /privacy
 │   │   ├── product.$slug.tsx   # /product/:slug
 │   │   ├── products.tsx        # /products
-│   │   ├── reset-password.$token.tsx  # /reset-password/:token
+│   │   ├── recently-viewed.tsx # /recently-viewed
+│   │   ├── reset-password.tsx  # /reset-password (validateSearch token+email)
 │   │   ├── returns.tsx         # /returns
 │   │   ├── shipping.tsx        # /shipping
 │   │   ├── shop.$slug.tsx      # /shop/:slug
-│   │   ├── shop.recently-viewed.tsx   # /shop/recently-viewed
-│   │   ├── size-guide.tsx      # /size-guide
 │   │   ├── terms.tsx           # /terms
-│   │   ├── tracking.tsx        # /tracking
+│   │   ├── tracking.tsx        # /tracking (built)
 │   │   │
 │   │   ├── auth/               # Auth pages
 │   │   │   ├── signin.tsx
@@ -183,7 +180,8 @@ oylkka/
 │   │   │   ├── my-account.tsx
 │   │   │   ├── wallet.tsx
 │   │   │   ├── wishlist.tsx
-│   │   │   ├── orders/         # Customer order history
+│   │   │   ├── vouchers/      # My vouchers
+│   │   │   ├── orders/         # Customer order history (+ returns)
 │   │   │   ├── reviews/        # My reviews
 │   │   │   ├── messages/       # Customer conversations
 │   │   │   │
@@ -195,9 +193,11 @@ oylkka/
 │   │   │   ├── vendor/
 │   │   │   │   ├── route.tsx   # Vendor layout — role guard (<Outlet />)
 │   │   │   │   ├── products/   # Index (list), add, edit
-│   │   │   │   ├── orders/     # Vendor orders
+│   │   │   │   ├── orders/     # Vendor orders (includes cancel)
 │   │   │   │   ├── sales/      # Sales dashboard
-│   │   │   │   ├── payouts/    # Payout history
+│   │   │   │   ├── payouts/    # Payout history + schedule
+│   │   │   │   ├── questions/  # Customer questions on products
+│   │   │   │   ├── returns/    # Vendor returns queue
 │   │   │   │   ├── shipping/   # Shipping zones
 │   │   │   │   └── shop/       # Profile, branding, policies
 │   │   │   │
@@ -209,11 +209,13 @@ oylkka/
 │   │   │       ├── content/    # Content blocks
 │   │   │       ├── coupons/    # Coupon management
 │   │   │       ├── customers/  # Customer list
+│   │   │       ├── global-attributes/  # Global attribute taxonomy + product mappings
 │   │   │       ├── messages/   # Admin conversations
 │   │   │       ├── orders/     # All orders
+│   │   │       ├── returns/    # Returns queue
 │   │   │       ├── reviews/    # All reviews
 │   │   │       ├── settings/   # Admin settings
-│   │   │       ├── staff/      # Staff management
+│   │   │       ├── staff/      # Audit logs only (index redirects to audit-logs)
 │   │   │       └── vendors/    # Vendor list, approve/reject
 │   │   │
 │   │   └── api/                # Server-side API routes
@@ -252,8 +254,8 @@ oylkka/
 │   │   ├── admin-coupons.ts
 │   │   ├── admin-customers.ts
 │   │   ├── admin-dashboard.ts
+│   │   ├── admin-global-attributes.ts
 │   │   ├── admin-orders.ts
-│   │   ├── admin-reports.ts
 │   │   ├── admin-reviews.ts
 │   │   ├── admin-settings.ts
 │   │   ├── banner.ts
@@ -269,9 +271,11 @@ oylkka/
 │   │   ├── shop.ts
 │   │   ├── sku-service.ts
 │   │   ├── user-reviews.ts
+│   │   ├── user.ts
 │   │   ├── vendor-analytics.ts
 │   │   ├── vendor-orders.ts
 │   │   ├── vendor-policies.ts
+│   │   ├── vendor-questions.ts
 │   │   ├── vendor-shipping.ts
 │   │   ├── voucher.ts
 │   │   ├── wallet.ts
@@ -311,8 +315,7 @@ TanStack Router file-based routing maps `src/routes/` paths directly to URL path
 | `src/routes/__root.tsx`                          | Root layout (wraps all routes)     |
 | `src/routes/product.$slug.tsx`                   | `/product/:slug`                   |
 | `src/routes/shop.$slug.tsx`                      | `/shop/:slug`                      |
-| `src/routes/blog.$slug.tsx`                      | `/blog/:slug`                      |
-| `src/routes/reset-password.$token.tsx`           | `/reset-password/:token`           |
+| `src/routes/reset-password.tsx`                  | `/reset-password` (token+email via `validateSearch`) |
 | `src/routes/checkout/confirmation.tsx`           | `/checkout/confirmation`           |
 | `src/routes/dashboard/vendor/products/index.tsx` | `/dashboard/vendor/products/`      |
 | `src/routes/api/shop/apply.ts`                   | `/api/shop/apply` (server handler) |
@@ -478,15 +481,15 @@ export function useUpdateShopMutation() {
 
 ### Shop statuses
 
-`PENDING → APPROVED → ACTIVE` (or `REJECTED`, `SUSPENDED`)
+`PENDING → ACTIVE` (or `REJECTED`, `SUSPENDED`) — there is no `APPROVED`; an application becomes `ACTIVE` on approval.
 
 ### Order statuses
 
-`PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED` (or `CANCELLED`, `REFUNDED`)
+`PENDING → CONFIRMED → PROCESSING → SHIPPED → DELIVERED` (or `CANCELLED`, `REFUNDED`, `PARTIALLY_REFUNDED`)
 
 ### Product statuses
 
-`DRAFT → ACTIVE → ARCHIVED`
+`DRAFT → PUBLISHED → ARCHIVED` (or `REJECTED`, `OUT_OF_STOCK`)
 
 ---
 
@@ -506,22 +509,24 @@ Query keys are centralized in `src/lib/constants.ts` (~35 keys). Each domain has
 | `address.ts`          | `useAddresses`, `useCreateAddress`, `useUpdateAddress`                                         |
 | `conversations.ts`    | `useConversations`, `useCreateConversation`                                                    |
 | `wallet.ts`           | `useWallet`, `useTopUp`                                                                        |
-| `voucher.ts`          | `useVouchers`, `useCreateVoucher`                                                              |
-| `returns.ts`          | `useReturnRequests`, `useCreateReturn`                                                         |
+| `voucher.ts`          | `useMyVouchers`, `useCollectVoucher`, `useAutoApplyVouchers`, `useProductVouchers` |
+| `returns.ts`          | `useMyReturns`, `useCreateReturnMutation`, `useVendorReturns`, `useAdminReturns`  |
 | `user-reviews.ts`     | `useMyReviews`, `useCreateReview`                                                              |
 | `vendor-orders.ts`    | `useVendorOrders`, `useUpdateFulfillment`                                                      |
 | `vendor-analytics.ts` | `useVendorAnalytics`                                                                           |
 | `vendor-shipping.ts`  | `useShippingZones`, `useCreateShippingZone`                                                    |
 | `vendor-policies.ts`  | `useShopPolicies`, `useUpdatePolicy`                                                           |
+| `vendor-questions.ts` | `useVendorQuestions`, `useAnswerQuestionMutation`                                              |
+| `user.ts`             | `useUploadAvatarMutation`                                                                      |
 | `admin-dashboard.ts`  | `useAdminDashboardMetrics`                                                                     |
 | `admin-orders.ts`     | `useAdminOrders`, `useUpdateOrderStatus`                                                       |
 | `admin-customers.ts`  | `useAdminCustomers`                                                                            |
-| `admin-reviews.ts`    | `useAdminReviews`, `useModerateReview`                                                         |
+| `admin-reviews.ts`    | `useAdminReviews`, `useModerateReviewMutation`                                                 |
 | `admin-coupons.ts`    | `useAdminCoupons`, `useCreateCoupon`                                                           |
-| `admin-content.ts`    | `useContentBlocks`, `useUpdateContentBlock`                                                    |
-| `admin-settings.ts`   | `useAdminSettings`, `useUpdateAdminSettings`                                                   |
-| `admin-reports.ts`    | `useAdminReports`                                                                              |
-| `admin-audit-logs.ts` | `useAuditLogs`                                                                                 |
+| `admin-content.ts`    | `useAdminContentBlocks`, `useSaveContentBlockMutation`, `useContentBlock`                      |
+| `admin-settings.ts`   | `useAdminSettings`, `useUpdateSettingsMutation`                                                |
+| `admin-global-attributes.ts` | `useAdminGlobalAttributes`, `useProductGlobalAttributeMappings`, `useGlobalAttributeProducts`, `useMapProductAttributeMutation`, `useUnmapProductAttributeMutation` |
+| `admin-audit-logs.ts` | `useAdminAuditLogs`                                                                            |
 | `sku-service.ts`      | SKU generation/validation utilities                                                            |
 | `payouts.ts`          | `usePayouts`, `useRequestPayout`                                                               |
 | `extra.ts`            | Followed shops, static pages                                                                   |

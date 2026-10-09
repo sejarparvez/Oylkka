@@ -15,6 +15,7 @@ import {
   useRemoveFromWishlistMutation,
   useWishlist,
 } from '@/services/wishlist';
+import { CompareIconButton } from './compare-button';
 
 type ProductCardProps = {
   product: CategoryProduct;
@@ -78,6 +79,10 @@ export function ProductCard({ product }: ProductCardProps) {
             <img
               src={thumbnail}
               alt={product.productName}
+              width={600}
+              height={600}
+              loading='lazy'
+              decoding='async'
               className='object-cover w-full h-full group-hover:scale-105 transition-transform duration-500'
             />
           ) : (
@@ -169,6 +174,8 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         />
       </button>
+
+      <CompareIconButton productId={product.id} className='top-11 right-2' />
 
       <div className='px-4 pb-4 pt-2'>
         <Button

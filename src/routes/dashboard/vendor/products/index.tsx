@@ -89,12 +89,7 @@ function RouteComponent() {
         </div>
         <Button
           className='rounded-xl h-10 gap-2'
-          onClick={() =>
-            navigate({
-              to: '/dashboard/vendor/products/add',
-              // biome-ignore lint/suspicious/noExplicitAny: navigate type limitations
-            } as any)
-          }
+          onClick={() => navigate({ to: '/dashboard/vendor/products/add' })}
         >
           <Plus className='w-4 h-4' />
           Add Product
@@ -232,6 +227,10 @@ function ProductRow({
           <img
             src={product.images[0].imageUrl}
             alt={product.productName}
+            width={56}
+            height={56}
+            loading='lazy'
+            decoding='async'
             className='w-full h-full object-cover'
           />
         ) : (

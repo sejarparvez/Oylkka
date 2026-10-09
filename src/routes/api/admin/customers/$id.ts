@@ -191,34 +191,38 @@ export const Route = createFileRoute('/api/admin/customers/$id')({
               await tx.session.deleteMany({ where: { userId: params.id } });
             }
 
+            // AUTH-04: the audit row belongs in the same transaction as the
+            // mutation — the record can never disagree with what happened.
+            const ipAddress = getClientIp(headers) ?? undefined;
+
+            if (banned === true && !wasBanned) {
+              await createAuditLog({
+                actorId: session.user.id,
+                actorRole,
+                action: 'USER_BANNED',
+                entity: 'User',
+                entityId: params.id,
+                details: { reason: banReason, name: existing.name },
+                ipAddress,
+                tx,
+              });
+            }
+
+            if (roleChanged) {
+              await createAuditLog({
+                actorId: session.user.id,
+                actorRole,
+                action: 'USER_ROLE_CHANGED',
+                entity: 'User',
+                entityId: params.id,
+                details: { from: existing.role, to: role, name: existing.name },
+                ipAddress,
+                tx,
+              });
+            }
+
             return updated;
           });
-
-          const ipAddress = getClientIp(headers) ?? undefined;
-
-          if (banned === true && !wasBanned) {
-            await createAuditLog({
-              actorId: session.user.id,
-              actorRole,
-              action: 'USER_BANNED',
-              entity: 'User',
-              entityId: params.id,
-              details: { reason: banReason, name: existing.name },
-              ipAddress,
-            });
-          }
-
-          if (roleChanged) {
-            await createAuditLog({
-              actorId: session.user.id,
-              actorRole,
-              action: 'USER_ROLE_CHANGED',
-              entity: 'User',
-              entityId: params.id,
-              details: { from: existing.role, to: role, name: existing.name },
-              ipAddress,
-            });
-          }
 
           return Response.json({ customer: user });
         } catch (_error) {

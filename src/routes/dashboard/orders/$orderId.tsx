@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -315,6 +316,10 @@ function RouteComponent() {
                                 <img
                                   src={item.imageUrl}
                                   alt={item.productName}
+                                  width={64}
+                                  height={64}
+                                  loading='lazy'
+                                  decoding='async'
                                   className='object-cover w-full h-full'
                                 />
                               ) : (
@@ -695,6 +700,9 @@ function RequestReturnDialog({
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Request Return</DialogTitle>
+          <DialogDescription className='sr-only'>
+            Tell us why you are returning this order.
+          </DialogDescription>
         </DialogHeader>
         <form
           className='space-y-4'
@@ -828,6 +836,9 @@ function CancelOrderDialog({ orderId }: { orderId: string }) {
       <DialogContent className='sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Cancel Order</DialogTitle>
+          <DialogDescription className='sr-only'>
+            Confirm that you want to cancel this order.
+          </DialogDescription>
         </DialogHeader>
         <form
           className='space-y-4'

@@ -6,6 +6,7 @@ import { QueryErrorState } from '@/components/query-state';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useVendorPayouts, useVendorPendingPayout } from '@/services/payouts';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -83,7 +84,7 @@ function RouteComponent() {
               />
             ) : (
               <p className='text-2xl font-bold'>
-                BDT {pending?.totalPending?.toLocaleString() ?? '0'}
+                ৳{formatBDT(pending?.totalPending ?? 0)}
               </p>
             )}
           </CardContent>
@@ -125,7 +126,7 @@ function RouteComponent() {
               />
             ) : (
               <p className='text-2xl font-bold'>
-                BDT {pending?.totalCommission?.toLocaleString() ?? '0'}
+                ৳{formatBDT(pending?.totalCommission ?? 0)}
               </p>
             )}
           </CardContent>
@@ -179,7 +180,7 @@ function RouteComponent() {
                     </div>
                     <div className='flex items-center gap-3'>
                       <span className='text-sm font-bold tabular-nums'>
-                        BDT {p.amount.toLocaleString()}
+                        ৳{formatBDT(p.amount)}
                       </span>
                       <Badge
                         variant={

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,6 +12,7 @@ import { QueryErrorState } from '@/components/query-state';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useAddToCartMutation } from '@/services/cart';
 import {
   useRemoveFromWishlistMutation,
@@ -26,7 +27,6 @@ export const Route = createFileRoute('/dashboard/wishlist')({
 });
 
 function WishlistPage() {
-  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, refetch } = useWishlist({
     page,
@@ -121,16 +121,17 @@ function WishlistPage() {
               return (
                 <Card
                   key={item.id}
-                  className='rounded-2xl border-border shadow-none overflow-hidden group cursor-pointer'
-                  onClick={() =>
-                    navigate({ to: `/product/${item.product.slug}` } as never)
-                  }
+                  className='relative rounded-2xl border-border shadow-none overflow-hidden group cursor-pointer'
                 >
                   <div className='aspect-square bg-muted relative overflow-hidden'>
                     {item.product.images[0]?.imageUrl ? (
                       <img
                         src={item.product.images[0].imageUrl}
                         alt={item.product.productName}
+                        width={600}
+                        height={600}
+                        loading='lazy'
+                        decoding='async'
                         className='h-full w-full object-cover group-hover:scale-105 transition-transform duration-300'
                       />
                     ) : (
@@ -140,6 +141,7 @@ function WishlistPage() {
                     )}
                     <button
                       type='button'
+                      aria-label='Remove from wishlist'
                       onClick={(e) => {
                         e.stopPropagation();
                         removeMutation.mutate({
@@ -147,7 +149,7 @@ function WishlistPage() {
                           variantId: item.variantId ?? undefined,
                         });
                       }}
-                      className='absolute top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-destructive hover:text-destructive-foreground transition-colors'
+                      className='absolute z-10 top-2 right-2 w-8 h-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-destructive hover:text-destructive-foreground transition-colors'
                     >
                       <Trash2 className='w-4 h-4' />
                     </button>
@@ -163,11 +165,11 @@ function WishlistPage() {
                     )}
                     <div className='flex items-center gap-2'>
                       <span className='text-base font-bold'>
-                        ৳{currentPrice.toLocaleString('en-BD')}
+                        ৳{formatBDT(currentPrice)}
                       </span>
                       {onSale && (
                         <span className='text-xs text-muted-foreground line-through'>
-                          ৳{basePrice.toLocaleString('en-BD')}
+                          ৳{formatBDT(basePrice)}
                         </span>
                       )}
                     </div>
@@ -179,7 +181,7 @@ function WishlistPage() {
                       <Button
                         variant='outline'
                         size='sm'
-                        className='w-full gap-2'
+                        className='relative z-10 w-full gap-2'
                         disabled={addToCartMutation.isPending}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -195,6 +197,12 @@ function WishlistPage() {
                       </Button>
                     )}
                   </CardContent>
+                  <Link
+                    to='/product/$slug'
+                    params={{ slug: item.product.slug }}
+                    aria-label={`View ${item.product.productName}`}
+                    className='absolute inset-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                  />
                 </Card>
               );
             })}

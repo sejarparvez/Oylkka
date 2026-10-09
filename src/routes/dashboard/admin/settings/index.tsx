@@ -2,13 +2,15 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Loader2, Settings } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import apiClient from '@/lib/api-client';
+import {
+  useAdminSettings,
+  useUpdateSettingsMutation,
+} from '@/services/admin-settings';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -27,27 +29,22 @@ export const Route = createFileRoute('/dashboard/admin/settings/')({
 
 function RouteComponent() {
   const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  const { data, isLoading: loading } = useAdminSettings();
+  const updateMutation = useUpdateSettingsMutation();
+
+  const saving = updateMutation.isPending;
 
   useEffect(() => {
-    apiClient
-      .get<{ settings: Record<string, string> }>('/api/admin/settings/list')
-      .then((r) => setSettings(r.data.settings))
-      .catch(() => toast.error('Failed to load settings'))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await apiClient.post('/api/admin/settings/update', { settings });
-      toast.success('Settings saved');
-    } catch {
-      toast.error('Failed to save settings');
-    } finally {
-      setSaving(false);
+    if (data?.settings && !loaded) {
+      setSettings(data.settings);
+      setLoaded(true);
     }
+  }, [data, loaded]);
+
+  const handleSave = () => {
+    updateMutation.mutate({ settings });
   };
 
   const update = (key: string, value: string) => {

@@ -41,6 +41,22 @@ describe('vendor-orders service API calls', () => {
       status: 'SHIPPED',
     });
   });
+
+  it('cancels an unpaid vendor order', async () => {
+    const post = spyOn(apiClient, 'post').mockResolvedValue({
+      data: { success: true },
+    });
+
+    const response = await apiClient.post('/api/vendor/orders/cancel', {
+      orderId: 'o1',
+      reason: 'Out of stock',
+    });
+    expect(post).toHaveBeenCalledWith('/api/vendor/orders/cancel', {
+      orderId: 'o1',
+      reason: 'Out of stock',
+    });
+    expect(response.data.success).toBe(true);
+  });
 });
 
 describe('vendor-shipping service API calls', () => {
@@ -93,5 +109,33 @@ describe('vendor-analytics service API calls', () => {
     const get = spyOn(apiClient, 'get').mockResolvedValue({ data: {} });
     await apiClient.get('/api/vendor/analytics/overview');
     expect(get).toHaveBeenCalledWith('/api/vendor/analytics/overview');
+  });
+});
+
+describe('vendor-questions service API calls', () => {
+  it('lists questions for vendor products', async () => {
+    const get = spyOn(apiClient, 'get').mockResolvedValue({
+      data: { questions: [], total: 0, page: 1, limit: 50, totalPages: 0 },
+    });
+    await apiClient.get('/api/vendor/questions', {
+      params: { page: 1, limit: 50 },
+    });
+    expect(get).toHaveBeenCalledWith('/api/vendor/questions', {
+      params: { page: 1, limit: 50 },
+    });
+  });
+
+  it('answers a product question', async () => {
+    const post = spyOn(apiClient, 'post').mockResolvedValue({
+      data: { id: 'q1', answer: 'Yes', answeredAt: null },
+    });
+    await apiClient.post('/api/product/answer-question', {
+      questionId: 'q1',
+      answer: 'Yes',
+    });
+    expect(post).toHaveBeenCalledWith('/api/product/answer-question', {
+      questionId: 'q1',
+      answer: 'Yes',
+    });
   });
 });

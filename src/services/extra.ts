@@ -45,26 +45,3 @@ export function useToggleFollowMutation() {
     },
   });
 }
-
-// --- ProductReport ---
-export function useReportProductMutation() {
-  return useMutation({
-    mutationFn: async (data: {
-      productId: string;
-      reason: string;
-      details?: string;
-    }) => {
-      const r = await apiClient.post<{ report: unknown }>(
-        '/api/product/report/create',
-        data,
-      );
-      return r.data;
-    },
-    onError: (error: unknown) => {
-      const message = axios.isAxiosError(error)
-        ? (error.response?.data?.error ?? error.message)
-        : 'Failed to submit report';
-      toast.error(`Error: ${message}`);
-    },
-  });
-}

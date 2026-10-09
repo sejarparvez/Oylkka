@@ -190,6 +190,10 @@ function RouteComponent() {
                         <img
                           src={review.product.images[0].imageUrl}
                           alt=''
+                          width={64}
+                          height={64}
+                          loading='lazy'
+                          decoding='async'
                           className='w-16 h-16 rounded object-cover'
                         />
                       ) : (

@@ -252,7 +252,6 @@ function RouteComponent() {
                         className='absolute right-0 top-0 h-full px-3 hover:bg-transparent'
                         onClick={() => setShowPassword(!showPassword)}
                         disabled={isLoading}
-                        tabIndex={-1}
                       >
                         {showPassword ? (
                           <EyeOff className='h-4 w-4' />
@@ -292,7 +291,6 @@ function RouteComponent() {
                           setShowConfirmPassword(!showConfirmPassword)
                         }
                         disabled={isLoading}
-                        tabIndex={-1}
                       >
                         {showConfirmPassword ? (
                           <EyeOff className='h-4 w-4' />

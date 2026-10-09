@@ -189,7 +189,6 @@ function RouteComponent() {
                       <Link
                         to='/auth/forgot-password'
                         className='ml-auto text-sm underline-offset-2 hover:underline'
-                        tabIndex={-1}
                       >
                         Forgot Password?
                       </Link>
@@ -211,7 +210,6 @@ function RouteComponent() {
                         className='absolute right-0 top-0 h-full px-3 hover:bg-transparent'
                         onClick={() => setShowPassword(!showPassword)}
                         disabled={isLoading}
-                        tabIndex={-1}
                       >
                         {showPassword ? (
                           <EyeOff className='h-4 w-4' />

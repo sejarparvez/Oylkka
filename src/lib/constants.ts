@@ -34,9 +34,9 @@ export const QUERY_KEYS = {
   ADMIN_SETTINGS: 'admin-settings',
   PUBLIC_SETTINGS: 'public-settings',
   GLOBAL_ATTRIBUTES: 'global-attributes',
-  ADMIN_REPORTS: 'admin-reports',
   CONTENT_BLOCKS: 'content-blocks',
   ADMIN_GLOBAL_ATTRIBUTES: 'admin-global-attributes',
+  VENDOR_QUESTIONS: 'vendor-questions',
 };
 
 /** Days after delivery a customer may request a return (CUST-02). */

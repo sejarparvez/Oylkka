@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { UploadImage } from '@/cloudinary';
+import { DeleteImage, UploadImage } from '@/cloudinary';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
@@ -11,6 +11,11 @@ export const Route = createFileRoute('/api/shop/apply')({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // LIFE-11: track Cloudinary uploads so a failed shop write can clean
+        // them up instead of leaking orphaned assets.
+        let uploadedLogoPublicId: string | null = null;
+        let uploadedBannerPublicId: string | null = null;
+
         try {
           const headers = getRequestHeaders();
           const session = await auth.api.getSession({ headers });
@@ -108,12 +113,14 @@ export const Route = createFileRoute('/api/shop/apply')({
             const result = await UploadImage(logoFile, 'shops');
             logoUrl = result.secure_url;
             logoPublicId = result.public_id;
+            uploadedLogoPublicId = result.public_id;
           }
 
           if (bannerFile instanceof File && bannerFile.size > 0) {
             const result = await UploadImage(bannerFile, 'shops');
             bannerUrl = result.secure_url;
             bannerPublicId = result.public_id;
+            uploadedBannerPublicId = result.public_id;
           }
 
           const shopFields = {
@@ -162,6 +169,15 @@ export const Route = createFileRoute('/api/shop/apply')({
             { status: 200 },
           );
         } catch (error) {
+          // LIFE-11: don't leak orphaned Cloudinary assets when an upload
+          // succeeded but the shop write failed.
+          if (uploadedLogoPublicId) {
+            await DeleteImage(uploadedLogoPublicId).catch(() => {});
+          }
+          if (uploadedBannerPublicId) {
+            await DeleteImage(uploadedBannerPublicId).catch(() => {});
+          }
+
           return Response.json(
             {
               error:

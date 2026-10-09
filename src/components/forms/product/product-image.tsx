@@ -204,6 +204,10 @@ export function ProductImagesCard() {
                     <img
                       src={image.preview}
                       alt='Product preview'
+                      width={600}
+                      height={600}
+                      loading='lazy'
+                      decoding='async'
                       className='h-full w-full object-cover transition-transform group-hover:scale-105'
                     />
                     <Button

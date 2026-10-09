@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useReturnDetail } from '@/services/returns';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -196,7 +197,7 @@ function RouteComponent() {
                 <div>
                   <span className='text-muted-foreground'>Refund Amount</span>
                   <p className='font-medium mt-0.5'>
-                    BDT {ret.refundAmount.toLocaleString()}
+                    ৳{formatBDT(ret.refundAmount)}
                   </p>
                 </div>
               )}
@@ -224,6 +225,10 @@ function RouteComponent() {
                       <img
                         src={url}
                         alt='Return evidence'
+                        width={80}
+                        height={80}
+                        loading='lazy'
+                        decoding='async'
                         className='w-20 h-20 object-cover rounded-lg border'
                       />
                     </a>
@@ -263,6 +268,10 @@ function RouteComponent() {
                     <img
                       src={item.imageUrl}
                       alt={item.productName}
+                      width={48}
+                      height={48}
+                      loading='lazy'
+                      decoding='async'
                       className='w-12 h-12 object-cover rounded-md'
                     />
                   )}
@@ -271,7 +280,7 @@ function RouteComponent() {
                       {item.productName}
                     </p>
                     <p className='text-xs text-muted-foreground'>
-                      Qty: {item.quantity} &times; BDT {item.unitPrice}
+                      Qty: {item.quantity} &times; ৳{formatBDT(item.unitPrice)}
                     </p>
                   </div>
                 </div>

@@ -50,9 +50,12 @@ export default function HeroSection() {
                 {/* Background image + overlay */}
                 <div className='absolute inset-0 overflow-hidden'>
                   <Image
-                    layout='fullWidth'
                     src={slide.imageUrl || '/placeholder.svg'}
                     alt={slide.title}
+                    width={1600}
+                    height={900}
+                    loading='eager'
+                    decoding='async'
                     className='h-full w-full object-cover object-center'
                   />
                   <div
@@ -103,11 +106,7 @@ export default function HeroSection() {
                       >
                         {slide.primaryActionText && slide.primaryActionLink && (
                           <Button asChild size='lg'>
-                            <Link
-                              to={slide.primaryActionLink}
-                              params={{} as never}
-                              search={{} as never}
-                            >
+                            <Link to={slide.primaryActionLink}>
                               {slide.primaryActionText}
                             </Link>
                           </Button>
@@ -120,11 +119,7 @@ export default function HeroSection() {
                               size='lg'
                               className='border-white/20 bg-white/10 text-white hover:bg-white/20'
                             >
-                              <Link
-                                to={slide.secondaryActionLink}
-                                params={{} as never}
-                                search={{} as never}
-                              >
+                              <Link to={slide.secondaryActionLink}>
                                 {slide.secondaryActionText}
                               </Link>
                             </Button>

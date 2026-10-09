@@ -57,6 +57,10 @@ export function ShopHeader({ shop }: ShopHeaderProps) {
           <img
             src={shop.bannerUrl}
             alt={`${shop.name} banner`}
+            width={1200}
+            height={400}
+            loading='eager'
+            decoding='async'
             className='object-cover w-full h-full'
           />
         ) : (
@@ -75,7 +79,6 @@ export function ShopHeader({ shop }: ShopHeaderProps) {
               width={140}
               height={140}
               alt={shop.name}
-              layout='fixed'
               className='object-cover w-full h-full'
             />
           ) : (

@@ -1,8 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '#/lib/auth';
 import { createAuditLog } from '@/lib/audit-log';
-import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
+import {
+  requireAdmin,
+  requireAdminOrManager,
+  requireAuth,
+} from '@/lib/auth-middleware';
+import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -42,14 +46,14 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
 
       PUT: async ({ request, params }) => {
         try {
+          // AUTH-09: authenticate through requireAuth so the per-actor admin
+          // limiter applies to this mutating handler too.
           const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const session = authResult.session;
+          const roleResponse = requireAdminOrManager(session);
+          if (roleResponse) return roleResponse;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -178,12 +182,12 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
 
           await createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role as string,
             action: 'COUPON_MODIFIED',
             entity: 'Coupon',
             entityId: coupon.id,
             details: { code: coupon.code },
-            ipAddress: headers.get('x-forwarded-for') || undefined,
+            ipAddress: getClientIp(headers) ?? undefined,
           });
 
           return Response.json({ coupon });
@@ -197,11 +201,13 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
 
       DELETE: async ({ params }) => {
         try {
+          // AUTH-09: route through requireAuth so the admin limiter applies.
           const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (!session?.user || session.user.role !== 'ADMIN') {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const session = authResult.session;
+          const roleResponse = requireAdmin(session);
+          if (roleResponse) return roleResponse;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -235,12 +241,12 @@ export const Route = createFileRoute('/api/admin/coupons/$id')({
 
           await createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role as string,
             action: 'COUPON_MODIFIED',
             entity: 'Coupon',
             entityId: params.id,
             details: { code: existing.code, action: 'deleted' },
-            ipAddress: headers.get('x-forwarded-for') || undefined,
+            ipAddress: getClientIp(headers) ?? undefined,
           });
 
           return Response.json({ success: true });

@@ -1,16 +1,28 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Loader2, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useAdminGlobalAttribute,
+  useGlobalAttributeProducts,
+  useMapProductAttributeMutation,
+  useProductGlobalAttributeMappings,
+  useUnmapProductAttributeMutation,
   useUpdateGlobalAttributeMutation,
 } from '@/services/admin-global-attributes';
+import { useAllProducts } from '@/services/product';
 
 export const Route = createFileRoute('/dashboard/admin/global-attributes/$id')({
   component: RouteComponent,
@@ -272,33 +284,257 @@ function RouteComponent() {
         </TabsContent>
 
         <TabsContent value='mappings' className='mt-6'>
-          <MappingsView attributeId={id} />
+          <MappingsView
+            attributeId={id}
+            attributeName={data.attribute.name}
+            values={data.attribute.values}
+          />
         </TabsContent>
       </Tabs>
     </div>
   );
 }
 
-function MappingsView({ attributeId: _attributeId }: { attributeId: string }) {
-  // For now, show a placeholder noting where product-level mapping happens
+function MappingsView({
+  attributeId,
+  attributeName,
+  values,
+}: {
+  attributeId: string;
+  attributeName: string;
+  values: Array<{ id: string; value: string; slug: string }>;
+}) {
+  const { data, isLoading, isError, refetch } =
+    useGlobalAttributeProducts(attributeId);
+  const unmap = useUnmapProductAttributeMutation();
+
+  const [productSearch, setProductSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState<{
+    id: string;
+    productName: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(productSearch), 300);
+    return () => clearTimeout(timer);
+  }, [productSearch]);
+
+  const { data: searchData, isFetching: isSearching } = useAllProducts(
+    { search: debouncedSearch || undefined, page: 1, limit: 8 },
+    { enabled: debouncedSearch.length > 2 && !selectedProduct },
+  );
+
+  const { data: productMappings, isLoading: isLoadingProductMappings } =
+    useProductGlobalAttributeMappings(selectedProduct?.id ?? '');
+  const mapMutation = useMapProductAttributeMutation();
+
+  const mappings = data?.mappings ?? [];
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className='text-base'>Product Mappings</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className='text-sm text-muted-foreground'>
-          Product-to-global-attribute mappings are managed at the product level
-          in the product edit form. This shows a summary of all products linked
-          to this attribute.
-        </p>
-        <div className='mt-4 p-6 border border-dashed rounded-xl text-center'>
-          <p className='text-sm text-muted-foreground'>
-            Product mapping UI will be added as a section in the product edit
-            form.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className='space-y-6'>
+      <Card>
+        <CardHeader>
+          <CardTitle className='text-base'>
+            Products using {attributeName}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className='space-y-3'>
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className='h-12 w-full' />
+              ))}
+            </div>
+          ) : isError ? (
+            <div className='flex flex-col items-center gap-3 py-8 text-center'>
+              <p className='text-sm text-muted-foreground'>
+                Failed to load product mappings.
+              </p>
+              <Button variant='outline' size='sm' onClick={() => refetch()}>
+                Retry
+              </Button>
+            </div>
+          ) : mappings.length === 0 ? (
+            <p className='text-sm text-muted-foreground py-4'>
+              No products are mapped to this attribute yet.
+            </p>
+          ) : (
+            <div className='divide-y divide-border'>
+              {mappings.map((mapping) => (
+                <div
+                  key={mapping.id}
+                  className='flex items-center justify-between gap-3 py-3'
+                >
+                  <div className='min-w-0'>
+                    <p className='text-sm font-medium truncate'>
+                      {mapping.product.productName}
+                    </p>
+                    <p className='text-xs text-muted-foreground'>
+                      {mapping.localValue
+                        ? `${mapping.localValue.option.name}: ${mapping.localValue.value}`
+                        : 'Local value'}{' '}
+                      &rarr; {mapping.globalValue.value}
+                    </p>
+                  </div>
+                  <Button
+                    size='sm'
+                    variant='ghost'
+                    className='shrink-0 text-destructive'
+                    disabled={unmap.isPending}
+                    onClick={() =>
+                      unmap.mutate({
+                        productId: mapping.productId,
+                        globalAttributeId: attributeId,
+                        localValueId: mapping.localValueId,
+                      })
+                    }
+                  >
+                    <Trash2 className='w-3.5 h-3.5' />
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className='text-base'>Map a product value</CardTitle>
+        </CardHeader>
+        <CardContent className='space-y-4'>
+          {!selectedProduct ? (
+            <div className='space-y-2'>
+              <Input
+                placeholder='Search products by name...'
+                value={productSearch}
+                onChange={(e) => setProductSearch(e.target.value)}
+              />
+              {isSearching && (
+                <p className='text-xs text-muted-foreground'>Searching...</p>
+              )}
+              {searchData && searchData.products.length > 0 && (
+                <div className='divide-y divide-border rounded-lg border'>
+                  {searchData.products.map((product) => (
+                    <button
+                      key={product.id}
+                      type='button'
+                      className='w-full px-3 py-2 text-left text-sm hover:bg-accent'
+                      onClick={() =>
+                        setSelectedProduct({
+                          id: product.id,
+                          productName: product.productName,
+                        })
+                      }
+                    >
+                      {product.productName}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {debouncedSearch.length > 2 &&
+                searchData &&
+                searchData.products.length === 0 && (
+                  <p className='text-xs text-muted-foreground'>
+                    No products found.
+                  </p>
+                )}
+            </div>
+          ) : (
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <p className='text-sm font-medium'>
+                  {selectedProduct.productName}
+                </p>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={() => setSelectedProduct(null)}
+                >
+                  Change product
+                </Button>
+              </div>
+
+              {isLoadingProductMappings ? (
+                <Skeleton className='h-24 w-full' />
+              ) : !productMappings?.product ||
+                productMappings.product.attributeOptions.length === 0 ? (
+                <p className='text-sm text-muted-foreground'>
+                  This product has no local attribute values to map.
+                </p>
+              ) : (
+                <div className='space-y-5'>
+                  {productMappings.product.attributeOptions.map((option) => (
+                    <div key={option.id} className='space-y-2'>
+                      <p className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+                        {option.name}
+                      </p>
+                      {option.attributeValues.map((localValue) => {
+                        const existing = productMappings.mappings.find(
+                          (m) =>
+                            m.localValueId === localValue.id &&
+                            m.globalAttributeId === attributeId,
+                        );
+                        return (
+                          <div
+                            key={localValue.id}
+                            className='flex items-center gap-2'
+                          >
+                            <span className='flex-1 truncate text-sm'>
+                              {localValue.value}
+                            </span>
+                            <Select
+                              value={existing?.globalValueId ?? ''}
+                              onValueChange={(globalValueId) =>
+                                mapMutation.mutate({
+                                  productId: selectedProduct.id,
+                                  globalAttributeId: attributeId,
+                                  localValueId: localValue.id,
+                                  globalValueId,
+                                })
+                              }
+                            >
+                              <SelectTrigger className='h-8 w-44'>
+                                <SelectValue placeholder='— Unmapped —' />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {values.map((value) => (
+                                  <SelectItem key={value.id} value={value.id}>
+                                    {value.value}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {existing && (
+                              <Button
+                                size='icon'
+                                variant='ghost'
+                                className='h-8 w-8 shrink-0 text-destructive'
+                                disabled={unmap.isPending}
+                                onClick={() =>
+                                  unmap.mutate({
+                                    productId: selectedProduct.id,
+                                    globalAttributeId: attributeId,
+                                    localValueId: localValue.id,
+                                  })
+                                }
+                              >
+                                <Trash2 className='h-3.5 w-3.5' />
+                              </Button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

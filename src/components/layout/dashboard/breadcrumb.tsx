@@ -44,13 +44,7 @@ export default function BreadCrumb() {
                     {!isLast ? (
                       // 3. Use asChild to preserve shadcn styling while gaining router benefits
                       <BreadcrumbLink asChild>
-                        <Link
-                          to={href}
-                          params={{} as never}
-                          search={{} as never}
-                        >
-                          {label}
-                        </Link>
+                        <Link to={href}>{label}</Link>
                       </BreadcrumbLink>
                     ) : (
                       <span className='font-normal text-foreground'>

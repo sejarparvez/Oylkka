@@ -31,7 +31,7 @@ type ConfirmationOrder = {
   couponDiscount: number | string | null;
   paymentMethod: string | null;
   paymentStatus: string;
-  invoice: { pdfUrl: string | null } | null;
+  invoice: { id?: string; pdfUrl: string | null } | null;
 };
 
 function num(value: number | string | null | undefined): number {
@@ -54,7 +54,11 @@ function RouteComponent() {
     }
   }, [orderId]);
 
-  const invoiceUrl = order?.invoice?.pdfUrl ?? null;
+  // MONEY-54: never deep-link the raw Cloudinary pdfUrl — hop through the
+  // session-scoped invoice endpoint which enforces ownership.
+  const invoiceUrl = order?.invoice?.id
+    ? `/api/orders/invoice/${order.invoice.id}`
+    : null;
 
   if (error) {
     const isCancelled = error === 'payment-cancelled';

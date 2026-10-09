@@ -32,8 +32,10 @@ import {
   type Variant,
 } from '@/components/pages/product/product-variant-picker';
 import { ProductVendorCard } from '@/components/pages/product/product-vendor-card';
+import { ProductVouchers } from '@/components/pages/product/product-vouchers';
 import { ProductReviews } from '@/components/pages/product/review';
 import { StockStatus } from '@/components/pages/product/stock-status';
+import { CompareButton } from '@/components/pages/shop/compare-button';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -481,6 +483,11 @@ function RouteComponent() {
                 </Button>
               </div>
 
+              <CompareButton
+                productId={product.id}
+                className='w-full h-11 rounded-xl'
+              />
+
               {variantInactive && (
                 <p className='text-xs text-red-500'>
                   This option is currently unavailable and cannot be added to
@@ -503,6 +510,8 @@ function RouteComponent() {
                 </span>
               </div>
             </div>
+
+            <ProductVouchers productId={product.id} />
           </motion.div>
         </div>
 

@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useVendorPayoutSchedule } from '@/services/payouts';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -105,11 +106,10 @@ function RouteComponent() {
               </CardHeader>
               <CardContent>
                 <div className='text-2xl font-bold tabular-nums'>
-                  BDT {(summary?.totalPending ?? 0).toLocaleString()}
+                  ৳{formatBDT(summary?.totalPending ?? 0)}
                 </div>
                 <p className='text-xs text-muted-foreground mt-1'>
-                  Commission: BDT{' '}
-                  {(summary?.totalCommission ?? 0).toLocaleString()}
+                  Commission: ৳{formatBDT(summary?.totalCommission ?? 0)}
                 </p>
               </CardContent>
             </Card>
@@ -128,7 +128,7 @@ function RouteComponent() {
                 </div>
                 <p className='text-xs text-muted-foreground mt-1'>
                   {summary?.lastPayoutAmount
-                    ? `BDT ${summary.lastPayoutAmount.toLocaleString()}`
+                    ? `৳${formatBDT(summary.lastPayoutAmount)}`
                     : 'No payouts yet'}
                 </p>
               </CardContent>
@@ -196,11 +196,10 @@ function RouteComponent() {
                       </div>
                       <div className='text-right ml-3'>
                         <p className='text-sm font-bold tabular-nums'>
-                          BDT {entry.totalAmount.toLocaleString()}
+                          ৳{formatBDT(entry.totalAmount)}
                         </p>
                         <p className='text-xs text-muted-foreground'>
-                          Commission: BDT{' '}
-                          {entry.totalCommission.toLocaleString()}
+                          Commission: ৳{formatBDT(entry.totalCommission)}
                         </p>
                       </div>
                     </div>

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/db';
 import { enqueueInvoiceGeneration } from '@/lib/invoice-queue';
-import { logError } from '@/lib/logger';
 import { commitVariantReservation, decrementStock } from '@/lib/stock';
+import { consumeVouchers } from '@/lib/voucher-consumption';
 import type { OrderMetadata } from '@/types/orders';
 
 const AMOUNT_TOLERANCE = 0.01;
@@ -121,47 +121,12 @@ export async function finalizeBkashOrder(params: {
         where: { cart: { userId: order.customerId } },
       });
 
-      for (const v of appliedVouchers) {
-        await tx.couponUsage.create({
-          data: {
-            couponId: v.couponId,
-            userId: order.customerId,
-            orderId: order.id,
-          },
-        });
-
-        // Enforce the usage cap with a conditional write (MONEY-38).
-        // The payment is already captured here, so hitting the cap must not
-        // throw and roll back the order — under-counting a coupon is far less
-        // costly than a paid customer with a dead order.
-        if (v.maxUses > 0) {
-          const { count } = await tx.coupon.updateMany({
-            where: { id: v.couponId, usedCount: { lt: v.maxUses } },
-            data: { usedCount: { increment: 1 } },
-          });
-
-          if (count === 0) {
-            logError(
-              'coupon-cap-exceeded',
-              new Error(
-                `Coupon ${v.couponId} hit its usage cap on order ${order.id}; usage not counted`,
-              ),
-            );
-          }
-        } else {
-          await tx.coupon.update({
-            where: { id: v.couponId },
-            data: { usedCount: { increment: 1 } },
-          });
-        }
-
-        if (v.userVoucherId) {
-          await tx.userVoucher.update({
-            where: { id: v.userVoucherId },
-            data: { usedAt: new Date(), orderId: order.id },
-          });
-        }
-      }
+      await consumeVouchers({
+        tx,
+        orderId: order.id,
+        customerId: order.customerId,
+        appliedVouchers,
+      });
 
       if (cashbackAmount > 0) {
         let wallet = await tx.wallet.findUnique({

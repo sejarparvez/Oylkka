@@ -162,6 +162,10 @@ function CategoryCard({
           <img
             src={category.imageUrl}
             alt={category.name}
+            width={800}
+            height={400}
+            loading='lazy'
+            decoding='async'
             className='object-cover w-full h-full group-hover:scale-105 transition-transform duration-500'
           />
         ) : (

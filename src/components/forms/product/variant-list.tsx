@@ -540,6 +540,10 @@ export default function VariantList({
                           <img
                             src={imageSrc}
                             alt={`Variant ${variant.name}`}
+                            width={64}
+                            height={64}
+                            loading='lazy'
+                            decoding='async'
                             className='h-16 w-16 rounded-md object-cover'
                           />
                           <button

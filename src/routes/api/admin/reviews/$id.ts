@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { z } from 'zod';
 import { createAuditLog } from '@/lib/audit-log';
-import { auth } from '@/lib/auth';
 import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { getClientIp } from '@/lib/client-ip';
 import { validateCsrf } from '@/lib/csrf';
@@ -67,14 +66,14 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
 
       PUT: async ({ request, params }) => {
         try {
+          // AUTH-09: authenticate through requireAuth so the per-actor admin
+          // limiter applies to this mutating handler too.
           const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const session = authResult.session;
+          const roleResponse = requireAdminOrManager(session);
+          if (roleResponse) return roleResponse;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -123,7 +122,7 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
 
           await createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role as string,
             action: 'REVIEW_MODERATED',
             entity: 'Review',
             entityId: params.id,
@@ -142,14 +141,14 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
 
       DELETE: async ({ params }) => {
         try {
+          // AUTH-09: authenticate through requireAuth so the admin limiter
+          // applies to this mutating handler too.
           const headers = getRequestHeaders();
-          const session = await auth.api.getSession({ headers });
-          if (
-            !session?.user ||
-            (session.user.role !== 'ADMIN' && session.user.role !== 'MANAGER')
-          ) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-          }
+          const authResult = await requireAuth();
+          if (authResult.response) return authResult.response;
+          const session = authResult.session;
+          const roleResponse = requireAdminOrManager(session);
+          if (roleResponse) return roleResponse;
 
           const csrfResponse = validateCsrf();
           if (csrfResponse) return csrfResponse;
@@ -188,7 +187,7 @@ export const Route = createFileRoute('/api/admin/reviews/$id')({
 
           await createAuditLog({
             actorId: session.user.id,
-            actorRole: session.user.role,
+            actorRole: session.user.role as string,
             action: 'REVIEW_MODERATED',
             entity: 'Review',
             entityId: params.id,

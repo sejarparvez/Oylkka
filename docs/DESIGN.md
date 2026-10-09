@@ -1,6 +1,6 @@
 # Oylkka — Design System
 
-A reference document for the visual language, layout conventions, and component patterns used across the Oylkka multi-vendor e-commerce Next.js / shadcn-ui codebase.
+A reference document for the visual language, layout conventions, and component patterns used across the Oylkka multi-vendor e-commerce TanStack Start / shadcn-ui codebase.
 
 ---
 

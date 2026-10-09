@@ -289,6 +289,10 @@ function ShopIdentityCard({
               <img
                 src={shop.bannerUrl}
                 alt='Shop banner'
+                width={1600}
+                height={600}
+                loading='lazy'
+                decoding='async'
                 className='w-full h-full object-cover'
               />
               <div className='absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent' />
@@ -312,6 +316,10 @@ function ShopIdentityCard({
                 <img
                   src={shop.logoUrl}
                   alt={shop.name}
+                  width={112}
+                  height={112}
+                  loading='lazy'
+                  decoding='async'
                   className='w-full h-full object-cover'
                 />
               ) : (
@@ -603,6 +611,10 @@ function ProductCard({ product }: { product: VendorProduct }) {
           <img
             src={product.images[0].imageUrl}
             alt={product.productName}
+            width={600}
+            height={600}
+            loading='lazy'
+            decoding='async'
             className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
           />
         ) : (

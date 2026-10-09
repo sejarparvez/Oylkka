@@ -642,6 +642,10 @@ export function BannerForm(props: BannerFormProps) {
                       <img
                         src={imagePreview}
                         alt='Banner preview'
+                        width={800}
+                        height={400}
+                        loading='lazy'
+                        decoding='async'
                         className='max-h-full max-w-full object-contain'
                       />
                     ) : (

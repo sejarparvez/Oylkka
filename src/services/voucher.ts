@@ -7,21 +7,18 @@ import { QUERY_KEYS } from '@/lib/constants';
 export type VoucherCoupon = {
   id: string;
   code: string;
-  title: string;
   description: string | null;
-  discountType: 'PERCENTAGE' | 'FIXED' | 'CASHBACK';
-  discountValue: number;
+  type: 'PERCENTAGE' | 'FIXED' | 'CASHBACK';
+  value: number;
+  maxDiscount: number | null;
   minOrderAmount: number | null;
   minQuantity: number | null;
-  maxUses: number | null;
-  claimedCount: number;
-  maxClaimCount: number;
-  expiresAt: string | null;
+  freeShipping: boolean;
+  shippingDiscount: number;
   scope: string;
   scopeId: string | null;
   autoApply: boolean;
-  freeShipping: boolean;
-  shippingDiscount: number;
+  expiresAt: string | null;
 };
 
 export type UserVoucher = {
@@ -32,12 +29,25 @@ export type UserVoucher = {
   coupon: VoucherCoupon;
 };
 
+export type AutoApplyVoucher = Omit<
+  VoucherCoupon,
+  'autoApply' | 'expiresAt'
+> & {
+  isCollected: boolean;
+};
+
+export type ProductVoucher = Omit<VoucherCoupon, 'autoApply' | 'expiresAt'> & {
+  isCollected: boolean;
+};
+
 export function useMyVouchers() {
   return useQuery<UserVoucher[]>({
     queryKey: [QUERY_KEYS.VOUCHERS, 'my'],
     queryFn: async () => {
-      const response = await apiClient.get<UserVoucher[]>('/api/vouchers/my');
-      return response.data;
+      const response = await apiClient.get<{ vouchers: UserVoucher[] }>(
+        '/api/vouchers/my',
+      );
+      return response.data.vouchers;
     },
   });
 }
@@ -45,11 +55,12 @@ export function useMyVouchers() {
 export function useCollectVoucher() {
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, string>({
+  return useMutation<{ success: true; voucher: UserVoucher }, Error, string>({
     mutationFn: async (couponId) => {
-      const response = await apiClient.post('/api/vouchers/collect', {
-        couponId,
-      });
+      const response = await apiClient.post<{
+        success: true;
+        voucher: UserVoucher;
+      }>('/api/vouchers/collect', { couponId });
       return response.data;
     },
     onSuccess: () => {
@@ -68,23 +79,26 @@ export function useCollectVoucher() {
 }
 
 export function useAutoApplyVouchers() {
-  return useQuery({
+  return useQuery<AutoApplyVoucher[]>({
     queryKey: [QUERY_KEYS.VOUCHERS, 'auto-apply'],
     queryFn: async () => {
-      const response = await apiClient.get('/api/vouchers/auto-apply');
-      return response.data;
+      const response = await apiClient.get<{ vouchers: AutoApplyVoucher[] }>(
+        '/api/vouchers/auto-apply',
+      );
+      return response.data.vouchers;
     },
   });
 }
 
 export function useProductVouchers(productId: string) {
-  return useQuery({
+  return useQuery<ProductVoucher[]>({
     queryKey: [QUERY_KEYS.VOUCHERS, 'product', productId],
     queryFn: async () => {
-      const response = await apiClient.post('/api/vouchers/product-vouchers', {
-        productId,
-      });
-      return response.data;
+      const response = await apiClient.post<{ vouchers: ProductVoucher[] }>(
+        '/api/vouchers/product-vouchers',
+        { productId },
+      );
+      return response.data.vouchers;
     },
     enabled: !!productId,
   });

@@ -93,8 +93,8 @@ function RouteComponent() {
       id: v.coupon.id,
       code: v.coupon.code,
       description: v.coupon.description,
-      type: v.coupon.discountType,
-      value: v.coupon.discountValue,
+      type: v.coupon.type,
+      value: v.coupon.value,
       freeShipping: v.coupon.freeShipping,
       shippingDiscount: v.coupon.shippingDiscount,
     },
@@ -440,6 +440,10 @@ function RouteComponent() {
                                   <img
                                     src={imageUrl}
                                     alt={item.product.productName}
+                                    width={56}
+                                    height={56}
+                                    loading='lazy'
+                                    decoding='async'
                                     className='h-full w-full object-cover'
                                   />
                                 ) : (

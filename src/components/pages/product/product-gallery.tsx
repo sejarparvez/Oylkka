@@ -99,7 +99,6 @@ export function ProductGallery({
           width={800}
           height={800}
           alt={img.altText ?? productName}
-          layout='constrained'
           className='object-cover w-full h-full transition-opacity duration-300'
         />
 
@@ -152,7 +151,6 @@ export function ProductGallery({
                   width={120}
                   height={120}
                   alt={img.altText ?? `${productName} thumbnail ${i + 1}`}
-                  layout='fixed'
                   className='object-cover w-full h-full'
                 />
               </button>
@@ -219,7 +217,6 @@ export function ProductGallery({
                 width={1200}
                 height={1200}
                 alt={activeImage.altText ?? productName}
-                layout='constrained'
                 className='object-contain w-full h-full rounded-2xl'
               />
             </motion.div>

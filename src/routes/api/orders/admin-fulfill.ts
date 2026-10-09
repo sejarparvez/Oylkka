@@ -5,6 +5,7 @@ import { requireAdminOrManager, requireAuth } from '@/lib/auth-middleware';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 import { incrementStock, incrementVariantStock } from '@/lib/stock';
+import { settleCodDeliveredVouchers } from '@/lib/voucher-consumption';
 
 const FULFILLMENT_TRANSITIONS: Record<string, string[]> = {
   PENDING: ['PROCESSING', 'CANCELLED'],
@@ -120,6 +121,12 @@ export const Route = createFileRoute('/api/orders/admin-fulfill')({
 
             return result;
           });
+
+          // COD is collected at the door — settle the order's vouchers once an
+          // item is delivered instead of at checkout (MONEY-23).
+          if (body.fulfillmentStatus === 'DELIVERED') {
+            await settleCodDeliveredVouchers(body.orderId);
+          }
 
           // Fire-and-forget: send shipping notification email after successful update
           if (body.fulfillmentStatus === 'SHIPPED') {

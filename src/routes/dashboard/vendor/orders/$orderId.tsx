@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { format } from 'date-fns';
-import { ChevronLeft, ExternalLink, Package, Truck } from 'lucide-react';
+import { Ban, ChevronLeft, ExternalLink, Package, Truck } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Tooltip,
   TooltipContent,
@@ -22,6 +23,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
+  useCancelVendorOrderMutation,
   useFulfillItemMutation,
   useVendorOrderDetail,
 } from '@/services/vendor-orders';
@@ -138,9 +140,12 @@ function RouteComponent() {
   const { orderId } = Route.useParams();
   const { data: order, isLoading } = useVendorOrderDetail(orderId);
   const fulfillMutation = useFulfillItemMutation(orderId);
+  const cancelMutation = useCancelVendorOrderMutation();
 
   const [trackingItemId, setTrackingItemId] = useState<string | null>(null);
   const [confirmItemId, setConfirmItemId] = useState<string | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
 
   if (isLoading) {
     return (
@@ -181,6 +186,15 @@ function RouteComponent() {
     variant: 'outline' as const,
     label: order.paymentStatus,
   };
+
+  // The cancel endpoint refuses paid or terminal orders, so only offer the
+  // action where it can actually succeed.
+  const canCancel =
+    !['PAID', 'PARTIALLY_REFUNDED', 'REFUNDED'].includes(order.paymentStatus) &&
+    !['CANCELLED', 'REFUNDED', 'DELIVERED', 'CONFIRMED'].includes(
+      order.orderStatus,
+    ) &&
+    order.items.some((i) => i.fulfillmentStatus !== 'CANCELLED');
 
   const handleFulfill = (
     itemId: string,
@@ -236,6 +250,20 @@ function RouteComponent() {
           >
             {sLabel}
           </Badge>
+          {canCancel && (
+            <Button
+              size='sm'
+              variant='outline'
+              className='gap-1.5 text-destructive'
+              onClick={() => {
+                setCancelReason('');
+                setCancelOpen(true);
+              }}
+            >
+              <Ban className='w-3.5 h-3.5' />
+              Cancel Order
+            </Button>
+          )}
         </div>
       </div>
 
@@ -292,6 +320,10 @@ function RouteComponent() {
                     <img
                       src={item.imageUrl}
                       alt={item.productName}
+                      width={56}
+                      height={56}
+                      loading='lazy'
+                      decoding='async'
                       className='object-cover w-full h-full'
                     />
                   ) : (
@@ -484,6 +516,45 @@ function RouteComponent() {
               disabled={fulfillMutation.isPending}
             >
               {fulfillMutation.isPending ? 'Updating...' : 'Confirm'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel order dialog */}
+      <Dialog
+        open={cancelOpen}
+        onOpenChange={(o) => !o && setCancelOpen(false)}
+      >
+        <DialogContent className='sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Cancel order</DialogTitle>
+            <DialogDescription>
+              This cancels the lines from your shop, restores their stock, and
+              emails the customer. Paid orders must be cancelled by an admin.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            placeholder='Reason for cancellation'
+            rows={4}
+          />
+          <DialogFooter className='gap-2'>
+            <Button variant='outline' onClick={() => setCancelOpen(false)}>
+              Keep Order
+            </Button>
+            <Button
+              variant='destructive'
+              disabled={!cancelReason.trim() || cancelMutation.isPending}
+              onClick={() => {
+                cancelMutation.mutate(
+                  { orderId, reason: cancelReason.trim() },
+                  { onSuccess: () => setCancelOpen(false) },
+                );
+              }}
+            >
+              {cancelMutation.isPending ? 'Cancelling...' : 'Cancel Order'}
             </Button>
           </DialogFooter>
         </DialogContent>

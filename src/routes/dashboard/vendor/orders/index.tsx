@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Eye, Package, Search } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -90,7 +90,10 @@ function RouteComponent() {
   };
 
   const viewOrder = (orderId: string) => {
-    navigate({ to: `/dashboard/vendor/orders/${orderId}` } as never);
+    navigate({
+      to: '/dashboard/vendor/orders/$orderId',
+      params: { orderId },
+    });
   };
 
   return (
@@ -173,14 +176,9 @@ function RouteComponent() {
             } = statusBadge(item.fulfillmentStatus);
 
             return (
-              // biome-ignore lint/a11y/noStaticElementInteractions: this is fine
               <div
                 key={item.id}
-                className='rounded-2xl border border-border bg-card p-4 flex items-center gap-4 hover:border-primary/30 transition-colors duration-200 cursor-pointer'
-                onClick={() => viewOrder(item.orderId)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') viewOrder(item.orderId);
-                }}
+                className='relative rounded-2xl border border-border bg-card p-4 flex items-center gap-4 hover:border-primary/30 transition-colors duration-200 cursor-pointer'
               >
                 <div className='flex items-start gap-4 flex-1 min-w-0'>
                   <div className='relative w-14 h-14 rounded-xl overflow-hidden bg-muted shrink-0'>
@@ -188,6 +186,10 @@ function RouteComponent() {
                       <img
                         src={item.imageUrl}
                         alt={item.productName}
+                        width={56}
+                        height={56}
+                        loading='lazy'
+                        decoding='async'
                         className='object-cover w-full h-full'
                       />
                     ) : (
@@ -235,7 +237,7 @@ function RouteComponent() {
                 <Button
                   variant='ghost'
                   size='icon'
-                  className='w-8 h-8 rounded-lg shrink-0'
+                  className='relative z-10 w-8 h-8 rounded-lg shrink-0'
                   onClick={(e) => {
                     e.stopPropagation();
                     viewOrder(item.orderId);
@@ -243,6 +245,12 @@ function RouteComponent() {
                 >
                   <Eye className='w-3.5 h-3.5' />
                 </Button>
+                <Link
+                  to='/dashboard/vendor/orders/$orderId'
+                  params={{ orderId: item.orderId }}
+                  aria-label={`View order ${item.orderNumber}`}
+                  className='absolute inset-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                />
               </div>
             );
           })}

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Eye, Package, Search } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -122,7 +122,7 @@ function RouteComponent() {
   };
 
   const viewOrder = (orderId: string) => {
-    navigate({ to: `/dashboard/orders/${orderId}` } as never);
+    navigate({ to: '/dashboard/orders/$orderId', params: { orderId } });
   };
 
   return (
@@ -213,14 +213,9 @@ function RouteComponent() {
             } = paymentStatusBadge(order.paymentStatus);
 
             return (
-              // biome-ignore lint/a11y/noStaticElementInteractions: this is fine
               <div
                 key={order.id}
-                className='rounded-2xl border border-border bg-card p-4 flex items-center gap-4 hover:border-primary/30 transition-colors duration-200 cursor-pointer'
-                onClick={() => viewOrder(order.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') viewOrder(order.id);
-                }}
+                className='relative rounded-2xl border border-border bg-card p-4 flex items-center gap-4 hover:border-primary/30 transition-colors duration-200 cursor-pointer'
               >
                 <div className='flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-3 items-center'>
                   <div className='min-w-0'>
@@ -259,7 +254,7 @@ function RouteComponent() {
                 <Button
                   variant='ghost'
                   size='icon'
-                  className='w-8 h-8 rounded-lg shrink-0'
+                  className='relative z-10 w-8 h-8 rounded-lg shrink-0'
                   onClick={(e) => {
                     e.stopPropagation();
                     viewOrder(order.id);
@@ -267,6 +262,12 @@ function RouteComponent() {
                 >
                   <Eye className='w-3.5 h-3.5' />
                 </Button>
+                <Link
+                  to='/dashboard/orders/$orderId'
+                  params={{ orderId: order.id }}
+                  aria-label={`View order ${order.orderNumber}`}
+                  className='absolute inset-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+                />
               </div>
             );
           })}

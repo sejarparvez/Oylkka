@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -150,6 +151,9 @@ export function ReviewForm({
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>Write a Review</DialogTitle>
+          <DialogDescription className='sr-only'>
+            Share your experience with this product.
+          </DialogDescription>
         </DialogHeader>
 
         <form
@@ -231,7 +235,6 @@ export function ReviewForm({
                     width={80}
                     height={80}
                     alt='Preview'
-                    layout='fixed'
                     className='object-cover w-full h-full'
                   />
                   <button

@@ -63,14 +63,14 @@ export function ProductDimensions() {
             </Field>
           </div>
           <Field>
-            <FieldLabel>Unit</FieldLabel>
+            <FieldLabel htmlFor='weightUnit'>Unit</FieldLabel>
             <Select
               onValueChange={(val) =>
                 setValue('weightUnit', val as 'kg' | 'g' | 'lb' | 'oz')
               }
               value={weightUnit}
             >
-              <SelectTrigger>
+              <SelectTrigger id='weightUnit'>
                 <SelectValue placeholder='Unit' />
               </SelectTrigger>
               <SelectContent>
@@ -93,7 +93,7 @@ export function ProductDimensions() {
                 }
                 value={dimUnit}
               >
-                <SelectTrigger className='w-20'>
+                <SelectTrigger className='w-20' aria-label='Dimension unit'>
                   <SelectValue placeholder='Unit' />
                 </SelectTrigger>
                 <SelectContent>
@@ -107,8 +107,9 @@ export function ProductDimensions() {
 
           <div className='grid grid-cols-3 gap-4'>
             <Field data-invalid={!!errors.dimensions?.length}>
-              <FieldLabel>Length</FieldLabel>
+              <FieldLabel htmlFor='dimensionLength'>Length</FieldLabel>
               <Input
+                id='dimensionLength'
                 type='number'
                 placeholder='Length'
                 step='0.1'
@@ -125,8 +126,9 @@ export function ProductDimensions() {
               )}
             </Field>
             <Field data-invalid={!!errors.dimensions?.width}>
-              <FieldLabel>Width</FieldLabel>
+              <FieldLabel htmlFor='dimensionWidth'>Width</FieldLabel>
               <Input
+                id='dimensionWidth'
                 type='number'
                 placeholder='Width'
                 step='0.1'
@@ -142,8 +144,9 @@ export function ProductDimensions() {
               )}
             </Field>
             <Field data-invalid={!!errors.dimensions?.height}>
-              <FieldLabel>Height</FieldLabel>
+              <FieldLabel htmlFor='dimensionHeight'>Height</FieldLabel>
               <Input
+                id='dimensionHeight'
                 type='number'
                 placeholder='Height'
                 step='0.1'

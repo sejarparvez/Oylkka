@@ -54,8 +54,6 @@ function NavLink({
   return (
     <Link
       to={to}
-      params={{} as never}
-      search={{} as never}
       onClick={onClick}
       className='group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:translate-x-0.5 hover:bg-primary/5 hover:text-primary'
     >
@@ -80,7 +78,7 @@ function SubLink({
   return (
     <Link
       to={to}
-      params={params as never}
+      params={params}
       onClick={onClick}
       className='block rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:text-primary'
     >
