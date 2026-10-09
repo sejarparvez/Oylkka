@@ -25,7 +25,11 @@ export async function checkRateLimit(
   const clientIp = getClientIp(headers);
 
   // Namespaced so an explicit identifier can never collide with an IP bucket.
-  const key = identifier ? `id:${identifier}` : clientIp ? `ip:${clientIp}` : null;
+  const key = identifier
+    ? `id:${identifier}`
+    : clientIp
+      ? `ip:${clientIp}`
+      : null;
 
   if (!key) {
     // No trustworthy client identity. Bucketing these together under a single

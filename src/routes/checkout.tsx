@@ -205,7 +205,8 @@ function RouteComponent() {
     enabled: !!cart,
   });
 
-  const isEmptyCart = !isLoading && !isError && !!cart && cart.items.length === 0;
+  const isEmptyCart =
+    !isLoading && !isError && !!cart && cart.items.length === 0;
   useEffect(() => {
     if (isEmptyCart) navigate({ to: '/cart', replace: true });
   }, [isEmptyCart, navigate]);

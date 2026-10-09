@@ -52,7 +52,10 @@ export async function processEmailQueue(): Promise<void> {
   try {
     // Recover jobs abandoned by a crashed worker.
     await prisma.emailQueue.updateMany({
-      where: { status: 'PROCESSING', startedAt: { lt: new Date(Date.now() - CLAIM_TIMEOUT_MS) } },
+      where: {
+        status: 'PROCESSING',
+        startedAt: { lt: new Date(Date.now() - CLAIM_TIMEOUT_MS) },
+      },
       data: { status: 'PENDING', startedAt: null },
     });
 

@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/db';
 import { BD_DISTRICTS } from '@/lib/bd-districts';
+import { prisma } from '@/lib/db';
 
 const VALID_DISTRICTS = new Set(BD_DISTRICTS);
 
@@ -22,11 +22,7 @@ export function normalizeZoneDistricts(districts: unknown): string[] | null {
 }
 
 export function isFiniteNonNegative(value: unknown): boolean {
-  return (
-    typeof value === 'number' &&
-    Number.isFinite(value) &&
-    value >= 0
-  );
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0;
 }
 
 export async function findOverlappingZone(

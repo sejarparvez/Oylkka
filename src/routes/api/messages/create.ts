@@ -2,9 +2,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
+import { prisma } from '@/lib/db';
 import { logError } from '@/lib/logger';
 import { uploadMessageImage } from '@/lib/message-upload';
-import { prisma } from '@/lib/db';
 import { messageLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
 

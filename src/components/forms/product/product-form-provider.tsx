@@ -85,8 +85,9 @@ export function ProductFormProvider({
 
   const { mutate: createMutate, isPending: createIsPending } =
     useCreateProduct();
-  const { mutate: updateMutate, isPending: updateIsPending } =
-    useUpdateProduct({ productId: productId || '' });
+  const { mutate: updateMutate, isPending: updateIsPending } = useUpdateProduct(
+    { productId: productId || '' },
+  );
 
   let mutate = createMutate;
   let isPending = createIsPending;

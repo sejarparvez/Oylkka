@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { prisma } from '@/lib/db';
 import { BD_DISTRICTS } from '@/lib/bd-districts';
+import { prisma } from '@/lib/db';
 
 const DISTRICTS = new Set(BD_DISTRICTS);
 
@@ -17,7 +17,11 @@ export const AddressFormSchema = z.object({
   district: z.string().refine((v) => DISTRICTS.has(v), {
     message: 'Select a valid Bangladesh district',
   }),
-  postalCode: z.string().regex(/^\d{4}$/).nullable().optional(),
+  postalCode: z
+    .string()
+    .regex(/^\d{4}$/)
+    .nullable()
+    .optional(),
   isDefault: z.boolean().optional(),
 });
 

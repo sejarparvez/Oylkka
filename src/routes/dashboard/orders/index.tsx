@@ -98,10 +98,12 @@ function RouteComponent() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const { data: orders, isLoading, isError, refetch } = useMyOrders(
-    status || undefined,
-    debouncedSearch || undefined,
-  );
+  const {
+    data: orders,
+    isLoading,
+    isError,
+    refetch,
+  } = useMyOrders(status || undefined, debouncedSearch || undefined);
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

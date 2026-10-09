@@ -11,7 +11,7 @@ const UpdateReviewSchema = z
     title: z.string().max(120).trim().min(1).optional(),
     content: z.string().max(3000).trim().min(1).optional(),
   })
-  .strip()
+  .strip();
 
 export const Route = createFileRoute('/api/reviews/my/$id')({
   server: {

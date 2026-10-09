@@ -68,10 +68,12 @@ function RouteComponent() {
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { data: items, isLoading, isError, refetch } = useVendorOrders(
-    status || undefined,
-    debouncedSearch || undefined,
-  );
+  const {
+    data: items,
+    isLoading,
+    isError,
+    refetch,
+  } = useVendorOrders(status || undefined, debouncedSearch || undefined);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);

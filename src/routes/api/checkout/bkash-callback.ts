@@ -7,7 +7,7 @@ import { finalizeBkashOrder } from '@/lib/bkash-finalize';
 import { prisma } from '@/lib/db';
 import { checkoutLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
-import { releaseReservedStock, incrementStock } from '@/lib/stock';
+import { incrementStock, releaseReservedStock } from '@/lib/stock';
 import type { OrderMetadata } from '@/types/orders';
 
 export const Route = createFileRoute('/api/checkout/bkash-callback')({

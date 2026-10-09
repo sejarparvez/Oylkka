@@ -320,7 +320,9 @@ function RouteComponent() {
               </div>
               <div className='flex justify-end gap-2 pt-2'>
                 <DialogClose asChild>
-                  <Button type='button' variant='outline'>Cancel</Button>
+                  <Button type='button' variant='outline'>
+                    Cancel
+                  </Button>
                 </DialogClose>
                 <Button type='submit' disabled={isPending}>
                   {isPending && (

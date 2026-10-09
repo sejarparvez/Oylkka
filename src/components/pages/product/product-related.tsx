@@ -18,9 +18,12 @@ export function ProductRelated({
   categorySlug,
   currentProductId,
 }: ProductRelatedProps) {
-  const { data: products, isLoading, isError, refetch } = useCategoryProducts(
-    categorySlug,
-  );
+  const {
+    data: products,
+    isLoading,
+    isError,
+    refetch,
+  } = useCategoryProducts(categorySlug);
 
   const related = (products ?? [])
     .filter((p) => p.id !== currentProductId)

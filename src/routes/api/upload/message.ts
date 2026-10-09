@@ -2,9 +2,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
+import { uploadMessageImage } from '@/lib/message-upload';
 import { generalLimiter } from '@/lib/rate-limit';
 import { checkRateLimit } from '@/lib/rate-limit-guard';
-import { uploadMessageImage } from '@/lib/message-upload';
 
 export const Route = createFileRoute('/api/upload/message')({
   server: {

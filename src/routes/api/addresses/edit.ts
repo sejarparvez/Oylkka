@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
+import {
+  AddressFormSchema,
+  promoteDefaultAddress,
+} from '@/lib/address-validation';
 import { auth } from '@/lib/auth';
-import { AddressFormSchema, promoteDefaultAddress } from '@/lib/address-validation';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -44,7 +47,10 @@ export const Route = createFileRoute('/api/addresses/edit')({
           const clean = Object.fromEntries(
             Object.entries(rest).filter(([, value]) => value !== undefined),
           );
-          if ('postalCode' in clean && (clean.postalCode === '' || clean.postalCode === null)) {
+          if (
+            'postalCode' in clean &&
+            (clean.postalCode === '' || clean.postalCode === null)
+          ) {
             clean.postalCode = null;
           }
           for (const [key, value] of Object.entries(clean)) {

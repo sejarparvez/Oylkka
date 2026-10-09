@@ -107,8 +107,7 @@ export const Route = createFileRoute('/api/vendor/shipping/create')({
               name: name.trim(),
               baseCost,
               perItem: isFiniteNonNegative(perItem) ? perItem : 0,
-              freeAbove:
-                typeof freeAbove === 'number' ? freeAbove : null,
+              freeAbove: typeof freeAbove === 'number' ? freeAbove : null,
               estDays: typeof estDays === 'string' ? estDays : null,
               districts: {
                 create: normalizedDistricts.map((district) => ({

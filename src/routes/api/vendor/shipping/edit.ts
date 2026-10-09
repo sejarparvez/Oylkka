@@ -94,7 +94,10 @@ export const Route = createFileRoute('/api/vendor/shipping/edit')({
             }
           }
 
-          if (name !== undefined && (typeof name !== 'string' || name.trim().length === 0)) {
+          if (
+            name !== undefined &&
+            (typeof name !== 'string' || name.trim().length === 0)
+          ) {
             return Response.json(
               { error: 'Name must be a non-empty string' },
               { status: 400 },
@@ -133,7 +136,9 @@ export const Route = createFileRoute('/api/vendor/shipping/edit')({
               ...(typeof name === 'string' && { name: name.trim() }),
               ...(baseCost !== undefined && { baseCost }),
               ...(perItem !== undefined && { perItem }),
-              ...(freeAbove !== undefined && { freeAbove: freeAbove === '' ? null : freeAbove }),
+              ...(freeAbove !== undefined && {
+                freeAbove: freeAbove === '' ? null : freeAbove,
+              }),
               ...(typeof estDays === 'string' && { estDays }),
               ...(estDays === null && { estDays: null }),
               ...(typeof isActive === 'boolean' && { isActive }),

@@ -83,7 +83,8 @@ function RootComponent() {
         });
     };
     window.addEventListener('auth:unauthorized', onUnauthorized);
-    return () => window.removeEventListener('auth:unauthorized', onUnauthorized);
+    return () =>
+      window.removeEventListener('auth:unauthorized', onUnauthorized);
   }, [queryClient, router]);
 
   return (

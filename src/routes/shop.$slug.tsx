@@ -114,8 +114,7 @@ function RouteComponent() {
     });
   }, [productPage, fetchedProducts]);
 
-  const allProducts =
-    seededSlug === slug ? accumulated : initialProducts;
+  const allProducts = seededSlug === slug ? accumulated : initialProducts;
 
   const categories = useMemo(() => {
     const cats = new Map<string, string>();

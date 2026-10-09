@@ -41,5 +41,9 @@ export const QUERY_KEYS = {
 export const RETURN_WINDOW_DAYS = 30;
 
 export const PRODUCT_IMAGE_MAX_BYTES = 500 * 1024;
-export const PRODUCT_IMAGE_ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+export const PRODUCT_IMAGE_ACCEPTED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+] as const;
 export const PRODUCT_IMAGE_ACCEPT = PRODUCT_IMAGE_ACCEPTED_TYPES.join(',');

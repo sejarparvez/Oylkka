@@ -94,10 +94,12 @@ function RouteComponent() {
   const [suspendId, setSuspendId] = useState<string | null>(null);
   const [suspendReason, setSuspendReason] = useState('');
 
-  const { data: shops, isLoading, isError, refetch } = useAdminShops(
-    status,
-    debouncedSearch || undefined,
-  );
+  const {
+    data: shops,
+    isLoading,
+    isError,
+    refetch,
+  } = useAdminShops(status, debouncedSearch || undefined);
   const { mutate: approveShop, isPending: isApproving } =
     useApproveShopMutation();
   const { mutate: rejectShop, isPending: isRejecting } =

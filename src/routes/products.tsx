@@ -99,7 +99,12 @@ function RouteComponent() {
 
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { data: listData, isLoading, isError, refetch } = useAllProducts({
+  const {
+    data: listData,
+    isLoading,
+    isError,
+    refetch,
+  } = useAllProducts({
     sort,
     page,
     limit: ITEMS_PER_PAGE,

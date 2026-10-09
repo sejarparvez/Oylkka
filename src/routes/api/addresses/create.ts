@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import { auth } from '@/lib/auth';
 import { AddressFormSchema } from '@/lib/address-validation';
+import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
@@ -26,8 +26,16 @@ export const Route = createFileRoute('/api/addresses/create')({
               { status: 400 },
             );
           }
-          const { label, name, phone, address, upzila, district, postalCode, isDefault } =
-            parsed.data;
+          const {
+            label,
+            name,
+            phone,
+            address,
+            upzila,
+            district,
+            postalCode,
+            isDefault,
+          } = parsed.data;
 
           const existingCount = await prisma.userAddress.count({
             where: { userId: session.user.id },

@@ -28,8 +28,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const removeFromWishlist = useRemoveFromWishlistMutation();
 
   const isWishlisted =
-    wishlistData?.items.some((item) => item.productId === product.id) ??
-    false;
+    wishlistData?.items.some((item) => item.productId === product.id) ?? false;
 
   const discountPct = product.discountPrice
     ? Math.round(

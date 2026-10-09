@@ -12,8 +12,7 @@ export const Route = createFileRoute('/api/wallet/bkash-callback')({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const baseUrl =
-          process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+        const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
         const walletUrl = `${baseUrl}/dashboard/wallet`;
 
         try {

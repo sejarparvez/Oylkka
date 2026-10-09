@@ -15,8 +15,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { usePublicCategories } from '@/services/category';
 
 export default function CategoryCarousel() {
-  const { data: categories, isLoading, isError, refetch } =
-    usePublicCategories();
+  const {
+    data: categories,
+    isLoading,
+    isError,
+    refetch,
+  } = usePublicCategories();
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);

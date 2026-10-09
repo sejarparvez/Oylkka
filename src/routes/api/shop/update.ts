@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
-import type { Prisma } from '@/generated/prisma/client';
 import { DeleteImage } from '@/cloudinary/delete-image';
 import { UploadImage } from '@/cloudinary/upload-image';
+import type { Prisma } from '@/generated/prisma/client';
 import { auth } from '@/lib/auth';
 import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
