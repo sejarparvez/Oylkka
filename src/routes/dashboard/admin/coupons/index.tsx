@@ -34,6 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { formatBDT } from '@/lib/currency';
 import {
   useAdminCoupons,
   useDeleteCouponMutation,
@@ -243,7 +244,7 @@ function RouteComponent() {
                         <TableCell className='tabular-nums'>
                           {coupon.type === 'PERCENTAGE'
                             ? `${coupon.value}%`
-                            : `BDT ${coupon.value.toLocaleString()}`}
+                            : `৳${formatBDT(coupon.value)}`}
                         </TableCell>
                         <TableCell>
                           {SCOPE_LABELS[coupon.scope] || coupon.scope}

@@ -37,9 +37,15 @@ const stagger = {
 // FE-20: the return-window claim is built from the public SiteSetting reader
 // in `Footer()` instead of a module-level constant, so it stays in sync with
 // the policy pages and the PDP trust block.
+// CONTENT-09: claims here must be provable. "100% vetted sellers" was not —
+// shops go through an approval step before listing, so that is what we say.
 const trustBadgesBase = [
   { icon: ShieldCheck, label: 'Secure Payment', sub: 'SSL encrypted checkout' },
-  { icon: BadgeCheck, label: 'Verified Vendors', sub: '100% vetted sellers' },
+  {
+    icon: BadgeCheck,
+    label: 'Approved Sellers',
+    sub: 'Reviewed before listing',
+  },
   { icon: Truck, label: 'Fast Delivery', sub: 'Nationwide coverage' },
 ] as const;
 
@@ -55,7 +61,6 @@ const shopLinks = [
 const companyLinks = [
   { label: 'About Us', to: '/about' },
   { label: 'Contact', to: '/contact' },
-  { label: 'Blog', to: '/blog' },
   { label: 'Privacy Policy', to: '/privacy' },
   { label: 'Terms & Conditions', to: '/terms' },
 ];
@@ -179,8 +184,8 @@ function NewsletterSection({ inView }: { inView: boolean }) {
               <span className='text-primary'>.</span>
             </h3>
             <p className='max-w-sm text-sm leading-relaxed text-muted-foreground'>
-              Flash sales, new vendor arrivals, and exclusive offers — straight
-              to your inbox.
+              New arrivals, seasonal offers, and product updates — straight to
+              your inbox.
             </p>
           </motion.div>
           <motion.div variants={fadeUp} custom={0.08}>
@@ -258,6 +263,12 @@ function SocialIcon({
   );
 }
 
+type SocialLink = {
+  href: string | undefined;
+  label: string;
+  icon: React.ReactNode;
+};
+
 export default function Footer() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: '-80px' });
@@ -276,6 +287,77 @@ export default function Footer() {
       },
     ],
     [returnWindowDays],
+  );
+
+  const platformName = publicSettings?.platform_name ?? 'Oylkka';
+  const socials = useMemo(
+    () =>
+      (
+        [
+          {
+            href: publicSettings?.social_facebook,
+            label: 'Facebook',
+            icon: (
+              <svg
+                width='18'
+                height='18'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                aria-hidden='true'
+              >
+                <path d='M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z' />
+              </svg>
+            ),
+          },
+          {
+            href: publicSettings?.social_instagram,
+            label: 'Instagram',
+            icon: (
+              <svg
+                width='18'
+                height='18'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                aria-hidden='true'
+              >
+                <rect width='20' height='20' x='2' y='2' rx='5' ry='5' />
+                <path d='M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z' />
+                <line x1='17.5' x2='17.51' y1='6.5' y2='6.5' />
+              </svg>
+            ),
+          },
+          {
+            href: publicSettings?.social_twitter,
+            label: 'Twitter (X)',
+            icon: (
+              <svg
+                width='18'
+                height='18'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                aria-hidden='true'
+              >
+                <path d='M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z' />
+              </svg>
+            ),
+          },
+        ] as SocialLink[]
+      ).filter((social): social is SocialLink & { href: string } =>
+        Boolean(social.href),
+      ),
+    [publicSettings],
   );
 
   return (
@@ -301,7 +383,9 @@ export default function Footer() {
               <div className='flex h-8 w-8 items-center justify-center rounded-xl bg-primary'>
                 <ShoppingBag className='h-4 w-4 text-primary-foreground' />
               </div>
-              <span className='text-lg font-bold tracking-tight'>Oylkka</span>
+              <span className='text-lg font-bold tracking-tight'>
+                {platformName}
+              </span>
             </Link>
             <p className='mb-6 max-w-xs text-sm leading-relaxed text-muted-foreground'>
               Discover quality products at unbeatable prices. We&apos;re
@@ -309,67 +393,22 @@ export default function Footer() {
               shipping, secure checkout, and premium customer support.
             </p>
 
-            <div>
-              <p className='mb-3 text-sm font-medium'>Follow Us</p>
-              <div className='flex items-center gap-3'>
-                <SocialIcon
-                  href='https://facebook.com/mookkly'
-                  label='Facebook'
-                >
-                  <svg
-                    width='18'
-                    height='18'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeWidth='2'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    aria-hidden='true'
-                  >
-                    <path d='M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z' />
-                  </svg>
-                </SocialIcon>
-                <SocialIcon
-                  href='https://instagram.com/mookkly'
-                  label='Instagram'
-                >
-                  <svg
-                    width='18'
-                    height='18'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeWidth='2'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    aria-hidden='true'
-                  >
-                    <rect width='20' height='20' x='2' y='2' rx='5' ry='5' />
-                    <path d='M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z' />
-                    <line x1='17.5' x2='17.51' y1='6.5' y2='6.5' />
-                  </svg>
-                </SocialIcon>
-                <SocialIcon
-                  href='https://twitter.com/mookkly'
-                  label='Twitter (X)'
-                >
-                  <svg
-                    width='18'
-                    height='18'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeWidth='2'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    aria-hidden='true'
-                  >
-                    <path d='M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z' />
-                  </svg>
-                </SocialIcon>
+            {socials.length > 0 && (
+              <div>
+                <p className='mb-3 text-sm font-medium'>Follow Us</p>
+                <div className='flex items-center gap-3'>
+                  {socials.map((social) => (
+                    <SocialIcon
+                      key={social.label}
+                      href={social.href}
+                      label={social.label}
+                    >
+                      {social.icon}
+                    </SocialIcon>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </motion.div>
 
           <motion.div variants={fadeUp} custom={0.06}>
@@ -397,7 +436,8 @@ export default function Footer() {
               transition={{ duration: 0.45, ease: EASE, delay: 0.3 }}
               className='flex items-center gap-2 text-xs text-muted-foreground'
             >
-              &copy; {new Date().getFullYear()} Oylkka. All rights reserved.
+              &copy; {new Date().getFullYear()} {platformName}. All rights
+              reserved.
             </motion.p>
             <motion.div
               initial={{ opacity: 0 }}
@@ -408,7 +448,7 @@ export default function Footer() {
               <span className='h-1 w-1 rounded-full bg-primary/50' />
               <span>Secure Checkout</span>
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
-              <span>Verified Vendors</span>
+              <span>Approved Sellers</span>
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />
               <span>{returnWindowDays}-Day Returns</span>
               <span className='ml-1 h-1 w-1 rounded-full bg-primary/50' />

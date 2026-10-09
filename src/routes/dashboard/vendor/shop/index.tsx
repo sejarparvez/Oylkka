@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useVendorProducts, type VendorProduct } from '@/services/product';
 import { useMyShop } from '@/services/shop';
 
@@ -374,7 +375,7 @@ function ShopStatsStrip({
 }) {
   const stats = [
     {
-      value: `$${shop.totalSales.toLocaleString()}`,
+      value: `৳${formatBDT(shop.totalSales)}`,
       label: 'Total Sales',
       icon: ShoppingCart,
     },
@@ -615,7 +616,7 @@ function ProductCard({ product }: { product: VendorProduct }) {
           {product.productName}
         </h3>
         <p className='text-base font-bold tabular-nums'>
-          ${product.price.toFixed(2)}
+          ৳{formatBDT(product.price)}
         </p>
         <Badge
           variant={variant}

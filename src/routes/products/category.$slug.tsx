@@ -29,6 +29,10 @@ function RouteComponent() {
     refetch,
   } = useCategoryProducts(slug);
 
+  // CONTENT-18: prefer the real category name the API returns; only fall back
+  // to prettifying the slug while the request is in flight.
+  const categoryName = products?.[0]?.category?.name ?? formatSlug(slug);
+
   return (
     <div>
       <Header />
@@ -42,7 +46,7 @@ function RouteComponent() {
               </span>
             </div>
             <h2 className='text-2xl md:text-3xl font-bold tracking-tight leading-tight'>
-              {formatSlug(slug)}
+              {categoryName}
               <span className='text-primary'>.</span>
             </h2>
           </div>
@@ -90,8 +94,8 @@ function RouteComponent() {
               <p className='text-sm font-semibold'>No products found</p>
               <p className='text-sm text-muted-foreground mt-1 max-w-xs'>
                 There are no products in{' '}
-                <span className='font-medium'>{formatSlug(slug)}</span> yet.
-                Check back soon!
+                <span className='font-medium'>{categoryName}</span> yet. Check
+                back soon!
               </p>
             </div>
             <Button size='sm' asChild className='mt-2'>

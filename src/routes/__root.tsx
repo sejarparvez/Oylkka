@@ -18,6 +18,11 @@ import { NotFound } from '@/components/not-found';
 import { getSession, signOut } from '@/lib/auth.functions';
 import appCss from '../styles.css?url';
 
+// CONTENT-19: set VITE_SITE_URL per deployment so the canonical URL matches the
+// host actually serving the app; falls back to the production domain.
+const siteUrl =
+  (import.meta.env.VITE_SITE_URL as string | undefined) ?? 'https://oylkka.com';
+
 export const Route = createRootRoute({
   beforeLoad: async () => {
     const session = await getSession();
@@ -31,13 +36,13 @@ export const Route = createRootRoute({
       {
         name: 'description',
         content:
-          'Shop thousands of products from verified vendors across Bangladesh. Fast delivery, secure payments, and easy returns on Oylkka.',
+          'Discover products from approved shops across Bangladesh. Fast delivery, secure payments and easy returns on Oylkka.',
       },
       { property: 'og:title', content: 'Oylkka — Bangladesh Marketplace' },
       {
         property: 'og:description',
         content:
-          'Shop thousands of products from verified vendors across Bangladesh. Fast delivery, secure payments, and easy returns.',
+          'Discover products from approved shops across Bangladesh. Fast delivery, secure payments and easy returns.',
       },
       { property: 'og:type', content: 'website' },
       { property: 'og:image', content: '/og-image.svg' },
@@ -45,14 +50,13 @@ export const Route = createRootRoute({
       { name: 'twitter:title', content: 'Oylkka — Bangladesh Marketplace' },
       {
         name: 'twitter:description',
-        content:
-          'Shop thousands of products from verified vendors across Bangladesh.',
+        content: 'Discover products from approved shops across Bangladesh.',
       },
       { name: 'twitter:image', content: '/og-image.svg' },
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
-      { rel: 'canonical', href: 'https://oylkka.com' },
+      { rel: 'canonical', href: siteUrl },
       { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
     ],
   }),

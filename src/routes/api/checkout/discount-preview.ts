@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/db';
+import { getCheckoutSettings } from '@/services/checkout/platform-settings';
 import { computeShippingEstimate } from '@/services/checkout/shipping';
 import type {
   CartWithItems,
@@ -90,8 +91,15 @@ export const Route = createFileRoute('/api/checkout/discount-preview')({
             freeShipping = result.some((v) => v.freeShipping);
           }
 
+          const settings = await getCheckoutSettings();
+
           return Response.json({
+            // CONTENT-14: shipping is capped *after* discounts at order
+            // creation (see create.ts). Return the uncapped base plus the cap
+            // and let the client apply it once vouchers are subtracted.
             baseShipping: shipping.cost,
+            maxShipping: settings.maxShipping,
+            minOrderAmount: settings.minOrderAmount,
             totalDiscount,
             totalShippingDiscount,
             freeShipping,

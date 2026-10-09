@@ -16,6 +16,8 @@ import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useContactMutation } from '@/services/contact';
+import { usePublicSettings } from '@/services/public-settings';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -37,23 +39,22 @@ export const Route = createFileRoute('/contact')({
   component: ContactPage,
 });
 
-const contactInfo = [
-  {
-    icon: MapPin,
-    label: 'Address',
-    value: '123 Business Rd, Dhaka, Bangladesh',
-  },
-  { icon: PhoneCall, label: 'Phone', value: '+880 1700-000000' },
-  { icon: Mail, label: 'Email', value: 'support@oylkka.com' },
-  { icon: Clock, label: 'Hours', value: 'Mon-Fri: 9AM - 6PM' },
-];
-
 function ContactPage() {
+  // CONTENT-03: identity comes from SiteSetting, not hardcoded literals.
+  // Rows with no configured value are omitted rather than shown as placeholders.
+  const { data: settings } = usePublicSettings();
+  const contactInfo = [
+    { icon: MapPin, label: 'Address', value: settings?.support_address },
+    { icon: PhoneCall, label: 'Phone', value: settings?.support_phone },
+    { icon: Mail, label: 'Email', value: settings?.support_email },
+    { icon: Clock, label: 'Hours', value: settings?.support_hours },
+  ].filter((info) => Boolean(info.value));
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
-  const [sending, setSending] = useState(false);
+  const contact = useContactMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,23 +62,24 @@ function ContactPage() {
       toast.error('Please fill in all required fields');
       return;
     }
-    setSending(true);
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, subject, message }),
+      await contact.mutateAsync({
+        name,
+        email,
+        subject: subject || undefined,
+        message,
       });
-      if (!res.ok) throw new Error('Failed to send');
       toast.success('Message sent! We will get back to you soon.');
       setName('');
       setEmail('');
       setSubject('');
       setMessage('');
-    } catch {
-      toast.error('Failed to send message. Please try again later.');
-    } finally {
-      setSending(false);
+    } catch (error) {
+      const apiError = error as { response?: { data?: { error?: string } } };
+      toast.error(
+        apiError.response?.data?.error ??
+          'Failed to send message. Please try again later.',
+      );
     }
   };
 
@@ -243,9 +245,13 @@ function ContactPage() {
                   />
                 </div>
 
-                <Button type='submit' className='gap-2' disabled={sending}>
+                <Button
+                  type='submit'
+                  className='gap-2'
+                  disabled={contact.isPending}
+                >
                   <Send className='w-4 h-4' />
-                  {sending ? 'Sending...' : 'Send Message'}
+                  {contact.isPending ? 'Sending...' : 'Send Message'}
                 </Button>
               </form>
             </div>

@@ -18,6 +18,7 @@ import {
   StockError,
 } from '@/lib/stock';
 import { checkCouponEligibility } from '@/services/checkout/coupon-validator';
+import { getCheckoutSettings } from '@/services/checkout/platform-settings';
 import { computeShippingEstimate } from '@/services/checkout/shipping';
 import type {
   CartWithItems,
@@ -331,6 +332,18 @@ export const Route = createFileRoute('/api/checkout/create')({
             totalDiscount += discount * item.quantity;
           }
 
+          // CONTENT-13/14: enforce admin-configured order constraints.
+          const platformSettings = await getCheckoutSettings();
+          if (subtotal < platformSettings.minOrderAmount) {
+            await restoreReservations();
+            return Response.json(
+              {
+                error: `Your order subtotal must be at least \u09f3${platformSettings.minOrderAmount}`,
+              },
+              { status: 400 },
+            );
+          }
+
           // --- Shipping calculation (zone-aware, shared with the preview quote) ---
           const { cost: baseShipping } = await computeShippingEstimate(
             cart.items.map((item) => ({
@@ -480,10 +493,15 @@ export const Route = createFileRoute('/api/checkout/create')({
           }
 
           // --- Apply shipping discounts ---
-          const finalShipping = applyShippingDiscounts(
+          const shippingAfterDiscounts = applyShippingDiscounts(
             selectedVouchers,
             baseShipping,
           );
+          // CONTENT-14: never charge more than the configured shipping cap.
+          const finalShipping =
+            platformSettings.maxShipping != null
+              ? Math.min(shippingAfterDiscounts, platformSettings.maxShipping)
+              : shippingAfterDiscounts;
 
           // --- Apply discount stacking ---
           const { totalCouponDiscount, totalCashback } =
@@ -577,7 +595,8 @@ export const Route = createFileRoute('/api/checkout/create')({
                         savedPrice < unitPrice ? savedPrice : null;
                       const lineTotal = savedPrice * item.quantity;
                       const commissionRate = Number(
-                        item.product.shop?.commissionRate ?? 10,
+                        item.product.shop?.commissionRate ??
+                          platformSettings.defaultCommission,
                       );
                       const commissionAmount =
                         (lineTotal * commissionRate) / 100;

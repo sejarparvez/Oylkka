@@ -16,7 +16,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar, // This is a client hook.
+  useSidebar,
 } from '@/components/ui/sidebar';
 import type { User } from './types';
 
@@ -25,7 +25,6 @@ interface NavUserDropdownProps {
 }
 
 export function NavUserDropdown({ user }: NavUserDropdownProps) {
-  // useSidebar can be called here since this is a client component.
   const { isMobile } = useSidebar();
 
   if (!user) {

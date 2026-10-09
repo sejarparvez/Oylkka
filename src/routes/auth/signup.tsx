@@ -154,7 +154,7 @@ function RouteComponent() {
     }
   }
 
-  async function handleSocialLogin(provider: 'google' | 'facebook') {
+  async function handleSocialLogin(provider: 'google') {
     setIsLoading(true);
     try {
       await signIn.social({

@@ -4,8 +4,10 @@ import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
+import { RichText } from '@/components/rich-text';
 import { Button } from '@/components/ui/button';
 import { RETURN_WINDOW_DAYS } from '@/lib/constants';
+import { useContentBlock } from '@/services/admin-content';
 import { usePublicSettings } from '@/services/public-settings';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -31,6 +33,11 @@ function ReturnsPage() {
   const { data: publicSettings } = usePublicSettings();
   const returnWindowDays =
     publicSettings?.return_window_days ?? String(RETURN_WINDOW_DAYS);
+
+  // CONTENT-11: admins can override this page via a published ContentBlock;
+  // a missing block (404) falls back to the built-in copy below.
+  const { data: cmsBlockData } = useContentBlock('returns');
+  const cmsBlock = cmsBlockData?.block;
 
   const sections = useMemo(
     () => [
@@ -172,56 +179,62 @@ function ReturnsPage() {
             )}
           </motion.aside>
 
-          {sections.map((section, i) => (
-            <motion.section
-              key={section.title}
-              initial='hidden'
-              whileInView='show'
-              viewport={{ once: true, margin: '-80px' }}
-              variants={fadeUp}
-              custom={0}
-            >
-              <div className='flex items-center gap-3 mb-4'>
-                <div className='h-px w-8 bg-primary' />
-                <span className='text-xs font-semibold tracking-[0.18em] uppercase text-primary'>
-                  Section {i + 1}
-                </span>
-              </div>
-              <h2 className='text-2xl md:text-3xl font-bold leading-tight tracking-tight mb-6'>
-                {section.title}
-                <span className='text-primary'>.</span>
-              </h2>
-              {section.isList && section.items ? (
-                <ul className='space-y-3'>
-                  {section.items.map((item) => {
-                    const label = Array.isArray(item) ? item[0] : item;
-                    return (
-                      <li
-                        key={label}
-                        className='flex items-start gap-3 text-sm leading-relaxed text-muted-foreground'
-                      >
-                        <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0 mt-1.5' />
-                        {Array.isArray(item) ? (
-                          <span>
-                            <strong className='text-foreground'>
-                              {item[0]}
-                            </strong>{' '}
-                            — {item[1]}
-                          </span>
-                        ) : (
-                          <span>{item}</span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className='text-sm leading-relaxed text-muted-foreground'>
-                  {section.content}
-                </p>
-              )}
-            </motion.section>
-          ))}
+          {cmsBlock ? (
+            <div className='prose prose-sm prose-gray dark:prose-invert max-w-none'>
+              <RichText content={cmsBlock.content} />
+            </div>
+          ) : (
+            sections.map((section, i) => (
+              <motion.section
+                key={section.title}
+                initial='hidden'
+                whileInView='show'
+                viewport={{ once: true, margin: '-80px' }}
+                variants={fadeUp}
+                custom={0}
+              >
+                <div className='flex items-center gap-3 mb-4'>
+                  <div className='h-px w-8 bg-primary' />
+                  <span className='text-xs font-semibold tracking-[0.18em] uppercase text-primary'>
+                    Section {i + 1}
+                  </span>
+                </div>
+                <h2 className='text-2xl md:text-3xl font-bold leading-tight tracking-tight mb-6'>
+                  {section.title}
+                  <span className='text-primary'>.</span>
+                </h2>
+                {section.isList && section.items ? (
+                  <ul className='space-y-3'>
+                    {section.items.map((item) => {
+                      const label = Array.isArray(item) ? item[0] : item;
+                      return (
+                        <li
+                          key={label}
+                          className='flex items-start gap-3 text-sm leading-relaxed text-muted-foreground'
+                        >
+                          <span className='w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0 mt-1.5' />
+                          {Array.isArray(item) ? (
+                            <span>
+                              <strong className='text-foreground'>
+                                {item[0]}
+                              </strong>{' '}
+                              — {item[1]}
+                            </span>
+                          ) : (
+                            <span>{item}</span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className='text-sm leading-relaxed text-muted-foreground'>
+                    {section.content}
+                  </p>
+                )}
+              </motion.section>
+            ))
+          )}
         </div>
       </div>
 

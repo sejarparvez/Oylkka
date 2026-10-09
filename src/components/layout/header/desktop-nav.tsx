@@ -17,17 +17,12 @@ export default function Navigation() {
   const [prevActiveIndex, setPrevActiveIndex] = useState<number | null>(null);
   const tabRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // 1. Swap usePathname for useLocation
   const { pathname } = useLocation();
   const isFirstRender = useRef(true);
 
-  // Determine active index based on current path
   const activeIndex = navItems.findIndex((item) =>
     item.href === '/' ? pathname === '/' : pathname.startsWith(item.href),
   );
-
-  // ... (Keep your existing useEffect logic for hover and active styles)
-  // The logic inside these effects is standard DOM manipulation and stays identical
 
   useEffect(() => {
     if (hoveredIndex !== null) {
@@ -126,11 +121,6 @@ export default function Navigation() {
               >
                 <div className='flex h-full items-center justify-center text-sm font-medium whitespace-nowrap'>
                   {item.label}
-                  {item.label === 'Sale' && (
-                    <span className='ml-1 inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-medium text-white'>
-                      20%
-                    </span>
-                  )}
                 </div>
               </div>
             </Link>

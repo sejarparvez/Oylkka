@@ -12,7 +12,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-// 1. Import the server function you showed me
 import { signOut } from '@/lib/auth.functions';
 import { cn } from '@/lib/utils';
 
@@ -21,15 +20,9 @@ export function SignOut({ className }: { className?: string }) {
 
   const handleSignOut = async () => {
     try {
-      // 2. Call the Server Function directly
-      // This sends a POST request to your server, which runs auth.api.signOut
       await signOut();
-
-      // 3. Sync the UI
-      // Force all loaders (like the one in __root.tsx) to re-run
+      // Re-run loaders (including __root) so the session is reflected, then go home.
       await router.invalidate();
-
-      // 4. Send them home
       await router.navigate({ to: '/', replace: true });
     } catch (error) {
       // biome-ignore lint/suspicious/noConsole: this is fine

@@ -1,12 +1,7 @@
-import { Banknote, CreditCard, Smartphone, Wallet } from 'lucide-react';
+import { Banknote, Smartphone, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 
-export type PaymentMethodOption =
-  | 'BKASH'
-  | 'CASH_ON_DELIVERY'
-  | 'NAGAD'
-  | 'ROCKET'
-  | 'WALLET';
+export type PaymentMethodOption = 'BKASH' | 'CASH_ON_DELIVERY' | 'WALLET';
 
 type PaymentOption = {
   value: PaymentMethodOption;
@@ -14,9 +9,10 @@ type PaymentOption = {
   description: string;
   icon: typeof Smartphone;
   available: boolean;
-  comingSoon?: boolean;
 };
 
+// CONTENT-15: only methods the platform can actually process are offered.
+// Nagad and Rocket were listed as "coming soon" placeholders and are removed.
 const paymentOptions: PaymentOption[] = [
   {
     value: 'BKASH',
@@ -31,22 +27,6 @@ const paymentOptions: PaymentOption[] = [
     description: 'Pay when you receive your order',
     icon: Banknote,
     available: true,
-  },
-  {
-    value: 'NAGAD',
-    label: 'Nagad',
-    description: 'Pay via Nagad mobile wallet',
-    icon: Smartphone,
-    available: false,
-    comingSoon: true,
-  },
-  {
-    value: 'ROCKET',
-    label: 'Rocket',
-    description: 'Pay via Rocket mobile wallet',
-    icon: CreditCard,
-    available: false,
-    comingSoon: true,
   },
   {
     value: 'WALLET',
@@ -85,15 +65,9 @@ export function PaymentSelector({
 
   function handleSelect(option: PaymentOption) {
     if (!isAvailable(option)) {
-      if (option.value === 'WALLET') {
-        toast.error('Insufficient wallet balance', {
-          description: 'Top up your wallet or choose another payment method.',
-        });
-      } else {
-        toast.error(`${option.label} is not available yet`, {
-          description: 'Please check back later.',
-        });
-      }
+      toast.error('Insufficient wallet balance', {
+        description: 'Top up your wallet or choose another payment method.',
+      });
       return;
     }
     onSelect(option.value);
@@ -128,11 +102,7 @@ export function PaymentSelector({
             <div>
               <p className='text-sm font-medium'>{option.label}</p>
               <p className='text-xs text-muted-foreground mt-0.5'>
-                {!available
-                  ? option.comingSoon
-                    ? 'Coming soon'
-                    : 'Insufficient balance'
-                  : option.description}
+                {available ? option.description : 'Insufficient balance'}
               </p>
               {option.value === 'WALLET' && walletBalance !== undefined && (
                 <p
@@ -145,11 +115,6 @@ export function PaymentSelector({
                 </p>
               )}
             </div>
-            {option.comingSoon && (
-              <span className='absolute right-2 top-2 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground'>
-                Soon
-              </span>
-            )}
             {isSelected && (
               <span className='absolute right-2 top-2 h-3 w-3 rounded-full bg-primary' />
             )}

@@ -28,7 +28,6 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CareersRouteImport } from './routes/careers'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BestsellersRouteImport } from './routes/bestsellers'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
@@ -43,7 +42,6 @@ import { Route as DashboardMyAccountRouteImport } from './routes/dashboard/my-ac
 import { Route as DashboardFollowedShopsRouteImport } from './routes/dashboard/followed-shops'
 import { Route as DashboardAddressesRouteImport } from './routes/dashboard/addresses'
 import { Route as CheckoutConfirmationRouteImport } from './routes/checkout/confirmation'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
 import { Route as AuthTwoFactorRouteImport } from './routes/auth/two-factor'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
@@ -359,11 +357,6 @@ const CareersRoute = CareersRouteImport.update({
   path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const BestsellersRoute = BestsellersRouteImport.update({
   id: '/bestsellers',
   path: '/bestsellers',
@@ -433,11 +426,6 @@ const CheckoutConfirmationRoute = CheckoutConfirmationRouteImport.update({
   id: '/confirmation',
   path: '/confirmation',
   getParentRoute: () => CheckoutRoute,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => BlogRoute,
 } as any)
 const AuthVerifyRoute = AuthVerifyRouteImport.update({
   id: '/auth/verify',
@@ -1620,7 +1608,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/bestsellers': typeof BestsellersRoute
-  '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
@@ -1651,7 +1638,6 @@ export interface FileRoutesByFullPath {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/two-factor': typeof AuthTwoFactorRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
   '/dashboard/addresses': typeof DashboardAddressesRoute
   '/dashboard/followed-shops': typeof DashboardFollowedShopsRoute
@@ -1875,7 +1861,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bestsellers': typeof BestsellersRoute
-  '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
@@ -1902,7 +1887,6 @@ export interface FileRoutesByTo {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/two-factor': typeof AuthTwoFactorRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
   '/dashboard/addresses': typeof DashboardAddressesRoute
   '/dashboard/followed-shops': typeof DashboardFollowedShopsRoute
@@ -2123,7 +2107,6 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/bestsellers': typeof BestsellersRoute
-  '/blog': typeof BlogRouteWithChildren
   '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
@@ -2154,7 +2137,6 @@ export interface FileRoutesById {
   '/auth/signup': typeof AuthSignupRoute
   '/auth/two-factor': typeof AuthTwoFactorRoute
   '/auth/verify': typeof AuthVerifyRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/checkout/confirmation': typeof CheckoutConfirmationRoute
   '/dashboard/addresses': typeof DashboardAddressesRoute
   '/dashboard/followed-shops': typeof DashboardFollowedShopsRoute
@@ -2381,7 +2363,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/about'
     | '/bestsellers'
-    | '/blog'
     | '/careers'
     | '/cart'
     | '/categories'
@@ -2412,7 +2393,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/two-factor'
     | '/auth/verify'
-    | '/blog/$slug'
     | '/checkout/confirmation'
     | '/dashboard/addresses'
     | '/dashboard/followed-shops'
@@ -2636,7 +2616,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/bestsellers'
-    | '/blog'
     | '/careers'
     | '/cart'
     | '/categories'
@@ -2663,7 +2642,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/two-factor'
     | '/auth/verify'
-    | '/blog/$slug'
     | '/checkout/confirmation'
     | '/dashboard/addresses'
     | '/dashboard/followed-shops'
@@ -2883,7 +2861,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/about'
     | '/bestsellers'
-    | '/blog'
     | '/careers'
     | '/cart'
     | '/categories'
@@ -2914,7 +2891,6 @@ export interface FileRouteTypes {
     | '/auth/signup'
     | '/auth/two-factor'
     | '/auth/verify'
-    | '/blog/$slug'
     | '/checkout/confirmation'
     | '/dashboard/addresses'
     | '/dashboard/followed-shops'
@@ -3140,7 +3116,6 @@ export interface RootRouteChildren {
   DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   BestsellersRoute: typeof BestsellersRoute
-  BlogRoute: typeof BlogRouteWithChildren
   CareersRoute: typeof CareersRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
@@ -3454,13 +3429,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/bestsellers': {
       id: '/bestsellers'
       path: '/bestsellers'
@@ -3558,13 +3526,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/checkout/confirmation'
       preLoaderRoute: typeof CheckoutConfirmationRouteImport
       parentRoute: typeof CheckoutRoute
-    }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof BlogRoute
     }
     '/auth/verify': {
       id: '/auth/verify'
@@ -5358,16 +5319,6 @@ const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
   DashboardRouteRouteChildren,
 )
 
-interface BlogRouteChildren {
-  BlogSlugRoute: typeof BlogSlugRoute
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSlugRoute: BlogSlugRoute,
-}
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
 interface CheckoutRouteChildren {
   CheckoutConfirmationRoute: typeof CheckoutConfirmationRoute
 }
@@ -5397,7 +5348,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRouteRoute: DashboardRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   BestsellersRoute: BestsellersRoute,
-  BlogRoute: BlogRouteWithChildren,
   CareersRoute: CareersRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,

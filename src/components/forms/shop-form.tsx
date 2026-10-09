@@ -317,7 +317,7 @@ export function ShopForm(props: ShopFormProps) {
                       <Input
                         id='email'
                         type='email'
-                        placeholder='shop@example.com'
+                        placeholder='info@yourshop.com'
                         aria-invalid={!!errors.email}
                         {...register('email')}
                       />
@@ -334,7 +334,7 @@ export function ShopForm(props: ShopFormProps) {
                       <Input
                         id='phone'
                         type='tel'
-                        placeholder='+1 (555) 123-4567'
+                        placeholder='+880 1XXX-XXXXXX'
                         aria-invalid={!!errors.phone}
                         {...register('phone')}
                       />
@@ -389,7 +389,7 @@ export function ShopForm(props: ShopFormProps) {
                     </FieldLabel>
                     <Input
                       id='addressLine2'
-                      placeholder='Apt, Suite, etc.'
+                      placeholder='House / Road, area'
                       aria-invalid={!!errors.addressLine2}
                       {...register('addressLine2')}
                     />
@@ -415,7 +415,7 @@ export function ShopForm(props: ShopFormProps) {
                     <FieldLabel htmlFor='state'>State</FieldLabel>
                     <Input
                       id='state'
-                      placeholder='State / Province'
+                      placeholder='District'
                       aria-invalid={!!errors.state}
                       {...register('state')}
                     />
@@ -441,7 +441,7 @@ export function ShopForm(props: ShopFormProps) {
                     <FieldLabel htmlFor='postalCode'>Postal Code</FieldLabel>
                     <Input
                       id='postalCode'
-                      placeholder='Postal / ZIP code'
+                      placeholder='Postal code'
                       aria-invalid={!!errors.postalCode}
                       {...register('postalCode')}
                     />

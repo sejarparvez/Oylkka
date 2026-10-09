@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import {
   useDeleteProductMutation,
   useVendorProducts,
@@ -247,10 +248,10 @@ function ProductRow({
           <p className='text-xs text-muted-foreground'>SKU: {product.sku}</p>
         </div>
         <div>
-          <p className='text-sm font-semibold'>${product.price.toFixed(2)}</p>
+          <p className='text-sm font-semibold'>৳{formatBDT(product.price)}</p>
           {product.discountPrice && (
             <p className='text-xs text-muted-foreground line-through'>
-              ${product.discountPrice.toFixed(2)}
+              ৳{formatBDT(product.discountPrice)}
             </p>
           )}
         </div>

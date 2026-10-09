@@ -1,3 +1,5 @@
+import { RETURN_WINDOW_DAYS } from '@/lib/constants';
+
 const BRAND = {
   primary: '#16a34a',
   primaryDark: '#15803d',
@@ -34,11 +36,11 @@ function brandFooter(): string {
           </span>
           <span style="color: ${BRAND.primary}; font-size: 11px; padding: 0 6px;">·</span>
           <span style="font-size: 11px; color: ${BRAND.mutedForeground};">
-            Verified Vendors
+            Approved Sellers
           </span>
           <span style="color: ${BRAND.primary}; font-size: 11px; padding: 0 6px;">·</span>
           <span style="font-size: 11px; color: ${BRAND.mutedForeground};">
-            7-Day Returns
+            ${RETURN_WINDOW_DAYS}-Day Returns
           </span>
           <span style="color: ${BRAND.primary}; font-size: 11px; padding: 0 6px;">·</span>
           <span style="font-size: 11px; color: ${BRAND.mutedForeground};">
@@ -524,7 +526,7 @@ export function welcomeHtml(name: string): string {
     </p>
 
     <p style="font-size: 14px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
-      Browse thousands of products from verified vendors across Bangladesh. Fast delivery, secure payments, and easy returns.
+      Discover products from approved shops across Bangladesh. Fast delivery, secure payments, and easy returns.
     </p>
 
     <table cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 24px;">
@@ -602,5 +604,66 @@ export function payoutProcessedHtml(
     </p>
 
     ${ctaButton('View Payouts', payoutsLink)}
+  `);
+}
+
+/** Escape user-supplied values before interpolating them into email HTML. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * CONTENT-02: notification sent to the support inbox when someone submits the
+ * public contact form. The message is also persisted (ContactMessage).
+ */
+export function contactMessageHtml(input: {
+  name: string;
+  email: string;
+  subject: string | null;
+  message: string;
+  receivedAt: Date;
+  messageId: string;
+}): string {
+  const { name, email, subject, message, receivedAt, messageId } = input;
+  const safeMessage = escapeHtml(message).replace(/\n/g, '<br />');
+
+  return baseWrapper(`
+    ${eyebrow('New Contact Message')}
+
+    <h1 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: ${BRAND.foreground};">
+      Message from ${escapeHtml(name)}<span style="color: ${BRAND.primary};">.</span>
+    </h1>
+
+    <p style="font-size: 13px; line-height: 1.6; color: ${BRAND.mutedForeground}; margin: 0 0 24px;">
+      Received ${receivedAt.toISOString()}
+    </p>
+
+    <table cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 24px;">
+      <tr>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.mutedForeground}; width: 80px;">Name</td>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.foreground}; font-weight: 600;">${escapeHtml(name)}</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.mutedForeground};">Email</td>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.foreground}; font-weight: 600;">${escapeHtml(email)}</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.mutedForeground};">Subject</td>
+        <td style="padding: 4px 0; font-size: 13px; color: ${BRAND.foreground}; font-weight: 600;">${subject ? escapeHtml(subject) : 'General inquiry'}</td>
+      </tr>
+    </table>
+
+    <div style="font-size: 14px; line-height: 1.6; color: ${BRAND.foreground}; padding: 16px; background: ${BRAND.background}; border-radius: 8px; margin-bottom: 24px;">
+      ${safeMessage}
+    </div>
+
+    <p style="font-size: 12px; color: ${BRAND.mutedForeground}; margin: 0; line-height: 1.5;">
+      Reference: ${messageId}
+    </p>
   `);
 }

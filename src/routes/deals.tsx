@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { ArrowLeft, Zap } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import {
@@ -32,33 +32,8 @@ export const Route = createFileRoute('/deals')({
   component: DealsPage,
 });
 
-// The countdown must render identically on server and first client pass (FE-08).
-// Seed at 0, compute the real deadline only after mount; a real campaign-backed
-// deadline (from a loader) is tracked under CONTENT-07 instead.
-const DEAL_DURATION_MS = 47 * 60 * 60 * 1000;
-
-function useCountdown(durationMs: number) {
-  const [remaining, setRemaining] = useState(0);
-
-  useEffect(() => {
-    const deadline = Date.now() + durationMs;
-    const tick = () =>
-      setRemaining(Math.max(0, Math.floor((deadline - Date.now()) / 1000)));
-    tick();
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
-  }, [durationMs]);
-
-  const hours = Math.floor(remaining / 3600);
-  const minutes = Math.floor((remaining % 3600) / 60);
-  const seconds = remaining % 60;
-
-  return { hours, minutes, seconds };
-}
-
 function DealsPage() {
   const [page, setPage] = useState(1);
-  const { hours, minutes, seconds } = useCountdown(DEAL_DURATION_MS);
 
   const { data, isLoading, isError, refetch } = useAllProducts({
     sort: 'newest',
@@ -100,64 +75,33 @@ function DealsPage() {
             custom={0.08}
           >
             <h1 className='text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight'>
-              Flash <span className='italic font-bold text-primary'>Deals</span>
-              <span className='text-primary'>.</span>
+              Deals<span className='text-primary'>.</span>
             </h1>
             <p className='text-sm text-muted-foreground mt-3'>
-              Limited-time discounts from verified vendors. Grab them before
-              they are gone.
+              Discounted products from approved shops, updated as prices change.
             </p>
           </motion.div>
         </div>
       </div>
 
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8'>
-        <motion.div
-          initial='hidden'
-          animate='show'
-          variants={fadeUp}
-          custom={0.1}
-          className='rounded-2xl bg-primary px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'
-        >
-          <div className='flex items-center gap-3'>
-            <Zap className='w-5 h-5 text-primary-foreground shrink-0' />
-            <div>
-              <p className='text-sm font-bold text-primary-foreground'>
-                Flash Sale — Up to 60% off
-              </p>
-              <p className='text-xs text-primary-foreground/70 mt-0.5'>
-                Verify vendors only · Deals refresh every hour
-              </p>
-            </div>
-          </div>
-
-          <div className='flex items-center gap-1.5 shrink-0'>
-            <div className='flex items-center gap-1.5'>
-              {[
-                { value: hours, label: 'HRS' },
-                { value: minutes, label: 'MIN' },
-                { value: seconds, label: 'SEC' },
-              ].map(({ value, label }, i) => (
-                <div key={label} className='flex items-center gap-1.5'>
-                  {i > 0 && (
-                    <span className='text-primary-foreground/50 font-bold text-sm mb-3'>
-                      :
-                    </span>
-                  )}
-                  <div className='flex flex-col items-center bg-black/20 rounded-lg px-2.5 py-1.5'>
-                    <span className='text-lg font-bold tabular-nums text-primary-foreground leading-none'>
-                      {String(value).padStart(2, '0')}
-                    </span>
-                    <span className='text-[9px] text-primary-foreground/60 tracking-wider mt-0.5'>
-                      {label}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      </div>
+      {!isLoading && !isError && (data?.total ?? 0) > 0 && (
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8'>
+          <motion.div
+            initial='hidden'
+            animate='show'
+            variants={fadeUp}
+            custom={0.1}
+            className='rounded-2xl border border-border bg-card px-6 py-4 flex items-center gap-3'
+          >
+            <Zap className='w-5 h-5 text-primary shrink-0' />
+            <p className='text-sm font-medium'>
+              {(data?.total ?? 0).toLocaleString()} discounted{' '}
+              {(data?.total ?? 0) === 1 ? 'product' : 'products'} from approved
+              shops
+            </p>
+          </motion.div>
+        </div>
+      )}
 
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 pt-8'>
         {isLoading ? (
@@ -187,7 +131,7 @@ function DealsPage() {
             <div>
               <p className='text-sm font-semibold'>No deals right now</p>
               <p className='text-sm text-muted-foreground mt-1 max-w-xs'>
-                Check back soon for new flash deals and discounts.
+                Check back soon for new discounts.
               </p>
             </div>
             <Button size='sm' asChild className='mt-2'>

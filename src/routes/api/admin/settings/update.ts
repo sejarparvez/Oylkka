@@ -5,9 +5,19 @@ import { validateCsrf } from '@/lib/csrf';
 import { prisma } from '@/lib/db';
 
 // Allowlisted SiteSetting keys with per-key value validation (MONEY-47).
+const optionalUrl = z.union([z.literal(''), z.url().max(200)]);
+
 const SETTING_VALIDATORS: Record<string, z.ZodType<string>> = {
   platform_name: z.string().trim().min(1).max(60),
   support_email: z.email().max(120),
+  // CONTENT-03/05: public business identity. Phone/address/hours may be left
+  // blank; the contact page simply omits unset rows.
+  support_phone: z.string().trim().max(40),
+  support_address: z.string().trim().max(200),
+  support_hours: z.string().trim().max(80),
+  social_facebook: optionalUrl,
+  social_instagram: optionalUrl,
+  social_twitter: optionalUrl,
   min_order_amount: z.string().regex(/^\d+(\.\d+)?$/),
   default_commission: z
     .string()

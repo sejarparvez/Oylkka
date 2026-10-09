@@ -103,7 +103,7 @@ function TrackingDialog({
               id='tracking-number'
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              placeholder='e.g. STEAMER123456789'
+              placeholder='e.g. TRK123456789'
             />
           </div>
           <div className='space-y-2'>

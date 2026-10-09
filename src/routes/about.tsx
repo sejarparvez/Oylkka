@@ -1,9 +1,18 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowLeft, BadgeCheck, ShoppingBag, Star, Truck } from 'lucide-react';
+import {
+  ArrowLeft,
+  BadgeCheck,
+  LayoutGrid,
+  ShoppingBag,
+  Truck,
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
+import { usePublicCategories } from '@/services/category';
+import { useAllProducts } from '@/services/product';
+import { usePublicShops } from '@/services/shop';
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -25,17 +34,15 @@ export const Route = createFileRoute('/about')({
   component: AboutPage,
 });
 
-const stats = [
-  { value: '10K+', label: 'Happy Customers', icon: Star },
-  { value: '500+', label: 'Verified Vendors', icon: BadgeCheck },
-  { value: '50K+', label: 'Products', icon: ShoppingBag },
-  { value: 'Nationwide', label: 'Delivery Coverage', icon: Truck },
-];
+// CONTENT-04: metrics are queried live on the page instead of hardcoded.
+function formatCount(value: number | undefined) {
+  return typeof value === 'number' ? value.toLocaleString() : '—';
+}
 
 const values = [
   {
     title: 'Trust & Transparency',
-    desc: 'Every vendor is verified, every product is vetted. What you see is exactly what you get.',
+    desc: 'Every shop is reviewed before it can list. What you see is exactly what you get.',
   },
   {
     title: 'Quality First',
@@ -43,7 +50,7 @@ const values = [
   },
   {
     title: 'Customer Centric',
-    desc: 'Your satisfaction drives every decision we make. Support is available 24/7.',
+    desc: 'Your satisfaction drives every decision we make — from easy returns to responsive support.',
   },
   {
     title: 'Empowering Vendors',
@@ -52,6 +59,29 @@ const values = [
 ];
 
 function AboutPage() {
+  const { data: products } = useAllProducts({ page: 1, limit: 1 });
+  const { data: shops } = usePublicShops({ page: 1 });
+  const { data: categories } = usePublicCategories();
+
+  const stats = [
+    {
+      value: formatCount(products?.total),
+      label: 'Products',
+      icon: ShoppingBag,
+    },
+    {
+      value: formatCount(shops?.total),
+      label: 'Approved Shops',
+      icon: BadgeCheck,
+    },
+    {
+      value: formatCount(categories?.length),
+      label: 'Categories',
+      icon: LayoutGrid,
+    },
+    { value: 'Nationwide', label: 'Delivery Coverage', icon: Truck },
+  ];
+
   return (
     <div className='min-h-screen bg-background'>
       <Header />
@@ -121,16 +151,15 @@ function AboutPage() {
                 unreliable sellers, and frustrating return processes.
               </p>
               <p className='text-sm leading-relaxed text-muted-foreground'>
-                Our platform rigorously verifies every vendor, ensuring that
-                when you shop on Oylkka, you are buying from trusted sellers
-                committed to quality. From electronics to fashion, home
-                essentials to artisan crafts, we bring the best of Bangladesh
-                commerce to your fingertips.
+                Our platform reviews every shop before it can list, so when you
+                shop on Oylkka you are buying from sellers committed to quality.
+                From electronics to fashion, home essentials to artisan crafts,
+                we bring the best of Bangladesh commerce to your fingertips.
               </p>
               <p className='text-sm leading-relaxed text-muted-foreground'>
-                Today, Oylkka serves thousands of happy customers across the
-                country, with hundreds of verified vendors and a commitment to
-                making every purchase a delight.
+                Today, Oylkka connects customers across the country with
+                approved shops, with a commitment to making every purchase a
+                delight.
               </p>
             </div>
           </motion.div>
@@ -240,8 +269,8 @@ function AboutPage() {
               <span className='text-primary'>?</span>
             </h2>
             <p className='text-sm text-muted-foreground mb-6 max-w-md mx-auto'>
-              Join thousands of happy customers. Discover verified vendors and
-              quality products delivered to your door.
+              Discover approved shops and quality products delivered to your
+              door.
             </p>
             <Button size='lg' asChild>
               <Link to='/products'>Start Shopping</Link>

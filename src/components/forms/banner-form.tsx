@@ -519,7 +519,7 @@ export function BannerForm(props: BannerFormProps) {
                       </FieldLabel>
                       <Input
                         id='primaryActionLink'
-                        placeholder='https://example.com/page'
+                        placeholder='https://yourshop.com/deals'
                         {...register('primaryActionLink')}
                       />
                       <FieldDescription>
@@ -570,7 +570,7 @@ export function BannerForm(props: BannerFormProps) {
                       </FieldLabel>
                       <Input
                         id='secondaryActionLink'
-                        placeholder='https://example.com/contact'
+                        placeholder='https://yourshop.com/contact'
                         {...register('secondaryActionLink')}
                       />
                       <FieldDescription>

@@ -249,7 +249,7 @@ export function OrderItemsTable({
                     id='tracking-number'
                     value={trackingNumber}
                     onChange={(e) => setTrackingNumber(e.target.value)}
-                    placeholder='e.g. STEAMER123456789'
+                    placeholder='e.g. TRK123456789'
                   />
                 </div>
                 <div className='space-y-2'>
@@ -260,7 +260,7 @@ export function OrderItemsTable({
                     id='tracking-url'
                     value={trackingUrl}
                     onChange={(e) => setTrackingUrl(e.target.value)}
-                    placeholder='https://track.steamer.com/...'
+                    placeholder='https://track.courier.com/...'
                   />
                 </div>
               </>

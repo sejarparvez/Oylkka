@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useAdminOrders } from '@/services/admin-orders';
 
 const STATUS_TABS = [
@@ -123,7 +124,7 @@ function RouteComponent() {
         <div className='rounded-2xl border border-border bg-card p-4'>
           <p className='text-xs text-muted-foreground'>Total Revenue</p>
           <p className='text-2xl font-bold mt-1'>
-            {isLoading ? '-' : `Ã Â§Â³${totalRevenue.toLocaleString('en-BD')}`}
+            {isLoading ? '-' : `৳${formatBDT(totalRevenue)}`}
           </p>
         </div>
         <div className='rounded-2xl border border-border bg-card p-4'>
@@ -258,7 +259,7 @@ function RouteComponent() {
                 </div>
 
                 <div className='text-sm font-bold tabular-nums'>
-                  Ã Â§Â³{order.total.toLocaleString('en-BD')}
+                  ৳{formatBDT(order.total)}
                 </div>
 
                 <StatusBadge type='payment' value={order.paymentStatus} />

@@ -109,7 +109,7 @@ export function ProductCondition({ productId }: ProductConditionProps) {
           <div className='flex space-x-2'>
             <div className='relative flex-1'>
               <Input
-                placeholder='SKU-12345'
+                placeholder='e.g. SKU-0001'
                 value={sku || ''}
                 onChange={(event) => setValue('sku', event.target.value)}
                 onBlur={handleSkuBlur}

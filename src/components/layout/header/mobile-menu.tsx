@@ -23,7 +23,6 @@ import {
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { Button } from '#/components/ui/button';
-// import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Sheet,
@@ -207,16 +206,7 @@ export default function MobileMenu() {
               <NavLink to='/new-arrivals' icon={Sparkles} onClick={closeSheet}>
                 New Arrivals
               </NavLink>
-              <NavLink
-                to='/deals'
-                icon={Percent}
-                onClick={closeSheet}
-                badge={
-                  <span className='rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-destructive'>
-                    20% OFF
-                  </span>
-                }
-              >
+              <NavLink to='/deals' icon={Percent} onClick={closeSheet}>
                 Sale
               </NavLink>
             </div>

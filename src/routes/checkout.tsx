@@ -160,6 +160,8 @@ function RouteComponent() {
       const res = await apiClient.post<
         | {
             baseShipping: number;
+            maxShipping: number | null;
+            minOrderAmount: number;
             totalDiscount: number;
             totalShippingDiscount: number;
             freeShipping: boolean;
@@ -240,15 +242,27 @@ function RouteComponent() {
   const freeShipping = discountPreview?.freeShipping ?? false;
   const shippingDiscount = discountPreview?.totalShippingDiscount ?? 0;
   const baseShipping = discountPreview?.baseShipping ?? 0;
-  const finalShipping = freeShipping
+  const shippingAfterDiscounts = freeShipping
     ? 0
     : Math.max(0, baseShipping - shippingDiscount);
+  // CONTENT-14: mirror the server's shipping cap so the quoted total matches
+  // the amount actually charged at order creation.
+  const maxShipping = discountPreview?.maxShipping ?? null;
+  const finalShipping =
+    maxShipping != null
+      ? Math.min(shippingAfterDiscounts, maxShipping)
+      : shippingAfterDiscounts;
 
   const taxBase = Math.max(0, subtotal - totalDiscount);
   const taxRate = discountPreview?.taxRate ?? 0;
   const tax = Math.round(taxBase * taxRate * 100) / 100;
 
   const total = subtotal + finalShipping + tax - totalDiscount;
+
+  // CONTENT-13: the server rejects orders below the configured minimum; warn
+  // before the customer reaches that error.
+  const minOrderAmount = discountPreview?.minOrderAmount ?? 0;
+  const belowMinimum = minOrderAmount > 0 && subtotal < minOrderAmount;
 
   // Wallet can only be used when it covers the order total (CUST-06).
   const walletShortfall =
@@ -637,7 +651,7 @@ function RouteComponent() {
                   type='submit'
                   size='lg'
                   className='w-full h-12 text-base rounded-xl'
-                  disabled={isPlacingOrder || walletShortfall}
+                  disabled={isPlacingOrder || walletShortfall || belowMinimum}
                 >
                   {isPlacingOrder ? (
                     <>
@@ -652,6 +666,12 @@ function RouteComponent() {
                   <p className='text-xs text-destructive text-center'>
                     Insufficient wallet balance. Top up your wallet or choose
                     another payment method.
+                  </p>
+                )}
+                {belowMinimum && (
+                  <p className='text-xs text-destructive text-center'>
+                    Minimum order amount is ৳{formatBDT(minOrderAmount)}. Add ৳
+                    {formatBDT(minOrderAmount - subtotal)} more to continue.
                   </p>
                 )}
               </div>

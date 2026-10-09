@@ -106,6 +106,30 @@ function RouteComponent() {
                   />
                 </div>
                 <div>
+                  <Label>Support Phone</Label>
+                  <Input
+                    value={settings.support_phone ?? ''}
+                    placeholder='+880 1XXX-XXXXXX'
+                    onChange={(e) => update('support_phone', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>Support Address</Label>
+                  <Input
+                    value={settings.support_address ?? ''}
+                    placeholder='Street, City, Bangladesh'
+                    onChange={(e) => update('support_address', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>Support Hours</Label>
+                  <Input
+                    value={settings.support_hours ?? ''}
+                    placeholder='Sun–Thu: 9AM – 6PM'
+                    onChange={(e) => update('support_hours', e.target.value)}
+                  />
+                </div>
+                <div>
                   <Label>Min Order Amount (BDT)</Label>
                   <Input
                     type='number'
@@ -146,10 +170,55 @@ function RouteComponent() {
         </Card>
       </motion.div>
 
+      {/* CONTENT-01/03: the footer and contact page read these social URLs.
+          Blank values hide the corresponding icon, so the placeholder
+          `mookkly` handles can never render. */}
+      <motion.div variants={fadeUp} custom={2}>
+        <Card>
+          <CardHeader>
+            <CardTitle className='text-lg'>Social Links</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='space-y-4'>
+              <div>
+                <Label>Facebook URL</Label>
+                <Input
+                  value={settings.social_facebook ?? ''}
+                  placeholder='https://facebook.com/your-page'
+                  onChange={(e) => update('social_facebook', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label>Instagram URL</Label>
+                <Input
+                  value={settings.social_instagram ?? ''}
+                  placeholder='https://instagram.com/your-page'
+                  onChange={(e) => update('social_instagram', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label>Twitter / X URL</Label>
+                <Input
+                  value={settings.social_twitter ?? ''}
+                  placeholder='https://x.com/your-page'
+                  onChange={(e) => update('social_twitter', e.target.value)}
+                />
+              </div>
+              <div className='flex justify-end'>
+                <Button onClick={handleSave} disabled={saving}>
+                  {saving && <Loader2 className='w-4 h-4 mr-2 animate-spin' />}
+                  Save Settings
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* FE-20: the public policy claims surfaced on the PDP, /shipping,
           /returns and the footer. Serving them from SiteSetting keeps every
           public page in agreement instead of five hardcoded copies. */}
-      <motion.div variants={fadeUp} custom={2}>
+      <motion.div variants={fadeUp} custom={3}>
         <Card>
           <CardHeader>
             <CardTitle className='text-lg'>

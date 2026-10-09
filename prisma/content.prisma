@@ -12,6 +12,22 @@ model Subscriber {
   @@map("subscriber")
 }
 
+model ContactMessage {
+  id      String  @id @default(cuid())
+  name    String
+  email   String
+  subject String?
+  message String
+  status  String  @default("NEW")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("contact_message")
+}
+
 model Verification {
   id         String   @id @default(cuid())
   identifier String

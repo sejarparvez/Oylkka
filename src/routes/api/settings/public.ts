@@ -12,6 +12,18 @@ import { logError } from '@/lib/logger';
  * everything stored in `site_setting`.
  */
 export const PUBLIC_SETTING_DEFAULTS: Record<string, string> = {
+  // Public business identity (CONTENT-03/05/09). Defaults are deliberately
+  // generic rather than a fabricated street address or phone number: the
+  // contact page only renders entries that are actually configured, and admins
+  // fill the real values in at /dashboard/admin/settings.
+  platform_name: 'Oylkka',
+  support_email: 'support@oylkka.com',
+  support_phone: '',
+  support_address: '',
+  support_hours: 'Sun–Thu: 9AM – 6PM',
+  social_facebook: '',
+  social_instagram: '',
+  social_twitter: '',
   free_shipping_threshold: '500',
   return_window_days: String(RETURN_WINDOW_DAYS),
   standard_delivery_fee: '60',

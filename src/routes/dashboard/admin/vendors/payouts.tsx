@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import {
   useAdminPayouts,
   useAdminPendingPayouts,
@@ -106,7 +107,7 @@ function RouteComponent() {
                     </div>
                     <div className='flex items-center gap-3'>
                       <span className='text-sm font-bold tabular-nums'>
-                        BDT {shop.totalAmount.toLocaleString()}
+                        ৳{formatBDT(shop.totalAmount)}
                       </span>
                       <Button
                         size='sm'
@@ -162,7 +163,7 @@ function RouteComponent() {
                     </div>
                     <div className='flex items-center gap-2'>
                       <span className='font-bold tabular-nums'>
-                        BDT {p.amount.toLocaleString()}
+                        ৳{formatBDT(p.amount)}
                       </span>
                       <Badge
                         variant={

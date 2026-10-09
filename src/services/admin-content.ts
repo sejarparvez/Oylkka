@@ -63,5 +63,8 @@ export function useContentBlock(slug: string | undefined) {
       return r.data;
     },
     enabled: !!slug,
+    // CONTENT-11: a missing/unpublished block is an expected "use the built-in
+    // copy" signal, not a transient failure — do not retry it three times.
+    retry: false,
   });
 }

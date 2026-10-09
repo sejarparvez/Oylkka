@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatBDT } from '@/lib/currency';
 import { useVendorOrders } from '@/services/vendor-orders';
 
 const STATUS_TABS = [
@@ -226,7 +227,7 @@ function RouteComponent() {
                     </div>
 
                     <div className='text-sm font-bold tabular-nums'>
-                      Ã Â§Â³{item.vendorAmount.toLocaleString('en-BD')}
+                      ৳{formatBDT(item.vendorAmount)}
                     </div>
                   </div>
                 </div>
