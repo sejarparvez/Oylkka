@@ -20,6 +20,7 @@ import {
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { getPublicProductMeta } from '@/actions/public-product-meta';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import { ProductDescription } from '@/components/pages/product/product-description';
@@ -65,6 +66,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RETURN_WINDOW_DAYS } from '@/lib/constants';
 import { trackProductView } from '@/lib/recently-viewed';
+import { getSiteUrl, siteAsset } from '@/lib/site-url';
 import { cn } from '@/lib/utils';
 import { useAddToCartMutation } from '@/services/cart';
 import { usePublicProduct } from '@/services/product';
@@ -81,7 +83,50 @@ import {
 // (`/api/settings/public` via `usePublicSettings`), with the defaults below as
 // the fallback while the request is in flight or the table is unreachable.
 
+function truncateForMeta(value: string, max = 160): string {
+  const cleaned = value.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= max) return cleaned;
+  return `${cleaned.slice(0, max)}…`;
+}
+
 export const Route = createFileRoute('/product/$slug')({
+  // Meta for social crawlers / SEO. A route `loader` is the only place head()
+  // can read product data on the server, and `createServerFn` keeps it safe on
+  // client-side navigation. The full product payload stays in `usePublicProduct`.
+  loader: async ({ params }) => ({
+    meta: await getPublicProductMeta({ data: { slug: params.slug } }),
+  }),
+  head: ({ loaderData, params }) => {
+    const meta = loaderData?.meta;
+    const siteUrl = getSiteUrl();
+    const pageUrl = `${siteUrl}/product/${params.slug}`;
+
+    const title = meta
+      ? meta.metaTitle || `${meta.productName} — Oylkka`
+      : 'Product not found — Oylkka';
+    const description = meta
+      ? truncateForMeta(meta.metaDescription || meta.description || '')
+      : 'This product is no longer available on Oylkka.';
+    // Product images are hosted on Cloudinary (absolute URLs), which Facebook
+    // requires for og:image; fall back to the site-wide share image otherwise.
+    const image = meta?.imageUrl || siteAsset('/og-image.svg');
+
+    return {
+      meta: [
+        { title },
+        { name: 'description', content: description },
+        { property: 'og:title', content: title },
+        { property: 'og:description', content: description },
+        { property: 'og:type', content: meta ? 'product' : 'website' },
+        { property: 'og:image', content: image },
+        { property: 'og:url', content: pageUrl },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: title },
+        { name: 'twitter:description', content: description },
+        { name: 'twitter:image', content: image },
+      ],
+    };
+  },
   component: RouteComponent,
 });
 

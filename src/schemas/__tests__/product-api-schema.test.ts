@@ -108,7 +108,7 @@ describe('ProductApiCreateSchema', () => {
       expect(result.data.condition).toBe('NEW');
       expect(result.data.hasVariants).toBe(false);
       expect(result.data.featured).toBe(false);
-      expect(result.data.status).toBe('DRAFT');
+      expect(result.data.status).toBe('PUBLISHED');
       expect(result.data.weightUnit).toBe('kg');
     }
   });

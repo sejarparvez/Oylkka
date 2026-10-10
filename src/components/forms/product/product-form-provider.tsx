@@ -55,7 +55,7 @@ export function ProductFormProvider({
       metaTitle: '',
       metaDescription: '',
       attributes: {},
-      status: 'DRAFT',
+      status: 'PUBLISHED',
       featured: false,
       variants: [],
       images: [],

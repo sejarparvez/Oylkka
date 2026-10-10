@@ -170,7 +170,7 @@ const ProductApiBaseSchema = z.object({
   variants: z.array(VariantSchema).optional().default([]),
   metaTitle: z.string().optional().nullable(),
   metaDescription: z.string().max(160).optional().nullable(),
-  status: ProductStatusEnum.default('DRAFT'),
+  status: ProductStatusEnum.default('PUBLISHED'),
   featured: z.boolean().default(false),
 });
 

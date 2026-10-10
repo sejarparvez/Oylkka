@@ -64,7 +64,7 @@ model Product {
   metaTitle       String?
   metaDescription String?
 
-  status   ProductStatus @default(DRAFT)
+  status   ProductStatus @default(PUBLISHED)
   featured Boolean       @default(false)
 
   shopId String?
