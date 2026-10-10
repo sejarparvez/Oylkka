@@ -9,345 +9,260 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TrackingRouteImport } from './routes/tracking'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as ShippingRouteImport } from './routes/shipping'
-import { Route as ReturnsRouteImport } from './routes/returns'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RecentlyViewedRouteImport } from './routes/recently-viewed'
-import { Route as ProductsRouteImport } from './routes/products'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
-import { Route as HelpRouteImport } from './routes/help'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as DealsRouteImport } from './routes/deals'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CompareRouteImport } from './routes/compare'
-import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as CategoriesRouteImport } from './routes/categories'
-import { Route as CartRouteImport } from './routes/cart'
-import { Route as BestsellersRouteImport } from './routes/bestsellers'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ShopsIndexRouteImport } from './routes/shops/index'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
-import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
-import { Route as ProductSlugRouteImport } from './routes/product.$slug'
-import { Route as DashboardWishlistRouteImport } from './routes/dashboard/wishlist'
-import { Route as DashboardWalletRouteImport } from './routes/dashboard/wallet'
-import { Route as DashboardMyAccountRouteImport } from './routes/dashboard/my-account'
-import { Route as DashboardFollowedShopsRouteImport } from './routes/dashboard/followed-shops'
-import { Route as DashboardAddressesRouteImport } from './routes/dashboard/addresses'
-import { Route as CheckoutConfirmationRouteImport } from './routes/checkout/confirmation'
-import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
-import { Route as AuthTwoFactorRouteImport } from './routes/auth/two-factor'
-import { Route as AuthSignupRouteImport } from './routes/auth/signup'
-import { Route as AuthSigninRouteImport } from './routes/auth/signin'
-import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
-import { Route as AuthErrorRouteImport } from './routes/auth/error'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as BestsellersRouteImport } from './routes/bestsellers'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CompareRouteImport } from './routes/compare'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
+import { Route as DealsRouteImport } from './routes/deals'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProductsRouteImport } from './routes/products'
+import { Route as RecentlyViewedRouteImport } from './routes/recently-viewed'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ReturnsRouteImport } from './routes/returns'
+import { Route as ShippingRouteImport } from './routes/shipping'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TrackingRouteImport } from './routes/tracking'
 import { Route as ApiContactRouteImport } from './routes/api/contact'
-import { Route as DashboardVendorRouteRouteImport } from './routes/dashboard/vendor/route'
-import { Route as DashboardOrdersRouteRouteImport } from './routes/dashboard/orders/route'
-import { Route as DashboardBecomeVendorRouteRouteImport } from './routes/dashboard/become-vendor/route'
+import { Route as AuthErrorRouteImport } from './routes/auth/error'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AuthSigninRouteImport } from './routes/auth/signin'
+import { Route as AuthSignupRouteImport } from './routes/auth/signup'
+import { Route as AuthTwoFactorRouteImport } from './routes/auth/two-factor'
+import { Route as AuthVerifyRouteImport } from './routes/auth/verify'
+import { Route as CheckoutConfirmationRouteImport } from './routes/checkout/confirmation'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardAddressesRouteImport } from './routes/dashboard/addresses'
 import { Route as DashboardAdminRouteRouteImport } from './routes/dashboard/admin/route'
-import { Route as DashboardVouchersIndexRouteImport } from './routes/dashboard/vouchers/index'
-import { Route as DashboardVendorIndexRouteImport } from './routes/dashboard/vendor/index'
-import { Route as DashboardReviewsIndexRouteImport } from './routes/dashboard/reviews/index'
-import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
-import { Route as DashboardMessagesIndexRouteImport } from './routes/dashboard/messages/index'
-import { Route as DashboardBecomeVendorIndexRouteImport } from './routes/dashboard/become-vendor/index'
-import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
-import { Route as ApiGlobalAttributesIndexRouteImport } from './routes/api/global-attributes/index'
-import { Route as ProductsCategorySlugRouteImport } from './routes/products/category.$slug'
-import { Route as DashboardOrdersOrderIdRouteImport } from './routes/dashboard/orders/$orderId'
-import { Route as DashboardMessagesIdRouteImport } from './routes/dashboard/messages/$id'
-import { Route as DashboardBecomeVendorPendingRouteImport } from './routes/dashboard/become-vendor/pending'
-import { Route as DashboardBecomeVendorApplyRouteImport } from './routes/dashboard/become-vendor/apply'
-import { Route as ApiWishlistRemoveRouteImport } from './routes/api/wishlist/remove'
-import { Route as ApiWishlistListRouteImport } from './routes/api/wishlist/list'
-import { Route as ApiWishlistAddRouteImport } from './routes/api/wishlist/add'
-import { Route as ApiWalletTopUpRouteImport } from './routes/api/wallet/top-up'
-import { Route as ApiWalletGetRouteImport } from './routes/api/wallet/get'
-import { Route as ApiWalletBkashCallbackRouteImport } from './routes/api/wallet/bkash-callback'
-import { Route as ApiVouchersProductVouchersRouteImport } from './routes/api/vouchers/product-vouchers'
-import { Route as ApiVouchersMyRouteImport } from './routes/api/vouchers/my'
-import { Route as ApiVouchersCollectRouteImport } from './routes/api/vouchers/collect'
-import { Route as ApiVouchersAutoApplyRouteImport } from './routes/api/vouchers/auto-apply'
-import { Route as ApiVendorQuestionsRouteImport } from './routes/api/vendor/questions'
-import { Route as ApiUploadMessageRouteImport } from './routes/api/upload/message'
-import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
-import { Route as ApiShopUpdateRouteImport } from './routes/api/shop/update'
-import { Route as ApiShopUnsuspendRouteImport } from './routes/api/shop/unsuspend'
-import { Route as ApiShopSuspendRouteImport } from './routes/api/shop/suspend'
-import { Route as ApiShopRejectRouteImport } from './routes/api/shop/reject'
-import { Route as ApiShopPublicSingleRouteImport } from './routes/api/shop/public-single'
-import { Route as ApiShopPublicProductsRouteImport } from './routes/api/shop/public-products'
-import { Route as ApiShopPublicListRouteImport } from './routes/api/shop/public-list'
-import { Route as ApiShopMyShopRouteImport } from './routes/api/shop/my-shop'
-import { Route as ApiShopGetSingleRouteImport } from './routes/api/shop/get-single'
-import { Route as ApiShopApproveRouteImport } from './routes/api/shop/approve'
-import { Route as ApiShopApplyRouteImport } from './routes/api/shop/apply'
-import { Route as ApiShopAdminListRouteImport } from './routes/api/shop/admin-list'
-import { Route as ApiSettingsPublicRouteImport } from './routes/api/settings/public'
-import { Route as ApiReturnsListRouteImport } from './routes/api/returns/list'
-import { Route as ApiReturnsCreateRouteImport } from './routes/api/returns/create'
-import { Route as ApiReturnsReturnIdRouteImport } from './routes/api/returns/$returnId'
-import { Route as ApiProductVendorListRouteImport } from './routes/api/product/vendor-list'
-import { Route as ApiProductVendorCategoriesRouteImport } from './routes/api/product/vendor-categories'
-import { Route as ApiProductPublicSingleRouteImport } from './routes/api/product/public-single'
-import { Route as ApiProductPublicReviewsRouteImport } from './routes/api/product/public-reviews'
-import { Route as ApiProductPublicRecentRouteImport } from './routes/api/product/public-recent'
-import { Route as ApiProductPublicQuestionsRouteImport } from './routes/api/product/public-questions'
-import { Route as ApiProductPublicListRouteImport } from './routes/api/product/public-list'
-import { Route as ApiProductPublicCompareRouteImport } from './routes/api/product/public-compare'
-import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/product/public-by-category'
-import { Route as ApiProductPublicBestsellersRouteImport } from './routes/api/product/public-bestsellers'
-import { Route as ApiProductHelpfulVoteRouteImport } from './routes/api/product/helpful-vote'
-import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/get-single'
-import { Route as ApiProductEditRouteImport } from './routes/api/product/edit'
-import { Route as ApiProductDeleteRouteImport } from './routes/api/product/delete'
-import { Route as ApiProductCreateReviewRouteImport } from './routes/api/product/create-review'
-import { Route as ApiProductCreateRouteImport } from './routes/api/product/create'
-import { Route as ApiProductCheckSkuRouteImport } from './routes/api/product/check-sku'
-import { Route as ApiProductAnswerQuestionRouteImport } from './routes/api/product/answer-question'
-import { Route as ApiOrdersListRouteImport } from './routes/api/orders/list'
-import { Route as ApiOrdersCancelRouteImport } from './routes/api/orders/cancel'
-import { Route as ApiOrdersAdminSingleRouteImport } from './routes/api/orders/admin-single'
-import { Route as ApiOrdersAdminRefundRouteImport } from './routes/api/orders/admin-refund'
-import { Route as ApiOrdersAdminListRouteImport } from './routes/api/orders/admin-list'
-import { Route as ApiOrdersAdminFulfillRouteImport } from './routes/api/orders/admin-fulfill'
-import { Route as ApiOrdersAdminCancelRouteImport } from './routes/api/orders/admin-cancel'
-import { Route as ApiOrdersOrderIdRouteImport } from './routes/api/orders/$orderId'
-import { Route as ApiNewsletterSubscribeRouteImport } from './routes/api/newsletter/subscribe'
-import { Route as ApiMessagesListRouteImport } from './routes/api/messages/list'
-import { Route as ApiMessagesCreateRouteImport } from './routes/api/messages/create'
-import { Route as ApiConversationsUnreadRouteImport } from './routes/api/conversations/unread'
-import { Route as ApiConversationsListRouteImport } from './routes/api/conversations/list'
-import { Route as ApiConversationsCreateRouteImport } from './routes/api/conversations/create'
-import { Route as ApiConversationsConversationIdRouteImport } from './routes/api/conversations/$conversationId'
-import { Route as ApiContentGetRouteImport } from './routes/api/content/get'
-import { Route as ApiCheckoutValidateCouponRouteImport } from './routes/api/checkout/validate-coupon'
-import { Route as ApiCheckoutDiscountPreviewRouteImport } from './routes/api/checkout/discount-preview'
-import { Route as ApiCheckoutCreateRouteImport } from './routes/api/checkout/create'
-import { Route as ApiCheckoutBkashPayRouteImport } from './routes/api/checkout/bkash-pay'
-import { Route as ApiCheckoutBkashIpnRouteImport } from './routes/api/checkout/bkash-ipn'
-import { Route as ApiCheckoutBkashCallbackRouteImport } from './routes/api/checkout/bkash-callback'
-import { Route as ApiCategoriesPublicListRouteImport } from './routes/api/categories/public-list'
-import { Route as ApiCategoriesListRouteImport } from './routes/api/categories/list'
-import { Route as ApiCategoriesGetSingleRouteImport } from './routes/api/categories/get-single'
-import { Route as ApiCategoriesEditRouteImport } from './routes/api/categories/edit'
-import { Route as ApiCategoriesDeleteRouteImport } from './routes/api/categories/delete'
-import { Route as ApiCategoriesAddRouteImport } from './routes/api/categories/add'
-import { Route as ApiCartUpdateRouteImport } from './routes/api/cart/update'
-import { Route as ApiCartRemoveRouteImport } from './routes/api/cart/remove'
-import { Route as ApiCartGetRouteImport } from './routes/api/cart/get'
-import { Route as ApiCartAddRouteImport } from './routes/api/cart/add'
-import { Route as ApiBannersHeroRouteImport } from './routes/api/banners/hero'
-import { Route as ApiBannersGetSingleRouteImport } from './routes/api/banners/get-single'
-import { Route as ApiBannersEditRouteImport } from './routes/api/banners/edit'
-import { Route as ApiBannersDeleteRouteImport } from './routes/api/banners/delete'
-import { Route as ApiBannersAdminListRouteImport } from './routes/api/banners/admin-list'
-import { Route as ApiBannersAddRouteImport } from './routes/api/banners/add'
-import { Route as ApiAuthSendPasswordResetConfirmationRouteImport } from './routes/api/auth/send-password-reset-confirmation'
-import { Route as ApiAuthCheckEmailRouteImport } from './routes/api/auth/check-email'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiAdminAuditLogsRouteImport } from './routes/api/admin/audit-logs'
-import { Route as ApiAddressesListRouteImport } from './routes/api/addresses/list'
-import { Route as ApiAddressesEditRouteImport } from './routes/api/addresses/edit'
-import { Route as ApiAddressesDeleteRouteImport } from './routes/api/addresses/delete'
+import { Route as DashboardBecomeVendorRouteRouteImport } from './routes/dashboard/become-vendor/route'
+import { Route as DashboardFollowedShopsRouteImport } from './routes/dashboard/followed-shops'
+import { Route as DashboardMyAccountRouteImport } from './routes/dashboard/my-account'
+import { Route as DashboardOrdersRouteRouteImport } from './routes/dashboard/orders/route'
+import { Route as DashboardVendorRouteRouteImport } from './routes/dashboard/vendor/route'
+import { Route as DashboardWalletRouteImport } from './routes/dashboard/wallet'
+import { Route as DashboardWishlistRouteImport } from './routes/dashboard/wishlist'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as ShopSlugRouteImport } from './routes/shop.$slug'
+import { Route as ShopsIndexRouteImport } from './routes/shops/index'
 import { Route as ApiAddressesCreateRouteImport } from './routes/api/addresses/create'
-import { Route as DashboardVendorShippingRouteRouteImport } from './routes/dashboard/vendor/shipping/route'
-import { Route as DashboardVendorPayoutsRouteRouteImport } from './routes/dashboard/vendor/payouts/route'
-import { Route as DashboardOrdersReturnsRouteRouteImport } from './routes/dashboard/orders/returns/route'
-import { Route as DashboardAdminStaffRouteRouteImport } from './routes/dashboard/admin/staff/route'
+import { Route as ApiAddressesDeleteRouteImport } from './routes/api/addresses/delete'
+import { Route as ApiAddressesEditRouteImport } from './routes/api/addresses/edit'
+import { Route as ApiAddressesListRouteImport } from './routes/api/addresses/list'
+import { Route as ApiAdminAuditLogsRouteImport } from './routes/api/admin/audit-logs'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiAuthCheckEmailRouteImport } from './routes/api/auth/check-email'
+import { Route as ApiAuthSendPasswordResetConfirmationRouteImport } from './routes/api/auth/send-password-reset-confirmation'
+import { Route as ApiBannersAddRouteImport } from './routes/api/banners/add'
+import { Route as ApiBannersAdminListRouteImport } from './routes/api/banners/admin-list'
+import { Route as ApiBannersDeleteRouteImport } from './routes/api/banners/delete'
+import { Route as ApiBannersEditRouteImport } from './routes/api/banners/edit'
+import { Route as ApiBannersGetSingleRouteImport } from './routes/api/banners/get-single'
+import { Route as ApiBannersHeroRouteImport } from './routes/api/banners/hero'
+import { Route as ApiCartAddRouteImport } from './routes/api/cart/add'
+import { Route as ApiCartGetRouteImport } from './routes/api/cart/get'
+import { Route as ApiCartRemoveRouteImport } from './routes/api/cart/remove'
+import { Route as ApiCartUpdateRouteImport } from './routes/api/cart/update'
+import { Route as ApiCategoriesAddRouteImport } from './routes/api/categories/add'
+import { Route as ApiCategoriesDeleteRouteImport } from './routes/api/categories/delete'
+import { Route as ApiCategoriesEditRouteImport } from './routes/api/categories/edit'
+import { Route as ApiCategoriesGetSingleRouteImport } from './routes/api/categories/get-single'
+import { Route as ApiCategoriesListRouteImport } from './routes/api/categories/list'
+import { Route as ApiCategoriesPublicListRouteImport } from './routes/api/categories/public-list'
+import { Route as ApiCheckoutBkashCallbackRouteImport } from './routes/api/checkout/bkash-callback'
+import { Route as ApiCheckoutBkashIpnRouteImport } from './routes/api/checkout/bkash-ipn'
+import { Route as ApiCheckoutBkashPayRouteImport } from './routes/api/checkout/bkash-pay'
+import { Route as ApiCheckoutCreateRouteImport } from './routes/api/checkout/create'
+import { Route as ApiCheckoutDiscountPreviewRouteImport } from './routes/api/checkout/discount-preview'
+import { Route as ApiCheckoutValidateCouponRouteImport } from './routes/api/checkout/validate-coupon'
+import { Route as ApiContentGetRouteImport } from './routes/api/content/get'
+import { Route as ApiConversationsConversationIdRouteImport } from './routes/api/conversations/$conversationId'
+import { Route as ApiConversationsCreateRouteImport } from './routes/api/conversations/create'
+import { Route as ApiConversationsListRouteImport } from './routes/api/conversations/list'
+import { Route as ApiConversationsUnreadRouteImport } from './routes/api/conversations/unread'
+import { Route as ApiGlobalAttributesIndexRouteImport } from './routes/api/global-attributes/index'
+import { Route as ApiMessagesCreateRouteImport } from './routes/api/messages/create'
+import { Route as ApiMessagesListRouteImport } from './routes/api/messages/list'
+import { Route as ApiNewsletterSubscribeRouteImport } from './routes/api/newsletter/subscribe'
+import { Route as ApiOrdersOrderIdRouteImport } from './routes/api/orders/$orderId'
+import { Route as ApiOrdersAdminCancelRouteImport } from './routes/api/orders/admin-cancel'
+import { Route as ApiOrdersAdminFulfillRouteImport } from './routes/api/orders/admin-fulfill'
+import { Route as ApiOrdersAdminListRouteImport } from './routes/api/orders/admin-list'
+import { Route as ApiOrdersAdminRefundRouteImport } from './routes/api/orders/admin-refund'
+import { Route as ApiOrdersAdminSingleRouteImport } from './routes/api/orders/admin-single'
+import { Route as ApiOrdersCancelRouteImport } from './routes/api/orders/cancel'
+import { Route as ApiOrdersListRouteImport } from './routes/api/orders/list'
+import { Route as ApiProductAnswerQuestionRouteImport } from './routes/api/product/answer-question'
+import { Route as ApiProductCheckSkuRouteImport } from './routes/api/product/check-sku'
+import { Route as ApiProductCreateRouteImport } from './routes/api/product/create'
+import { Route as ApiProductCreateReviewRouteImport } from './routes/api/product/create-review'
+import { Route as ApiProductDeleteRouteImport } from './routes/api/product/delete'
+import { Route as ApiProductEditRouteImport } from './routes/api/product/edit'
+import { Route as ApiProductGetSingleRouteImport } from './routes/api/product/get-single'
+import { Route as ApiProductHelpfulVoteRouteImport } from './routes/api/product/helpful-vote'
+import { Route as ApiProductPublicBestsellersRouteImport } from './routes/api/product/public-bestsellers'
+import { Route as ApiProductPublicByCategoryRouteImport } from './routes/api/product/public-by-category'
+import { Route as ApiProductPublicCompareRouteImport } from './routes/api/product/public-compare'
+import { Route as ApiProductPublicListRouteImport } from './routes/api/product/public-list'
+import { Route as ApiProductPublicQuestionsRouteImport } from './routes/api/product/public-questions'
+import { Route as ApiProductPublicRecentRouteImport } from './routes/api/product/public-recent'
+import { Route as ApiProductPublicReviewsRouteImport } from './routes/api/product/public-reviews'
+import { Route as ApiProductPublicSingleRouteImport } from './routes/api/product/public-single'
+import { Route as ApiProductVendorCategoriesRouteImport } from './routes/api/product/vendor-categories'
+import { Route as ApiProductVendorListRouteImport } from './routes/api/product/vendor-list'
+import { Route as ApiReturnsReturnIdRouteImport } from './routes/api/returns/$returnId'
+import { Route as ApiReturnsCreateRouteImport } from './routes/api/returns/create'
+import { Route as ApiReturnsListRouteImport } from './routes/api/returns/list'
+import { Route as ApiSettingsPublicRouteImport } from './routes/api/settings/public'
+import { Route as ApiShopAdminListRouteImport } from './routes/api/shop/admin-list'
+import { Route as ApiShopApplyRouteImport } from './routes/api/shop/apply'
+import { Route as ApiShopApproveRouteImport } from './routes/api/shop/approve'
+import { Route as ApiShopGetSingleRouteImport } from './routes/api/shop/get-single'
+import { Route as ApiShopMyShopRouteImport } from './routes/api/shop/my-shop'
+import { Route as ApiShopPublicListRouteImport } from './routes/api/shop/public-list'
+import { Route as ApiShopPublicProductsRouteImport } from './routes/api/shop/public-products'
+import { Route as ApiShopPublicSingleRouteImport } from './routes/api/shop/public-single'
+import { Route as ApiShopRejectRouteImport } from './routes/api/shop/reject'
+import { Route as ApiShopSuspendRouteImport } from './routes/api/shop/suspend'
+import { Route as ApiShopUnsuspendRouteImport } from './routes/api/shop/unsuspend'
+import { Route as ApiShopUpdateRouteImport } from './routes/api/shop/update'
+import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
+import { Route as ApiUploadMessageRouteImport } from './routes/api/upload/message'
+import { Route as ApiVendorQuestionsRouteImport } from './routes/api/vendor/questions'
+import { Route as ApiVouchersAutoApplyRouteImport } from './routes/api/vouchers/auto-apply'
+import { Route as ApiVouchersCollectRouteImport } from './routes/api/vouchers/collect'
+import { Route as ApiVouchersMyRouteImport } from './routes/api/vouchers/my'
+import { Route as ApiVouchersProductVouchersRouteImport } from './routes/api/vouchers/product-vouchers'
+import { Route as ApiWalletBkashCallbackRouteImport } from './routes/api/wallet/bkash-callback'
+import { Route as ApiWalletGetRouteImport } from './routes/api/wallet/get'
+import { Route as ApiWalletTopUpRouteImport } from './routes/api/wallet/top-up'
+import { Route as ApiWishlistAddRouteImport } from './routes/api/wishlist/add'
+import { Route as ApiWishlistListRouteImport } from './routes/api/wishlist/list'
+import { Route as ApiWishlistRemoveRouteImport } from './routes/api/wishlist/remove'
+import { Route as DashboardAdminIndexRouteImport } from './routes/dashboard/admin/index'
 import { Route as DashboardAdminGlobalAttributesRouteRouteImport } from './routes/dashboard/admin/global-attributes/route'
-import { Route as DashboardVendorShopIndexRouteImport } from './routes/dashboard/vendor/shop/index'
-import { Route as DashboardVendorShippingIndexRouteImport } from './routes/dashboard/vendor/shipping/index'
-import { Route as DashboardVendorSalesIndexRouteImport } from './routes/dashboard/vendor/sales/index'
-import { Route as DashboardVendorReturnsIndexRouteImport } from './routes/dashboard/vendor/returns/index'
-import { Route as DashboardVendorQuestionsIndexRouteImport } from './routes/dashboard/vendor/questions/index'
-import { Route as DashboardVendorProductsIndexRouteImport } from './routes/dashboard/vendor/products/index'
-import { Route as DashboardVendorPayoutsIndexRouteImport } from './routes/dashboard/vendor/payouts/index'
-import { Route as DashboardVendorOrdersIndexRouteImport } from './routes/dashboard/vendor/orders/index'
-import { Route as DashboardOrdersReturnsIndexRouteImport } from './routes/dashboard/orders/returns/index'
-import { Route as DashboardAdminVendorsIndexRouteImport } from './routes/dashboard/admin/vendors/index'
-import { Route as DashboardAdminStaffIndexRouteImport } from './routes/dashboard/admin/staff/index'
-import { Route as DashboardAdminSettingsIndexRouteImport } from './routes/dashboard/admin/settings/index'
-import { Route as DashboardAdminReviewsIndexRouteImport } from './routes/dashboard/admin/reviews/index'
-import { Route as DashboardAdminReturnsIndexRouteImport } from './routes/dashboard/admin/returns/index'
-import { Route as DashboardAdminOrdersIndexRouteImport } from './routes/dashboard/admin/orders/index'
-import { Route as DashboardAdminMessagesIndexRouteImport } from './routes/dashboard/admin/messages/index'
-import { Route as DashboardAdminGlobalAttributesIndexRouteImport } from './routes/dashboard/admin/global-attributes/index'
-import { Route as DashboardAdminCustomersIndexRouteImport } from './routes/dashboard/admin/customers/index'
-import { Route as DashboardAdminCouponsIndexRouteImport } from './routes/dashboard/admin/coupons/index'
-import { Route as DashboardAdminContentIndexRouteImport } from './routes/dashboard/admin/content/index'
-import { Route as DashboardVendorShopPoliciesRouteImport } from './routes/dashboard/vendor/shop/policies'
-import { Route as DashboardVendorShopPayoutRouteImport } from './routes/dashboard/vendor/shop/payout'
-import { Route as DashboardVendorShopBrandingRouteImport } from './routes/dashboard/vendor/shop/branding'
-import { Route as DashboardVendorShippingTrackingRouteImport } from './routes/dashboard/vendor/shipping/tracking'
-import { Route as DashboardVendorShippingLabelsRouteImport } from './routes/dashboard/vendor/shipping/labels'
-import { Route as DashboardVendorProductsEditRouteImport } from './routes/dashboard/vendor/products/edit'
-import { Route as DashboardVendorProductsAddRouteImport } from './routes/dashboard/vendor/products/add'
-import { Route as DashboardVendorPayoutsScheduleRouteImport } from './routes/dashboard/vendor/payouts/schedule'
-import { Route as DashboardVendorOrdersOrderIdRouteImport } from './routes/dashboard/vendor/orders/$orderId'
-import { Route as DashboardOrdersReturnsReturnIdRouteImport } from './routes/dashboard/orders/returns/$returnId'
-import { Route as DashboardAdminVendorsPayoutsRouteImport } from './routes/dashboard/admin/vendors/payouts'
-import { Route as DashboardAdminVendorsDetailRouteImport } from './routes/dashboard/admin/vendors/detail'
-import { Route as DashboardAdminStaffAuditLogsRouteImport } from './routes/dashboard/admin/staff/audit-logs'
-import { Route as DashboardAdminOrdersOrderIdRouteImport } from './routes/dashboard/admin/orders/$orderId'
-import { Route as DashboardAdminMessagesIdRouteImport } from './routes/dashboard/admin/messages/$id'
-import { Route as DashboardAdminGlobalAttributesCreateRouteImport } from './routes/dashboard/admin/global-attributes/create'
-import { Route as DashboardAdminGlobalAttributesIdRouteImport } from './routes/dashboard/admin/global-attributes/$id'
-import { Route as DashboardAdminCustomersIdRouteImport } from './routes/dashboard/admin/customers/$id'
-import { Route as DashboardAdminCouponsCreateRouteImport } from './routes/dashboard/admin/coupons/create'
-import { Route as DashboardAdminCouponsIdRouteImport } from './routes/dashboard/admin/coupons/$id'
-import { Route as DashboardAdminCategoryEditRouteImport } from './routes/dashboard/admin/category/edit'
-import { Route as DashboardAdminCategoryAllRouteImport } from './routes/dashboard/admin/category/all'
-import { Route as DashboardAdminCategoryAddRouteImport } from './routes/dashboard/admin/category/add'
-import { Route as DashboardAdminBannerListRouteImport } from './routes/dashboard/admin/banner/list'
-import { Route as DashboardAdminBannerEditRouteImport } from './routes/dashboard/admin/banner/edit'
-import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/admin/banner/add'
-import { Route as ApiVendorShopPoliciesRouteImport } from './routes/api/vendor/shop/policies'
-import { Route as ApiVendorShopPayoutDetailsRouteImport } from './routes/api/vendor/shop/payout-details'
-import { Route as ApiVendorShippingListRouteImport } from './routes/api/vendor/shipping/list'
-import { Route as ApiVendorShippingEditRouteImport } from './routes/api/vendor/shipping/edit'
-import { Route as ApiVendorShippingDeleteRouteImport } from './routes/api/vendor/shipping/delete'
-import { Route as ApiVendorShippingCreateRouteImport } from './routes/api/vendor/shipping/create'
-import { Route as ApiVendorReturnsReviewRouteImport } from './routes/api/vendor/returns/review'
-import { Route as ApiVendorReturnsListRouteImport } from './routes/api/vendor/returns/list'
-import { Route as ApiVendorPayoutsScheduleRouteImport } from './routes/api/vendor/payouts/schedule'
-import { Route as ApiVendorPayoutsPendingRouteImport } from './routes/api/vendor/payouts/pending'
-import { Route as ApiVendorPayoutsListRouteImport } from './routes/api/vendor/payouts/list'
-import { Route as ApiVendorOrdersListRouteImport } from './routes/api/vendor/orders/list'
-import { Route as ApiVendorOrdersCancelRouteImport } from './routes/api/vendor/orders/cancel'
-import { Route as ApiVendorOrdersOrderIdRouteImport } from './routes/api/vendor/orders/$orderId'
-import { Route as ApiVendorConversationsListRouteImport } from './routes/api/vendor/conversations/list'
-import { Route as ApiVendorConversationsConversationIdRouteImport } from './routes/api/vendor/conversations/$conversationId'
-import { Route as ApiVendorAnalyticsOverviewRouteImport } from './routes/api/vendor/analytics/overview'
-import { Route as ApiShopFollowToggleRouteImport } from './routes/api/shop/follow/toggle'
-import { Route as ApiShopFollowListRouteImport } from './routes/api/shop/follow/list'
-import { Route as ApiReviewsMyListRouteImport } from './routes/api/reviews/my/list'
-import { Route as ApiReviewsMyIdRouteImport } from './routes/api/reviews/my/$id'
-import { Route as ApiOrdersInvoiceInvoiceIdRouteImport } from './routes/api/orders/invoice/$invoiceId'
-import { Route as ApiAdminShopsShopIdRouteImport } from './routes/api/admin/shops/$shopId'
-import { Route as ApiAdminSettingsUpdateRouteImport } from './routes/api/admin/settings/update'
-import { Route as ApiAdminSettingsListRouteImport } from './routes/api/admin/settings/list'
-import { Route as ApiAdminReviewsListRouteImport } from './routes/api/admin/reviews/list'
-import { Route as ApiAdminReviewsIdRouteImport } from './routes/api/admin/reviews/$id'
-import { Route as ApiAdminReturnsReviewRouteImport } from './routes/api/admin/returns/review'
-import { Route as ApiAdminReturnsListRouteImport } from './routes/api/admin/returns/list'
-import { Route as ApiAdminPayoutsProcessRouteImport } from './routes/api/admin/payouts/process'
-import { Route as ApiAdminPayoutsPendingRouteImport } from './routes/api/admin/payouts/pending'
-import { Route as ApiAdminPayoutsListRouteImport } from './routes/api/admin/payouts/list'
-import { Route as ApiAdminMessagesCreateRouteImport } from './routes/api/admin/messages/create'
-import { Route as ApiAdminGlobalAttributesProductMappingsRouteImport } from './routes/api/admin/global-attributes/product-mappings'
-import { Route as ApiAdminGlobalAttributesMapProductRouteImport } from './routes/api/admin/global-attributes/map-product'
-import { Route as ApiAdminGlobalAttributesListRouteImport } from './routes/api/admin/global-attributes/list'
-import { Route as ApiAdminGlobalAttributesCreateRouteImport } from './routes/api/admin/global-attributes/create'
-import { Route as ApiAdminGlobalAttributesIdRouteImport } from './routes/api/admin/global-attributes/$id'
-import { Route as ApiAdminDashboardStatsRouteImport } from './routes/api/admin/dashboard/stats'
-import { Route as ApiAdminCustomersListRouteImport } from './routes/api/admin/customers/list'
-import { Route as ApiAdminCustomersIdRouteImport } from './routes/api/admin/customers/$id'
-import { Route as ApiAdminCouponsListRouteImport } from './routes/api/admin/coupons/list'
-import { Route as ApiAdminCouponsCreateRouteImport } from './routes/api/admin/coupons/create'
-import { Route as ApiAdminCouponsIdRouteImport } from './routes/api/admin/coupons/$id'
-import { Route as ApiAdminConversationsListRouteImport } from './routes/api/admin/conversations/list'
-import { Route as ApiAdminConversationsCloseRouteImport } from './routes/api/admin/conversations/close'
-import { Route as ApiAdminConversationsConversationIdRouteImport } from './routes/api/admin/conversations/$conversationId'
-import { Route as ApiAdminContentSaveRouteImport } from './routes/api/admin/content/save'
+import { Route as DashboardAdminStaffRouteRouteImport } from './routes/dashboard/admin/staff/route'
+import { Route as DashboardBecomeVendorIndexRouteImport } from './routes/dashboard/become-vendor/index'
+import { Route as DashboardBecomeVendorApplyRouteImport } from './routes/dashboard/become-vendor/apply'
+import { Route as DashboardBecomeVendorPendingRouteImport } from './routes/dashboard/become-vendor/pending'
+import { Route as DashboardMessagesIndexRouteImport } from './routes/dashboard/messages/index'
+import { Route as DashboardMessagesIdRouteImport } from './routes/dashboard/messages/$id'
+import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
+import { Route as DashboardOrdersOrderIdRouteImport } from './routes/dashboard/orders/$orderId'
+import { Route as DashboardOrdersReturnsRouteRouteImport } from './routes/dashboard/orders/returns/route'
+import { Route as DashboardReviewsIndexRouteImport } from './routes/dashboard/reviews/index'
+import { Route as DashboardVendorIndexRouteImport } from './routes/dashboard/vendor/index'
+import { Route as DashboardVendorPayoutsRouteRouteImport } from './routes/dashboard/vendor/payouts/route'
+import { Route as DashboardVendorShippingRouteRouteImport } from './routes/dashboard/vendor/shipping/route'
+import { Route as DashboardVouchersIndexRouteImport } from './routes/dashboard/vouchers/index'
+import { Route as ProductsCategorySlugRouteImport } from './routes/products/category.$slug'
 import { Route as ApiAdminContentListRouteImport } from './routes/api/admin/content/list'
+import { Route as ApiAdminContentSaveRouteImport } from './routes/api/admin/content/save'
+import { Route as ApiAdminConversationsConversationIdRouteImport } from './routes/api/admin/conversations/$conversationId'
+import { Route as ApiAdminConversationsCloseRouteImport } from './routes/api/admin/conversations/close'
+import { Route as ApiAdminConversationsListRouteImport } from './routes/api/admin/conversations/list'
+import { Route as ApiAdminCouponsIdRouteImport } from './routes/api/admin/coupons/$id'
+import { Route as ApiAdminCouponsCreateRouteImport } from './routes/api/admin/coupons/create'
+import { Route as ApiAdminCouponsListRouteImport } from './routes/api/admin/coupons/list'
+import { Route as ApiAdminCustomersIdRouteImport } from './routes/api/admin/customers/$id'
+import { Route as ApiAdminCustomersListRouteImport } from './routes/api/admin/customers/list'
+import { Route as ApiAdminDashboardStatsRouteImport } from './routes/api/admin/dashboard/stats'
+import { Route as ApiAdminGlobalAttributesIdRouteImport } from './routes/api/admin/global-attributes/$id'
+import { Route as ApiAdminGlobalAttributesCreateRouteImport } from './routes/api/admin/global-attributes/create'
+import { Route as ApiAdminGlobalAttributesListRouteImport } from './routes/api/admin/global-attributes/list'
+import { Route as ApiAdminGlobalAttributesMapProductRouteImport } from './routes/api/admin/global-attributes/map-product'
+import { Route as ApiAdminGlobalAttributesProductMappingsRouteImport } from './routes/api/admin/global-attributes/product-mappings'
+import { Route as ApiAdminMessagesCreateRouteImport } from './routes/api/admin/messages/create'
+import { Route as ApiAdminPayoutsListRouteImport } from './routes/api/admin/payouts/list'
+import { Route as ApiAdminPayoutsPendingRouteImport } from './routes/api/admin/payouts/pending'
+import { Route as ApiAdminPayoutsProcessRouteImport } from './routes/api/admin/payouts/process'
+import { Route as ApiAdminReturnsListRouteImport } from './routes/api/admin/returns/list'
+import { Route as ApiAdminReturnsReviewRouteImport } from './routes/api/admin/returns/review'
+import { Route as ApiAdminReviewsIdRouteImport } from './routes/api/admin/reviews/$id'
+import { Route as ApiAdminReviewsListRouteImport } from './routes/api/admin/reviews/list'
+import { Route as ApiAdminSettingsListRouteImport } from './routes/api/admin/settings/list'
+import { Route as ApiAdminSettingsUpdateRouteImport } from './routes/api/admin/settings/update'
+import { Route as ApiAdminShopsShopIdRouteImport } from './routes/api/admin/shops/$shopId'
+import { Route as ApiOrdersInvoiceInvoiceIdRouteImport } from './routes/api/orders/invoice/$invoiceId'
+import { Route as ApiReviewsMyIdRouteImport } from './routes/api/reviews/my/$id'
+import { Route as ApiReviewsMyListRouteImport } from './routes/api/reviews/my/list'
+import { Route as ApiShopFollowListRouteImport } from './routes/api/shop/follow/list'
+import { Route as ApiShopFollowToggleRouteImport } from './routes/api/shop/follow/toggle'
+import { Route as ApiVendorAnalyticsOverviewRouteImport } from './routes/api/vendor/analytics/overview'
+import { Route as ApiVendorConversationsConversationIdRouteImport } from './routes/api/vendor/conversations/$conversationId'
+import { Route as ApiVendorConversationsListRouteImport } from './routes/api/vendor/conversations/list'
+import { Route as ApiVendorOrdersOrderIdRouteImport } from './routes/api/vendor/orders/$orderId'
+import { Route as ApiVendorOrdersCancelRouteImport } from './routes/api/vendor/orders/cancel'
+import { Route as ApiVendorOrdersListRouteImport } from './routes/api/vendor/orders/list'
+import { Route as ApiVendorPayoutsListRouteImport } from './routes/api/vendor/payouts/list'
+import { Route as ApiVendorPayoutsPendingRouteImport } from './routes/api/vendor/payouts/pending'
+import { Route as ApiVendorPayoutsScheduleRouteImport } from './routes/api/vendor/payouts/schedule'
+import { Route as ApiVendorReturnsListRouteImport } from './routes/api/vendor/returns/list'
+import { Route as ApiVendorReturnsReviewRouteImport } from './routes/api/vendor/returns/review'
+import { Route as ApiVendorShippingCreateRouteImport } from './routes/api/vendor/shipping/create'
+import { Route as ApiVendorShippingDeleteRouteImport } from './routes/api/vendor/shipping/delete'
+import { Route as ApiVendorShippingEditRouteImport } from './routes/api/vendor/shipping/edit'
+import { Route as ApiVendorShippingListRouteImport } from './routes/api/vendor/shipping/list'
+import { Route as ApiVendorShopPayoutDetailsRouteImport } from './routes/api/vendor/shop/payout-details'
+import { Route as ApiVendorShopPoliciesRouteImport } from './routes/api/vendor/shop/policies'
+import { Route as DashboardAdminBannerAddRouteImport } from './routes/dashboard/admin/banner/add'
+import { Route as DashboardAdminBannerEditRouteImport } from './routes/dashboard/admin/banner/edit'
+import { Route as DashboardAdminBannerListRouteImport } from './routes/dashboard/admin/banner/list'
+import { Route as DashboardAdminCategoryAddRouteImport } from './routes/dashboard/admin/category/add'
+import { Route as DashboardAdminCategoryAllRouteImport } from './routes/dashboard/admin/category/all'
+import { Route as DashboardAdminCategoryEditRouteImport } from './routes/dashboard/admin/category/edit'
+import { Route as DashboardAdminContentIndexRouteImport } from './routes/dashboard/admin/content/index'
+import { Route as DashboardAdminCouponsIndexRouteImport } from './routes/dashboard/admin/coupons/index'
+import { Route as DashboardAdminCouponsIdRouteImport } from './routes/dashboard/admin/coupons/$id'
+import { Route as DashboardAdminCouponsCreateRouteImport } from './routes/dashboard/admin/coupons/create'
+import { Route as DashboardAdminCustomersIndexRouteImport } from './routes/dashboard/admin/customers/index'
+import { Route as DashboardAdminCustomersIdRouteImport } from './routes/dashboard/admin/customers/$id'
+import { Route as DashboardAdminGlobalAttributesIndexRouteImport } from './routes/dashboard/admin/global-attributes/index'
+import { Route as DashboardAdminGlobalAttributesIdRouteImport } from './routes/dashboard/admin/global-attributes/$id'
+import { Route as DashboardAdminGlobalAttributesCreateRouteImport } from './routes/dashboard/admin/global-attributes/create'
+import { Route as DashboardAdminMessagesIndexRouteImport } from './routes/dashboard/admin/messages/index'
+import { Route as DashboardAdminMessagesIdRouteImport } from './routes/dashboard/admin/messages/$id'
+import { Route as DashboardAdminOrdersIndexRouteImport } from './routes/dashboard/admin/orders/index'
+import { Route as DashboardAdminOrdersOrderIdRouteImport } from './routes/dashboard/admin/orders/$orderId'
+import { Route as DashboardAdminReturnsIndexRouteImport } from './routes/dashboard/admin/returns/index'
+import { Route as DashboardAdminReviewsIndexRouteImport } from './routes/dashboard/admin/reviews/index'
+import { Route as DashboardAdminSettingsIndexRouteImport } from './routes/dashboard/admin/settings/index'
+import { Route as DashboardAdminStaffIndexRouteImport } from './routes/dashboard/admin/staff/index'
+import { Route as DashboardAdminStaffAuditLogsRouteImport } from './routes/dashboard/admin/staff/audit-logs'
+import { Route as DashboardAdminVendorsIndexRouteImport } from './routes/dashboard/admin/vendors/index'
+import { Route as DashboardAdminVendorsDetailRouteImport } from './routes/dashboard/admin/vendors/detail'
+import { Route as DashboardAdminVendorsPayoutsRouteImport } from './routes/dashboard/admin/vendors/payouts'
+import { Route as DashboardOrdersReturnsIndexRouteImport } from './routes/dashboard/orders/returns/index'
+import { Route as DashboardOrdersReturnsReturnIdRouteImport } from './routes/dashboard/orders/returns/$returnId'
+import { Route as DashboardVendorOrdersIndexRouteImport } from './routes/dashboard/vendor/orders/index'
+import { Route as DashboardVendorOrdersOrderIdRouteImport } from './routes/dashboard/vendor/orders/$orderId'
+import { Route as DashboardVendorPayoutsIndexRouteImport } from './routes/dashboard/vendor/payouts/index'
+import { Route as DashboardVendorPayoutsScheduleRouteImport } from './routes/dashboard/vendor/payouts/schedule'
+import { Route as DashboardVendorProductsIndexRouteImport } from './routes/dashboard/vendor/products/index'
+import { Route as DashboardVendorProductsAddRouteImport } from './routes/dashboard/vendor/products/add'
+import { Route as DashboardVendorProductsEditRouteImport } from './routes/dashboard/vendor/products/edit'
+import { Route as DashboardVendorQuestionsIndexRouteImport } from './routes/dashboard/vendor/questions/index'
+import { Route as DashboardVendorReturnsIndexRouteImport } from './routes/dashboard/vendor/returns/index'
+import { Route as DashboardVendorSalesIndexRouteImport } from './routes/dashboard/vendor/sales/index'
+import { Route as DashboardVendorShippingIndexRouteImport } from './routes/dashboard/vendor/shipping/index'
+import { Route as DashboardVendorShippingLabelsRouteImport } from './routes/dashboard/vendor/shipping/labels'
+import { Route as DashboardVendorShippingTrackingRouteImport } from './routes/dashboard/vendor/shipping/tracking'
+import { Route as DashboardVendorShopIndexRouteImport } from './routes/dashboard/vendor/shop/index'
+import { Route as DashboardVendorShopBrandingRouteImport } from './routes/dashboard/vendor/shop/branding'
+import { Route as DashboardVendorShopPayoutRouteImport } from './routes/dashboard/vendor/shop/payout'
+import { Route as DashboardVendorShopPoliciesRouteImport } from './routes/dashboard/vendor/shop/policies'
 import { Route as DashboardVendorShopMessagesIndexRouteImport } from './routes/dashboard/vendor/shop/messages/index'
 import { Route as DashboardVendorShopMessagesIdRouteImport } from './routes/dashboard/vendor/shop/messages/$id'
 
-const TrackingRoute = TrackingRouteImport.update({
-  id: '/tracking',
-  path: '/tracking',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShippingRoute = ShippingRouteImport.update({
-  id: '/shipping',
-  path: '/shipping',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReturnsRoute = ReturnsRouteImport.update({
-  id: '/returns',
-  path: '/returns',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecentlyViewedRoute = RecentlyViewedRouteImport.update({
-  id: '/recently-viewed',
-  path: '/recently-viewed',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductsRoute = ProductsRouteImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NewArrivalsRoute = NewArrivalsRouteImport.update({
-  id: '/new-arrivals',
-  path: '/new-arrivals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealsRoute = DealsRouteImport.update({
-  id: '/deals',
-  path: '/deals',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompareRoute = CompareRouteImport.update({
-  id: '/compare',
-  path: '/compare',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CategoriesRoute = CategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BestsellersRoute = BestsellersRouteImport.update({
-  id: '/bestsellers',
-  path: '/bestsellers',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -355,94 +270,99 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BestsellersRoute = BestsellersRouteImport.update({
+  id: '/bestsellers',
+  path: '/bestsellers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRouteRoute = DashboardRouteRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const DealsRoute = DealsRouteImport.update({
+  id: '/deals',
+  path: '/deals',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShopsIndexRoute = ShopsIndexRouteImport.update({
-  id: '/shops/',
-  path: '/shops/',
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const ShopSlugRoute = ShopSlugRouteImport.update({
-  id: '/shop/$slug',
-  path: '/shop/$slug',
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProductSlugRoute = ProductSlugRouteImport.update({
-  id: '/product/$slug',
-  path: '/product/$slug',
+const NewArrivalsRoute = NewArrivalsRouteImport.update({
+  id: '/new-arrivals',
+  path: '/new-arrivals',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardWishlistRoute = DashboardWishlistRouteImport.update({
-  id: '/wishlist',
-  path: '/wishlist',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const DashboardWalletRoute = DashboardWalletRouteImport.update({
-  id: '/wallet',
-  path: '/wallet',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const DashboardMyAccountRoute = DashboardMyAccountRouteImport.update({
-  id: '/my-account',
-  path: '/my-account',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const DashboardFollowedShopsRoute = DashboardFollowedShopsRouteImport.update({
-  id: '/followed-shops',
-  path: '/followed-shops',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const DashboardAddressesRoute = DashboardAddressesRouteImport.update({
-  id: '/addresses',
-  path: '/addresses',
-  getParentRoute: () => DashboardRouteRoute,
-} as any)
-const CheckoutConfirmationRoute = CheckoutConfirmationRouteImport.update({
-  id: '/confirmation',
-  path: '/confirmation',
-  getParentRoute: () => CheckoutRoute,
-} as any)
-const AuthVerifyRoute = AuthVerifyRouteImport.update({
-  id: '/auth/verify',
-  path: '/auth/verify',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthTwoFactorRoute = AuthTwoFactorRouteImport.update({
-  id: '/auth/two-factor',
-  path: '/auth/two-factor',
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/auth/signup',
-  path: '/auth/signup',
+const RecentlyViewedRoute = RecentlyViewedRouteImport.update({
+  id: '/recently-viewed',
+  path: '/recently-viewed',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthSigninRoute = AuthSigninRouteImport.update({
-  id: '/auth/signin',
-  path: '/auth/signin',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/auth/forgot-password',
-  path: '/auth/forgot-password',
+const ReturnsRoute = ReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthErrorRoute = AuthErrorRouteImport.update({
-  id: '/auth/error',
-  path: '/auth/error',
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackingRoute = TrackingRouteImport.update({
+  id: '/tracking',
+  path: '/tracking',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiContactRoute = ApiContactRouteImport.update({
@@ -450,14 +370,54 @@ const ApiContactRoute = ApiContactRouteImport.update({
   path: '/api/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardVendorRouteRoute = DashboardVendorRouteRouteImport.update({
-  id: '/vendor',
-  path: '/vendor',
+const AuthErrorRoute = AuthErrorRouteImport.update({
+  id: '/auth/error',
+  path: '/auth/error',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/auth/forgot-password',
+  path: '/auth/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSigninRoute = AuthSigninRouteImport.update({
+  id: '/auth/signin',
+  path: '/auth/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/auth/signup',
+  path: '/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthTwoFactorRoute = AuthTwoFactorRouteImport.update({
+  id: '/auth/two-factor',
+  path: '/auth/two-factor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthVerifyRoute = AuthVerifyRouteImport.update({
+  id: '/auth/verify',
+  path: '/auth/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutConfirmationRoute = CheckoutConfirmationRouteImport.update({
+  id: '/confirmation',
+  path: '/confirmation',
+  getParentRoute: () => CheckoutRoute,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardOrdersRouteRoute = DashboardOrdersRouteRouteImport.update({
-  id: '/orders',
-  path: '/orders',
+const DashboardAddressesRoute = DashboardAddressesRouteImport.update({
+  id: '/addresses',
+  path: '/addresses',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
 const DashboardBecomeVendorRouteRoute =
@@ -466,513 +426,84 @@ const DashboardBecomeVendorRouteRoute =
     path: '/become-vendor',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
-const DashboardAdminRouteRoute = DashboardAdminRouteRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const DashboardFollowedShopsRoute = DashboardFollowedShopsRouteImport.update({
+  id: '/followed-shops',
+  path: '/followed-shops',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardVouchersIndexRoute = DashboardVouchersIndexRouteImport.update({
-  id: '/vouchers/',
-  path: '/vouchers/',
+const DashboardMyAccountRoute = DashboardMyAccountRouteImport.update({
+  id: '/my-account',
+  path: '/my-account',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardVendorIndexRoute = DashboardVendorIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardVendorRouteRoute,
-} as any)
-const DashboardReviewsIndexRoute = DashboardReviewsIndexRouteImport.update({
-  id: '/reviews/',
-  path: '/reviews/',
+const DashboardOrdersRouteRoute = DashboardOrdersRouteRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardOrdersIndexRoute = DashboardOrdersIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardOrdersRouteRoute,
-} as any)
-const DashboardMessagesIndexRoute = DashboardMessagesIndexRouteImport.update({
-  id: '/messages/',
-  path: '/messages/',
+const DashboardVendorRouteRoute = DashboardVendorRouteRouteImport.update({
+  id: '/vendor',
+  path: '/vendor',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardBecomeVendorIndexRoute =
-  DashboardBecomeVendorIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardBecomeVendorRouteRoute,
-  } as any)
-const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DashboardAdminRouteRoute,
-} as any)
-const ApiGlobalAttributesIndexRoute =
-  ApiGlobalAttributesIndexRouteImport.update({
-    id: '/api/global-attributes/',
-    path: '/api/global-attributes/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ProductsCategorySlugRoute = ProductsCategorySlugRouteImport.update({
-  id: '/category/$slug',
-  path: '/category/$slug',
-  getParentRoute: () => ProductsRoute,
-} as any)
-const DashboardOrdersOrderIdRoute = DashboardOrdersOrderIdRouteImport.update({
-  id: '/$orderId',
-  path: '/$orderId',
-  getParentRoute: () => DashboardOrdersRouteRoute,
-} as any)
-const DashboardMessagesIdRoute = DashboardMessagesIdRouteImport.update({
-  id: '/messages/$id',
-  path: '/messages/$id',
+const DashboardWalletRoute = DashboardWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardBecomeVendorPendingRoute =
-  DashboardBecomeVendorPendingRouteImport.update({
-    id: '/pending',
-    path: '/pending',
-    getParentRoute: () => DashboardBecomeVendorRouteRoute,
-  } as any)
-const DashboardBecomeVendorApplyRoute =
-  DashboardBecomeVendorApplyRouteImport.update({
-    id: '/apply',
-    path: '/apply',
-    getParentRoute: () => DashboardBecomeVendorRouteRoute,
-  } as any)
-const ApiWishlistRemoveRoute = ApiWishlistRemoveRouteImport.update({
-  id: '/api/wishlist/remove',
-  path: '/api/wishlist/remove',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiWishlistListRoute = ApiWishlistListRouteImport.update({
-  id: '/api/wishlist/list',
-  path: '/api/wishlist/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiWishlistAddRoute = ApiWishlistAddRouteImport.update({
-  id: '/api/wishlist/add',
-  path: '/api/wishlist/add',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiWalletTopUpRoute = ApiWalletTopUpRouteImport.update({
-  id: '/api/wallet/top-up',
-  path: '/api/wallet/top-up',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiWalletGetRoute = ApiWalletGetRouteImport.update({
-  id: '/api/wallet/get',
-  path: '/api/wallet/get',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiWalletBkashCallbackRoute = ApiWalletBkashCallbackRouteImport.update({
-  id: '/api/wallet/bkash-callback',
-  path: '/api/wallet/bkash-callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVouchersProductVouchersRoute =
-  ApiVouchersProductVouchersRouteImport.update({
-    id: '/api/vouchers/product-vouchers',
-    path: '/api/vouchers/product-vouchers',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiVouchersMyRoute = ApiVouchersMyRouteImport.update({
-  id: '/api/vouchers/my',
-  path: '/api/vouchers/my',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVouchersCollectRoute = ApiVouchersCollectRouteImport.update({
-  id: '/api/vouchers/collect',
-  path: '/api/vouchers/collect',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVouchersAutoApplyRoute = ApiVouchersAutoApplyRouteImport.update({
-  id: '/api/vouchers/auto-apply',
-  path: '/api/vouchers/auto-apply',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorQuestionsRoute = ApiVendorQuestionsRouteImport.update({
-  id: '/api/vendor/questions',
-  path: '/api/vendor/questions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiUploadMessageRoute = ApiUploadMessageRouteImport.update({
-  id: '/api/upload/message',
-  path: '/api/upload/message',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiUploadAvatarRoute = ApiUploadAvatarRouteImport.update({
-  id: '/api/upload/avatar',
-  path: '/api/upload/avatar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopUpdateRoute = ApiShopUpdateRouteImport.update({
-  id: '/api/shop/update',
-  path: '/api/shop/update',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopUnsuspendRoute = ApiShopUnsuspendRouteImport.update({
-  id: '/api/shop/unsuspend',
-  path: '/api/shop/unsuspend',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopSuspendRoute = ApiShopSuspendRouteImport.update({
-  id: '/api/shop/suspend',
-  path: '/api/shop/suspend',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopRejectRoute = ApiShopRejectRouteImport.update({
-  id: '/api/shop/reject',
-  path: '/api/shop/reject',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopPublicSingleRoute = ApiShopPublicSingleRouteImport.update({
-  id: '/api/shop/public-single',
-  path: '/api/shop/public-single',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopPublicProductsRoute = ApiShopPublicProductsRouteImport.update({
-  id: '/api/shop/public-products',
-  path: '/api/shop/public-products',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopPublicListRoute = ApiShopPublicListRouteImport.update({
-  id: '/api/shop/public-list',
-  path: '/api/shop/public-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopMyShopRoute = ApiShopMyShopRouteImport.update({
-  id: '/api/shop/my-shop',
-  path: '/api/shop/my-shop',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopGetSingleRoute = ApiShopGetSingleRouteImport.update({
-  id: '/api/shop/get-single',
-  path: '/api/shop/get-single',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopApproveRoute = ApiShopApproveRouteImport.update({
-  id: '/api/shop/approve',
-  path: '/api/shop/approve',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopApplyRoute = ApiShopApplyRouteImport.update({
-  id: '/api/shop/apply',
-  path: '/api/shop/apply',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopAdminListRoute = ApiShopAdminListRouteImport.update({
-  id: '/api/shop/admin-list',
-  path: '/api/shop/admin-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSettingsPublicRoute = ApiSettingsPublicRouteImport.update({
-  id: '/api/settings/public',
-  path: '/api/settings/public',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiReturnsListRoute = ApiReturnsListRouteImport.update({
-  id: '/api/returns/list',
-  path: '/api/returns/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiReturnsCreateRoute = ApiReturnsCreateRouteImport.update({
-  id: '/api/returns/create',
-  path: '/api/returns/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiReturnsReturnIdRoute = ApiReturnsReturnIdRouteImport.update({
-  id: '/api/returns/$returnId',
-  path: '/api/returns/$returnId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductVendorListRoute = ApiProductVendorListRouteImport.update({
-  id: '/api/product/vendor-list',
-  path: '/api/product/vendor-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductVendorCategoriesRoute =
-  ApiProductVendorCategoriesRouteImport.update({
-    id: '/api/product/vendor-categories',
-    path: '/api/product/vendor-categories',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiProductPublicSingleRoute = ApiProductPublicSingleRouteImport.update({
-  id: '/api/product/public-single',
-  path: '/api/product/public-single',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductPublicReviewsRoute = ApiProductPublicReviewsRouteImport.update({
-  id: '/api/product/public-reviews',
-  path: '/api/product/public-reviews',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductPublicRecentRoute = ApiProductPublicRecentRouteImport.update({
-  id: '/api/product/public-recent',
-  path: '/api/product/public-recent',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductPublicQuestionsRoute =
-  ApiProductPublicQuestionsRouteImport.update({
-    id: '/api/product/public-questions',
-    path: '/api/product/public-questions',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiProductPublicListRoute = ApiProductPublicListRouteImport.update({
-  id: '/api/product/public-list',
-  path: '/api/product/public-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductPublicCompareRoute = ApiProductPublicCompareRouteImport.update({
-  id: '/api/product/public-compare',
-  path: '/api/product/public-compare',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductPublicByCategoryRoute =
-  ApiProductPublicByCategoryRouteImport.update({
-    id: '/api/product/public-by-category',
-    path: '/api/product/public-by-category',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiProductPublicBestsellersRoute =
-  ApiProductPublicBestsellersRouteImport.update({
-    id: '/api/product/public-bestsellers',
-    path: '/api/product/public-bestsellers',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiProductHelpfulVoteRoute = ApiProductHelpfulVoteRouteImport.update({
-  id: '/api/product/helpful-vote',
-  path: '/api/product/helpful-vote',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductGetSingleRoute = ApiProductGetSingleRouteImport.update({
-  id: '/api/product/get-single',
-  path: '/api/product/get-single',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductEditRoute = ApiProductEditRouteImport.update({
-  id: '/api/product/edit',
-  path: '/api/product/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductDeleteRoute = ApiProductDeleteRouteImport.update({
-  id: '/api/product/delete',
-  path: '/api/product/delete',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductCreateReviewRoute = ApiProductCreateReviewRouteImport.update({
-  id: '/api/product/create-review',
-  path: '/api/product/create-review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductCreateRoute = ApiProductCreateRouteImport.update({
-  id: '/api/product/create',
-  path: '/api/product/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductCheckSkuRoute = ApiProductCheckSkuRouteImport.update({
-  id: '/api/product/check-sku',
-  path: '/api/product/check-sku',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiProductAnswerQuestionRoute =
-  ApiProductAnswerQuestionRouteImport.update({
-    id: '/api/product/answer-question',
-    path: '/api/product/answer-question',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiOrdersListRoute = ApiOrdersListRouteImport.update({
-  id: '/api/orders/list',
-  path: '/api/orders/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersCancelRoute = ApiOrdersCancelRouteImport.update({
-  id: '/api/orders/cancel',
-  path: '/api/orders/cancel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersAdminSingleRoute = ApiOrdersAdminSingleRouteImport.update({
-  id: '/api/orders/admin-single',
-  path: '/api/orders/admin-single',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersAdminRefundRoute = ApiOrdersAdminRefundRouteImport.update({
-  id: '/api/orders/admin-refund',
-  path: '/api/orders/admin-refund',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersAdminListRoute = ApiOrdersAdminListRouteImport.update({
-  id: '/api/orders/admin-list',
-  path: '/api/orders/admin-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersAdminFulfillRoute = ApiOrdersAdminFulfillRouteImport.update({
-  id: '/api/orders/admin-fulfill',
-  path: '/api/orders/admin-fulfill',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersAdminCancelRoute = ApiOrdersAdminCancelRouteImport.update({
-  id: '/api/orders/admin-cancel',
-  path: '/api/orders/admin-cancel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersOrderIdRoute = ApiOrdersOrderIdRouteImport.update({
-  id: '/api/orders/$orderId',
-  path: '/api/orders/$orderId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiNewsletterSubscribeRoute = ApiNewsletterSubscribeRouteImport.update({
-  id: '/api/newsletter/subscribe',
-  path: '/api/newsletter/subscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMessagesListRoute = ApiMessagesListRouteImport.update({
-  id: '/api/messages/list',
-  path: '/api/messages/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiMessagesCreateRoute = ApiMessagesCreateRouteImport.update({
-  id: '/api/messages/create',
-  path: '/api/messages/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiConversationsUnreadRoute = ApiConversationsUnreadRouteImport.update({
-  id: '/api/conversations/unread',
-  path: '/api/conversations/unread',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiConversationsListRoute = ApiConversationsListRouteImport.update({
-  id: '/api/conversations/list',
-  path: '/api/conversations/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiConversationsCreateRoute = ApiConversationsCreateRouteImport.update({
-  id: '/api/conversations/create',
-  path: '/api/conversations/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiConversationsConversationIdRoute =
-  ApiConversationsConversationIdRouteImport.update({
-    id: '/api/conversations/$conversationId',
-    path: '/api/conversations/$conversationId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiContentGetRoute = ApiContentGetRouteImport.update({
-  id: '/api/content/get',
-  path: '/api/content/get',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCheckoutValidateCouponRoute =
-  ApiCheckoutValidateCouponRouteImport.update({
-    id: '/api/checkout/validate-coupon',
-    path: '/api/checkout/validate-coupon',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiCheckoutDiscountPreviewRoute =
-  ApiCheckoutDiscountPreviewRouteImport.update({
-    id: '/api/checkout/discount-preview',
-    path: '/api/checkout/discount-preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiCheckoutCreateRoute = ApiCheckoutCreateRouteImport.update({
-  id: '/api/checkout/create',
-  path: '/api/checkout/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCheckoutBkashPayRoute = ApiCheckoutBkashPayRouteImport.update({
-  id: '/api/checkout/bkash-pay',
-  path: '/api/checkout/bkash-pay',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCheckoutBkashIpnRoute = ApiCheckoutBkashIpnRouteImport.update({
-  id: '/api/checkout/bkash-ipn',
-  path: '/api/checkout/bkash-ipn',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCheckoutBkashCallbackRoute =
-  ApiCheckoutBkashCallbackRouteImport.update({
-    id: '/api/checkout/bkash-callback',
-    path: '/api/checkout/bkash-callback',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiCategoriesPublicListRoute = ApiCategoriesPublicListRouteImport.update({
-  id: '/api/categories/public-list',
-  path: '/api/categories/public-list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCategoriesListRoute = ApiCategoriesListRouteImport.update({
-  id: '/api/categories/list',
-  path: '/api/categories/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCategoriesGetSingleRoute = ApiCategoriesGetSingleRouteImport.update({
-  id: '/api/categories/get-single',
-  path: '/api/categories/get-single',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCategoriesEditRoute = ApiCategoriesEditRouteImport.update({
-  id: '/api/categories/edit',
-  path: '/api/categories/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCategoriesDeleteRoute = ApiCategoriesDeleteRouteImport.update({
-  id: '/api/categories/delete',
-  path: '/api/categories/delete',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCategoriesAddRoute = ApiCategoriesAddRouteImport.update({
-  id: '/api/categories/add',
-  path: '/api/categories/add',
-  getParentRoute: () => rootRouteImport,
+const DashboardWishlistRoute = DashboardWishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-const ApiCartUpdateRoute = ApiCartUpdateRouteImport.update({
-  id: '/api/cart/update',
-  path: '/api/cart/update',
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiCartRemoveRoute = ApiCartRemoveRouteImport.update({
-  id: '/api/cart/remove',
-  path: '/api/cart/remove',
+const ShopSlugRoute = ShopSlugRouteImport.update({
+  id: '/shop/$slug',
+  path: '/shop/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiCartGetRoute = ApiCartGetRouteImport.update({
-  id: '/api/cart/get',
-  path: '/api/cart/get',
+const ShopsIndexRoute = ShopsIndexRouteImport.update({
+  id: '/shops/',
+  path: '/shops/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiCartAddRoute = ApiCartAddRouteImport.update({
-  id: '/api/cart/add',
-  path: '/api/cart/add',
+const ApiAddressesCreateRoute = ApiAddressesCreateRouteImport.update({
+  id: '/api/addresses/create',
+  path: '/api/addresses/create',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBannersHeroRoute = ApiBannersHeroRouteImport.update({
-  id: '/api/banners/hero',
-  path: '/api/banners/hero',
+const ApiAddressesDeleteRoute = ApiAddressesDeleteRouteImport.update({
+  id: '/api/addresses/delete',
+  path: '/api/addresses/delete',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBannersGetSingleRoute = ApiBannersGetSingleRouteImport.update({
-  id: '/api/banners/get-single',
-  path: '/api/banners/get-single',
+const ApiAddressesEditRoute = ApiAddressesEditRouteImport.update({
+  id: '/api/addresses/edit',
+  path: '/api/addresses/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBannersEditRoute = ApiBannersEditRouteImport.update({
-  id: '/api/banners/edit',
-  path: '/api/banners/edit',
+const ApiAddressesListRoute = ApiAddressesListRouteImport.update({
+  id: '/api/addresses/list',
+  path: '/api/addresses/list',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBannersDeleteRoute = ApiBannersDeleteRouteImport.update({
-  id: '/api/banners/delete',
-  path: '/api/banners/delete',
+const ApiAdminAuditLogsRoute = ApiAdminAuditLogsRouteImport.update({
+  id: '/api/admin/audit-logs',
+  path: '/api/admin/audit-logs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBannersAdminListRoute = ApiBannersAdminListRouteImport.update({
-  id: '/api/banners/admin-list',
-  path: '/api/banners/admin-list',
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiBannersAddRoute = ApiBannersAddRouteImport.update({
-  id: '/api/banners/add',
-  path: '/api/banners/add',
+const ApiAuthCheckEmailRoute = ApiAuthCheckEmailRouteImport.update({
+  id: '/api/auth/check-email',
+  path: '/api/auth/check-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSendPasswordResetConfirmationRoute =
@@ -981,58 +512,457 @@ const ApiAuthSendPasswordResetConfirmationRoute =
     path: '/api/auth/send-password-reset-confirmation',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiAuthCheckEmailRoute = ApiAuthCheckEmailRouteImport.update({
-  id: '/api/auth/check-email',
-  path: '/api/auth/check-email',
+const ApiBannersAddRoute = ApiBannersAddRouteImport.update({
+  id: '/api/banners/add',
+  path: '/api/banners/add',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
+const ApiBannersAdminListRoute = ApiBannersAdminListRouteImport.update({
+  id: '/api/banners/admin-list',
+  path: '/api/banners/admin-list',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAdminAuditLogsRoute = ApiAdminAuditLogsRouteImport.update({
-  id: '/api/admin/audit-logs',
-  path: '/api/admin/audit-logs',
+const ApiBannersDeleteRoute = ApiBannersDeleteRouteImport.update({
+  id: '/api/banners/delete',
+  path: '/api/banners/delete',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAddressesListRoute = ApiAddressesListRouteImport.update({
-  id: '/api/addresses/list',
-  path: '/api/addresses/list',
+const ApiBannersEditRoute = ApiBannersEditRouteImport.update({
+  id: '/api/banners/edit',
+  path: '/api/banners/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAddressesEditRoute = ApiAddressesEditRouteImport.update({
-  id: '/api/addresses/edit',
-  path: '/api/addresses/edit',
+const ApiBannersGetSingleRoute = ApiBannersGetSingleRouteImport.update({
+  id: '/api/banners/get-single',
+  path: '/api/banners/get-single',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAddressesDeleteRoute = ApiAddressesDeleteRouteImport.update({
-  id: '/api/addresses/delete',
-  path: '/api/addresses/delete',
+const ApiBannersHeroRoute = ApiBannersHeroRouteImport.update({
+  id: '/api/banners/hero',
+  path: '/api/banners/hero',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAddressesCreateRoute = ApiAddressesCreateRouteImport.update({
-  id: '/api/addresses/create',
-  path: '/api/addresses/create',
+const ApiCartAddRoute = ApiCartAddRouteImport.update({
+  id: '/api/cart/add',
+  path: '/api/cart/add',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardVendorShippingRouteRoute =
-  DashboardVendorShippingRouteRouteImport.update({
-    id: '/shipping',
-    path: '/shipping',
-    getParentRoute: () => DashboardVendorRouteRoute,
+const ApiCartGetRoute = ApiCartGetRouteImport.update({
+  id: '/api/cart/get',
+  path: '/api/cart/get',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCartRemoveRoute = ApiCartRemoveRouteImport.update({
+  id: '/api/cart/remove',
+  path: '/api/cart/remove',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCartUpdateRoute = ApiCartUpdateRouteImport.update({
+  id: '/api/cart/update',
+  path: '/api/cart/update',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesAddRoute = ApiCategoriesAddRouteImport.update({
+  id: '/api/categories/add',
+  path: '/api/categories/add',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesDeleteRoute = ApiCategoriesDeleteRouteImport.update({
+  id: '/api/categories/delete',
+  path: '/api/categories/delete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesEditRoute = ApiCategoriesEditRouteImport.update({
+  id: '/api/categories/edit',
+  path: '/api/categories/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesGetSingleRoute = ApiCategoriesGetSingleRouteImport.update({
+  id: '/api/categories/get-single',
+  path: '/api/categories/get-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesListRoute = ApiCategoriesListRouteImport.update({
+  id: '/api/categories/list',
+  path: '/api/categories/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesPublicListRoute = ApiCategoriesPublicListRouteImport.update({
+  id: '/api/categories/public-list',
+  path: '/api/categories/public-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCheckoutBkashCallbackRoute =
+  ApiCheckoutBkashCallbackRouteImport.update({
+    id: '/api/checkout/bkash-callback',
+    path: '/api/checkout/bkash-callback',
+    getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardVendorPayoutsRouteRoute =
-  DashboardVendorPayoutsRouteRouteImport.update({
-    id: '/payouts',
-    path: '/payouts',
-    getParentRoute: () => DashboardVendorRouteRoute,
+const ApiCheckoutBkashIpnRoute = ApiCheckoutBkashIpnRouteImport.update({
+  id: '/api/checkout/bkash-ipn',
+  path: '/api/checkout/bkash-ipn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCheckoutBkashPayRoute = ApiCheckoutBkashPayRouteImport.update({
+  id: '/api/checkout/bkash-pay',
+  path: '/api/checkout/bkash-pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCheckoutCreateRoute = ApiCheckoutCreateRouteImport.update({
+  id: '/api/checkout/create',
+  path: '/api/checkout/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCheckoutDiscountPreviewRoute =
+  ApiCheckoutDiscountPreviewRouteImport.update({
+    id: '/api/checkout/discount-preview',
+    path: '/api/checkout/discount-preview',
+    getParentRoute: () => rootRouteImport,
   } as any)
-const DashboardOrdersReturnsRouteRoute =
-  DashboardOrdersReturnsRouteRouteImport.update({
-    id: '/returns',
-    path: '/returns',
-    getParentRoute: () => DashboardOrdersRouteRoute,
+const ApiCheckoutValidateCouponRoute =
+  ApiCheckoutValidateCouponRouteImport.update({
+    id: '/api/checkout/validate-coupon',
+    path: '/api/checkout/validate-coupon',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiContentGetRoute = ApiContentGetRouteImport.update({
+  id: '/api/content/get',
+  path: '/api/content/get',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiConversationsConversationIdRoute =
+  ApiConversationsConversationIdRouteImport.update({
+    id: '/api/conversations/$conversationId',
+    path: '/api/conversations/$conversationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiConversationsCreateRoute = ApiConversationsCreateRouteImport.update({
+  id: '/api/conversations/create',
+  path: '/api/conversations/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiConversationsListRoute = ApiConversationsListRouteImport.update({
+  id: '/api/conversations/list',
+  path: '/api/conversations/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiConversationsUnreadRoute = ApiConversationsUnreadRouteImport.update({
+  id: '/api/conversations/unread',
+  path: '/api/conversations/unread',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGlobalAttributesIndexRoute =
+  ApiGlobalAttributesIndexRouteImport.update({
+    id: '/api/global-attributes/',
+    path: '/api/global-attributes/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiMessagesCreateRoute = ApiMessagesCreateRouteImport.update({
+  id: '/api/messages/create',
+  path: '/api/messages/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMessagesListRoute = ApiMessagesListRouteImport.update({
+  id: '/api/messages/list',
+  path: '/api/messages/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiNewsletterSubscribeRoute = ApiNewsletterSubscribeRouteImport.update({
+  id: '/api/newsletter/subscribe',
+  path: '/api/newsletter/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersOrderIdRoute = ApiOrdersOrderIdRouteImport.update({
+  id: '/api/orders/$orderId',
+  path: '/api/orders/$orderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersAdminCancelRoute = ApiOrdersAdminCancelRouteImport.update({
+  id: '/api/orders/admin-cancel',
+  path: '/api/orders/admin-cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersAdminFulfillRoute = ApiOrdersAdminFulfillRouteImport.update({
+  id: '/api/orders/admin-fulfill',
+  path: '/api/orders/admin-fulfill',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersAdminListRoute = ApiOrdersAdminListRouteImport.update({
+  id: '/api/orders/admin-list',
+  path: '/api/orders/admin-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersAdminRefundRoute = ApiOrdersAdminRefundRouteImport.update({
+  id: '/api/orders/admin-refund',
+  path: '/api/orders/admin-refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersAdminSingleRoute = ApiOrdersAdminSingleRouteImport.update({
+  id: '/api/orders/admin-single',
+  path: '/api/orders/admin-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersCancelRoute = ApiOrdersCancelRouteImport.update({
+  id: '/api/orders/cancel',
+  path: '/api/orders/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersListRoute = ApiOrdersListRouteImport.update({
+  id: '/api/orders/list',
+  path: '/api/orders/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductAnswerQuestionRoute =
+  ApiProductAnswerQuestionRouteImport.update({
+    id: '/api/product/answer-question',
+    path: '/api/product/answer-question',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiProductCheckSkuRoute = ApiProductCheckSkuRouteImport.update({
+  id: '/api/product/check-sku',
+  path: '/api/product/check-sku',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductCreateRoute = ApiProductCreateRouteImport.update({
+  id: '/api/product/create',
+  path: '/api/product/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductCreateReviewRoute = ApiProductCreateReviewRouteImport.update({
+  id: '/api/product/create-review',
+  path: '/api/product/create-review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductDeleteRoute = ApiProductDeleteRouteImport.update({
+  id: '/api/product/delete',
+  path: '/api/product/delete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductEditRoute = ApiProductEditRouteImport.update({
+  id: '/api/product/edit',
+  path: '/api/product/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductGetSingleRoute = ApiProductGetSingleRouteImport.update({
+  id: '/api/product/get-single',
+  path: '/api/product/get-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductHelpfulVoteRoute = ApiProductHelpfulVoteRouteImport.update({
+  id: '/api/product/helpful-vote',
+  path: '/api/product/helpful-vote',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicBestsellersRoute =
+  ApiProductPublicBestsellersRouteImport.update({
+    id: '/api/product/public-bestsellers',
+    path: '/api/product/public-bestsellers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiProductPublicByCategoryRoute =
+  ApiProductPublicByCategoryRouteImport.update({
+    id: '/api/product/public-by-category',
+    path: '/api/product/public-by-category',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiProductPublicCompareRoute = ApiProductPublicCompareRouteImport.update({
+  id: '/api/product/public-compare',
+  path: '/api/product/public-compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicListRoute = ApiProductPublicListRouteImport.update({
+  id: '/api/product/public-list',
+  path: '/api/product/public-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicQuestionsRoute =
+  ApiProductPublicQuestionsRouteImport.update({
+    id: '/api/product/public-questions',
+    path: '/api/product/public-questions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiProductPublicRecentRoute = ApiProductPublicRecentRouteImport.update({
+  id: '/api/product/public-recent',
+  path: '/api/product/public-recent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicReviewsRoute = ApiProductPublicReviewsRouteImport.update({
+  id: '/api/product/public-reviews',
+  path: '/api/product/public-reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductPublicSingleRoute = ApiProductPublicSingleRouteImport.update({
+  id: '/api/product/public-single',
+  path: '/api/product/public-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProductVendorCategoriesRoute =
+  ApiProductVendorCategoriesRouteImport.update({
+    id: '/api/product/vendor-categories',
+    path: '/api/product/vendor-categories',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiProductVendorListRoute = ApiProductVendorListRouteImport.update({
+  id: '/api/product/vendor-list',
+  path: '/api/product/vendor-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReturnsReturnIdRoute = ApiReturnsReturnIdRouteImport.update({
+  id: '/api/returns/$returnId',
+  path: '/api/returns/$returnId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReturnsCreateRoute = ApiReturnsCreateRouteImport.update({
+  id: '/api/returns/create',
+  path: '/api/returns/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReturnsListRoute = ApiReturnsListRouteImport.update({
+  id: '/api/returns/list',
+  path: '/api/returns/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSettingsPublicRoute = ApiSettingsPublicRouteImport.update({
+  id: '/api/settings/public',
+  path: '/api/settings/public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopAdminListRoute = ApiShopAdminListRouteImport.update({
+  id: '/api/shop/admin-list',
+  path: '/api/shop/admin-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopApplyRoute = ApiShopApplyRouteImport.update({
+  id: '/api/shop/apply',
+  path: '/api/shop/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopApproveRoute = ApiShopApproveRouteImport.update({
+  id: '/api/shop/approve',
+  path: '/api/shop/approve',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopGetSingleRoute = ApiShopGetSingleRouteImport.update({
+  id: '/api/shop/get-single',
+  path: '/api/shop/get-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopMyShopRoute = ApiShopMyShopRouteImport.update({
+  id: '/api/shop/my-shop',
+  path: '/api/shop/my-shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopPublicListRoute = ApiShopPublicListRouteImport.update({
+  id: '/api/shop/public-list',
+  path: '/api/shop/public-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopPublicProductsRoute = ApiShopPublicProductsRouteImport.update({
+  id: '/api/shop/public-products',
+  path: '/api/shop/public-products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopPublicSingleRoute = ApiShopPublicSingleRouteImport.update({
+  id: '/api/shop/public-single',
+  path: '/api/shop/public-single',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopRejectRoute = ApiShopRejectRouteImport.update({
+  id: '/api/shop/reject',
+  path: '/api/shop/reject',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopSuspendRoute = ApiShopSuspendRouteImport.update({
+  id: '/api/shop/suspend',
+  path: '/api/shop/suspend',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopUnsuspendRoute = ApiShopUnsuspendRouteImport.update({
+  id: '/api/shop/unsuspend',
+  path: '/api/shop/unsuspend',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopUpdateRoute = ApiShopUpdateRouteImport.update({
+  id: '/api/shop/update',
+  path: '/api/shop/update',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUploadAvatarRoute = ApiUploadAvatarRouteImport.update({
+  id: '/api/upload/avatar',
+  path: '/api/upload/avatar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUploadMessageRoute = ApiUploadMessageRouteImport.update({
+  id: '/api/upload/message',
+  path: '/api/upload/message',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorQuestionsRoute = ApiVendorQuestionsRouteImport.update({
+  id: '/api/vendor/questions',
+  path: '/api/vendor/questions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVouchersAutoApplyRoute = ApiVouchersAutoApplyRouteImport.update({
+  id: '/api/vouchers/auto-apply',
+  path: '/api/vouchers/auto-apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVouchersCollectRoute = ApiVouchersCollectRouteImport.update({
+  id: '/api/vouchers/collect',
+  path: '/api/vouchers/collect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVouchersMyRoute = ApiVouchersMyRouteImport.update({
+  id: '/api/vouchers/my',
+  path: '/api/vouchers/my',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVouchersProductVouchersRoute =
+  ApiVouchersProductVouchersRouteImport.update({
+    id: '/api/vouchers/product-vouchers',
+    path: '/api/vouchers/product-vouchers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiWalletBkashCallbackRoute = ApiWalletBkashCallbackRouteImport.update({
+  id: '/api/wallet/bkash-callback',
+  path: '/api/wallet/bkash-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWalletGetRoute = ApiWalletGetRouteImport.update({
+  id: '/api/wallet/get',
+  path: '/api/wallet/get',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWalletTopUpRoute = ApiWalletTopUpRouteImport.update({
+  id: '/api/wallet/top-up',
+  path: '/api/wallet/top-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWishlistAddRoute = ApiWishlistAddRouteImport.update({
+  id: '/api/wishlist/add',
+  path: '/api/wishlist/add',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWishlistListRoute = ApiWishlistListRouteImport.update({
+  id: '/api/wishlist/list',
+  path: '/api/wishlist/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWishlistRemoveRoute = ApiWishlistRemoveRouteImport.update({
+  id: '/api/wishlist/remove',
+  path: '/api/wishlist/remove',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardAdminIndexRoute = DashboardAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardAdminRouteRoute,
+} as any)
+const DashboardAdminGlobalAttributesRouteRoute =
+  DashboardAdminGlobalAttributesRouteRouteImport.update({
+    id: '/global-attributes',
+    path: '/global-attributes',
+    getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
 const DashboardAdminStaffRouteRoute =
   DashboardAdminStaffRouteRouteImport.update({
@@ -1040,521 +970,96 @@ const DashboardAdminStaffRouteRoute =
     path: '/staff',
     getParentRoute: () => DashboardAdminRouteRoute,
   } as any)
-const DashboardAdminGlobalAttributesRouteRoute =
-  DashboardAdminGlobalAttributesRouteRouteImport.update({
-    id: '/global-attributes',
-    path: '/global-attributes',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardVendorShopIndexRoute =
-  DashboardVendorShopIndexRouteImport.update({
-    id: '/shop/',
-    path: '/shop/',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardVendorShippingIndexRoute =
-  DashboardVendorShippingIndexRouteImport.update({
+const DashboardBecomeVendorIndexRoute =
+  DashboardBecomeVendorIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => DashboardVendorShippingRouteRoute,
+    getParentRoute: () => DashboardBecomeVendorRouteRoute,
   } as any)
-const DashboardVendorSalesIndexRoute =
-  DashboardVendorSalesIndexRouteImport.update({
-    id: '/sales/',
-    path: '/sales/',
+const DashboardBecomeVendorApplyRoute =
+  DashboardBecomeVendorApplyRouteImport.update({
+    id: '/apply',
+    path: '/apply',
+    getParentRoute: () => DashboardBecomeVendorRouteRoute,
+  } as any)
+const DashboardBecomeVendorPendingRoute =
+  DashboardBecomeVendorPendingRouteImport.update({
+    id: '/pending',
+    path: '/pending',
+    getParentRoute: () => DashboardBecomeVendorRouteRoute,
+  } as any)
+const DashboardMessagesIndexRoute = DashboardMessagesIndexRouteImport.update({
+  id: '/messages/',
+  path: '/messages/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardMessagesIdRoute = DashboardMessagesIdRouteImport.update({
+  id: '/messages/$id',
+  path: '/messages/$id',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardOrdersIndexRoute = DashboardOrdersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardOrdersRouteRoute,
+} as any)
+const DashboardOrdersOrderIdRoute = DashboardOrdersOrderIdRouteImport.update({
+  id: '/$orderId',
+  path: '/$orderId',
+  getParentRoute: () => DashboardOrdersRouteRoute,
+} as any)
+const DashboardOrdersReturnsRouteRoute =
+  DashboardOrdersReturnsRouteRouteImport.update({
+    id: '/returns',
+    path: '/returns',
+    getParentRoute: () => DashboardOrdersRouteRoute,
+  } as any)
+const DashboardReviewsIndexRoute = DashboardReviewsIndexRouteImport.update({
+  id: '/reviews/',
+  path: '/reviews/',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
+const DashboardVendorIndexRoute = DashboardVendorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardVendorRouteRoute,
+} as any)
+const DashboardVendorPayoutsRouteRoute =
+  DashboardVendorPayoutsRouteRouteImport.update({
+    id: '/payouts',
+    path: '/payouts',
     getParentRoute: () => DashboardVendorRouteRoute,
   } as any)
-const DashboardVendorReturnsIndexRoute =
-  DashboardVendorReturnsIndexRouteImport.update({
-    id: '/returns/',
-    path: '/returns/',
+const DashboardVendorShippingRouteRoute =
+  DashboardVendorShippingRouteRouteImport.update({
+    id: '/shipping',
+    path: '/shipping',
     getParentRoute: () => DashboardVendorRouteRoute,
   } as any)
-const DashboardVendorQuestionsIndexRoute =
-  DashboardVendorQuestionsIndexRouteImport.update({
-    id: '/questions/',
-    path: '/questions/',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardVendorProductsIndexRoute =
-  DashboardVendorProductsIndexRouteImport.update({
-    id: '/products/',
-    path: '/products/',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardVendorPayoutsIndexRoute =
-  DashboardVendorPayoutsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardVendorPayoutsRouteRoute,
-  } as any)
-const DashboardVendorOrdersIndexRoute =
-  DashboardVendorOrdersIndexRouteImport.update({
-    id: '/orders/',
-    path: '/orders/',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardOrdersReturnsIndexRoute =
-  DashboardOrdersReturnsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardOrdersReturnsRouteRoute,
-  } as any)
-const DashboardAdminVendorsIndexRoute =
-  DashboardAdminVendorsIndexRouteImport.update({
-    id: '/vendors/',
-    path: '/vendors/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminStaffIndexRoute =
-  DashboardAdminStaffIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminStaffRouteRoute,
-  } as any)
-const DashboardAdminSettingsIndexRoute =
-  DashboardAdminSettingsIndexRouteImport.update({
-    id: '/settings/',
-    path: '/settings/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminReviewsIndexRoute =
-  DashboardAdminReviewsIndexRouteImport.update({
-    id: '/reviews/',
-    path: '/reviews/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminReturnsIndexRoute =
-  DashboardAdminReturnsIndexRouteImport.update({
-    id: '/returns/',
-    path: '/returns/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminOrdersIndexRoute =
-  DashboardAdminOrdersIndexRouteImport.update({
-    id: '/orders/',
-    path: '/orders/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminMessagesIndexRoute =
-  DashboardAdminMessagesIndexRouteImport.update({
-    id: '/messages/',
-    path: '/messages/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminGlobalAttributesIndexRoute =
-  DashboardAdminGlobalAttributesIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DashboardAdminGlobalAttributesRouteRoute,
-  } as any)
-const DashboardAdminCustomersIndexRoute =
-  DashboardAdminCustomersIndexRouteImport.update({
-    id: '/customers/',
-    path: '/customers/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminCouponsIndexRoute =
-  DashboardAdminCouponsIndexRouteImport.update({
-    id: '/coupons/',
-    path: '/coupons/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminContentIndexRoute =
-  DashboardAdminContentIndexRouteImport.update({
-    id: '/content/',
-    path: '/content/',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardVendorShopPoliciesRoute =
-  DashboardVendorShopPoliciesRouteImport.update({
-    id: '/shop/policies',
-    path: '/shop/policies',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardVendorShopPayoutRoute =
-  DashboardVendorShopPayoutRouteImport.update({
-    id: '/shop/payout',
-    path: '/shop/payout',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardVendorShopBrandingRoute =
-  DashboardVendorShopBrandingRouteImport.update({
-    id: '/shop/branding',
-    path: '/shop/branding',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardVendorShippingTrackingRoute =
-  DashboardVendorShippingTrackingRouteImport.update({
-    id: '/tracking',
-    path: '/tracking',
-    getParentRoute: () => DashboardVendorShippingRouteRoute,
-  } as any)
-const DashboardVendorShippingLabelsRoute =
-  DashboardVendorShippingLabelsRouteImport.update({
-    id: '/labels',
-    path: '/labels',
-    getParentRoute: () => DashboardVendorShippingRouteRoute,
-  } as any)
-const DashboardVendorProductsEditRoute =
-  DashboardVendorProductsEditRouteImport.update({
-    id: '/products/edit',
-    path: '/products/edit',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardVendorProductsAddRoute =
-  DashboardVendorProductsAddRouteImport.update({
-    id: '/products/add',
-    path: '/products/add',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardVendorPayoutsScheduleRoute =
-  DashboardVendorPayoutsScheduleRouteImport.update({
-    id: '/schedule',
-    path: '/schedule',
-    getParentRoute: () => DashboardVendorPayoutsRouteRoute,
-  } as any)
-const DashboardVendorOrdersOrderIdRoute =
-  DashboardVendorOrdersOrderIdRouteImport.update({
-    id: '/orders/$orderId',
-    path: '/orders/$orderId',
-    getParentRoute: () => DashboardVendorRouteRoute,
-  } as any)
-const DashboardOrdersReturnsReturnIdRoute =
-  DashboardOrdersReturnsReturnIdRouteImport.update({
-    id: '/$returnId',
-    path: '/$returnId',
-    getParentRoute: () => DashboardOrdersReturnsRouteRoute,
-  } as any)
-const DashboardAdminVendorsPayoutsRoute =
-  DashboardAdminVendorsPayoutsRouteImport.update({
-    id: '/vendors/payouts',
-    path: '/vendors/payouts',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminVendorsDetailRoute =
-  DashboardAdminVendorsDetailRouteImport.update({
-    id: '/vendors/detail',
-    path: '/vendors/detail',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminStaffAuditLogsRoute =
-  DashboardAdminStaffAuditLogsRouteImport.update({
-    id: '/audit-logs',
-    path: '/audit-logs',
-    getParentRoute: () => DashboardAdminStaffRouteRoute,
-  } as any)
-const DashboardAdminOrdersOrderIdRoute =
-  DashboardAdminOrdersOrderIdRouteImport.update({
-    id: '/orders/$orderId',
-    path: '/orders/$orderId',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminMessagesIdRoute =
-  DashboardAdminMessagesIdRouteImport.update({
-    id: '/messages/$id',
-    path: '/messages/$id',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminGlobalAttributesCreateRoute =
-  DashboardAdminGlobalAttributesCreateRouteImport.update({
-    id: '/create',
-    path: '/create',
-    getParentRoute: () => DashboardAdminGlobalAttributesRouteRoute,
-  } as any)
-const DashboardAdminGlobalAttributesIdRoute =
-  DashboardAdminGlobalAttributesIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => DashboardAdminGlobalAttributesRouteRoute,
-  } as any)
-const DashboardAdminCustomersIdRoute =
-  DashboardAdminCustomersIdRouteImport.update({
-    id: '/customers/$id',
-    path: '/customers/$id',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminCouponsCreateRoute =
-  DashboardAdminCouponsCreateRouteImport.update({
-    id: '/coupons/create',
-    path: '/coupons/create',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminCouponsIdRoute = DashboardAdminCouponsIdRouteImport.update({
-  id: '/coupons/$id',
-  path: '/coupons/$id',
-  getParentRoute: () => DashboardAdminRouteRoute,
+const DashboardVouchersIndexRoute = DashboardVouchersIndexRouteImport.update({
+  id: '/vouchers/',
+  path: '/vouchers/',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-const DashboardAdminCategoryEditRoute =
-  DashboardAdminCategoryEditRouteImport.update({
-    id: '/category/edit',
-    path: '/category/edit',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminCategoryAllRoute =
-  DashboardAdminCategoryAllRouteImport.update({
-    id: '/category/all',
-    path: '/category/all',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminCategoryAddRoute =
-  DashboardAdminCategoryAddRouteImport.update({
-    id: '/category/add',
-    path: '/category/add',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminBannerListRoute =
-  DashboardAdminBannerListRouteImport.update({
-    id: '/banner/list',
-    path: '/banner/list',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminBannerEditRoute =
-  DashboardAdminBannerEditRouteImport.update({
-    id: '/banner/edit',
-    path: '/banner/edit',
-    getParentRoute: () => DashboardAdminRouteRoute,
-  } as any)
-const DashboardAdminBannerAddRoute = DashboardAdminBannerAddRouteImport.update({
-  id: '/banner/add',
-  path: '/banner/add',
-  getParentRoute: () => DashboardAdminRouteRoute,
+const ProductsCategorySlugRoute = ProductsCategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
+  getParentRoute: () => ProductsRoute,
 } as any)
-const ApiVendorShopPoliciesRoute = ApiVendorShopPoliciesRouteImport.update({
-  id: '/api/vendor/shop/policies',
-  path: '/api/vendor/shop/policies',
+const ApiAdminContentListRoute = ApiAdminContentListRouteImport.update({
+  id: '/api/admin/content/list',
+  path: '/api/admin/content/list',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiVendorShopPayoutDetailsRoute =
-  ApiVendorShopPayoutDetailsRouteImport.update({
-    id: '/api/vendor/shop/payout-details',
-    path: '/api/vendor/shop/payout-details',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiVendorShippingListRoute = ApiVendorShippingListRouteImport.update({
-  id: '/api/vendor/shipping/list',
-  path: '/api/vendor/shipping/list',
+const ApiAdminContentSaveRoute = ApiAdminContentSaveRouteImport.update({
+  id: '/api/admin/content/save',
+  path: '/api/admin/content/save',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiVendorShippingEditRoute = ApiVendorShippingEditRouteImport.update({
-  id: '/api/vendor/shipping/edit',
-  path: '/api/vendor/shipping/edit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorShippingDeleteRoute = ApiVendorShippingDeleteRouteImport.update({
-  id: '/api/vendor/shipping/delete',
-  path: '/api/vendor/shipping/delete',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorShippingCreateRoute = ApiVendorShippingCreateRouteImport.update({
-  id: '/api/vendor/shipping/create',
-  path: '/api/vendor/shipping/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorReturnsReviewRoute = ApiVendorReturnsReviewRouteImport.update({
-  id: '/api/vendor/returns/review',
-  path: '/api/vendor/returns/review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorReturnsListRoute = ApiVendorReturnsListRouteImport.update({
-  id: '/api/vendor/returns/list',
-  path: '/api/vendor/returns/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorPayoutsScheduleRoute =
-  ApiVendorPayoutsScheduleRouteImport.update({
-    id: '/api/vendor/payouts/schedule',
-    path: '/api/vendor/payouts/schedule',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiVendorPayoutsPendingRoute = ApiVendorPayoutsPendingRouteImport.update({
-  id: '/api/vendor/payouts/pending',
-  path: '/api/vendor/payouts/pending',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorPayoutsListRoute = ApiVendorPayoutsListRouteImport.update({
-  id: '/api/vendor/payouts/list',
-  path: '/api/vendor/payouts/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorOrdersListRoute = ApiVendorOrdersListRouteImport.update({
-  id: '/api/vendor/orders/list',
-  path: '/api/vendor/orders/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorOrdersCancelRoute = ApiVendorOrdersCancelRouteImport.update({
-  id: '/api/vendor/orders/cancel',
-  path: '/api/vendor/orders/cancel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorOrdersOrderIdRoute = ApiVendorOrdersOrderIdRouteImport.update({
-  id: '/api/vendor/orders/$orderId',
-  path: '/api/vendor/orders/$orderId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiVendorConversationsListRoute =
-  ApiVendorConversationsListRouteImport.update({
-    id: '/api/vendor/conversations/list',
-    path: '/api/vendor/conversations/list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiVendorConversationsConversationIdRoute =
-  ApiVendorConversationsConversationIdRouteImport.update({
-    id: '/api/vendor/conversations/$conversationId',
-    path: '/api/vendor/conversations/$conversationId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiVendorAnalyticsOverviewRoute =
-  ApiVendorAnalyticsOverviewRouteImport.update({
-    id: '/api/vendor/analytics/overview',
-    path: '/api/vendor/analytics/overview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiShopFollowToggleRoute = ApiShopFollowToggleRouteImport.update({
-  id: '/api/shop/follow/toggle',
-  path: '/api/shop/follow/toggle',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiShopFollowListRoute = ApiShopFollowListRouteImport.update({
-  id: '/api/shop/follow/list',
-  path: '/api/shop/follow/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiReviewsMyListRoute = ApiReviewsMyListRouteImport.update({
-  id: '/api/reviews/my/list',
-  path: '/api/reviews/my/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiReviewsMyIdRoute = ApiReviewsMyIdRouteImport.update({
-  id: '/api/reviews/my/$id',
-  path: '/api/reviews/my/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiOrdersInvoiceInvoiceIdRoute =
-  ApiOrdersInvoiceInvoiceIdRouteImport.update({
-    id: '/api/orders/invoice/$invoiceId',
-    path: '/api/orders/invoice/$invoiceId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminShopsShopIdRoute = ApiAdminShopsShopIdRouteImport.update({
-  id: '/api/admin/shops/$shopId',
-  path: '/api/admin/shops/$shopId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminSettingsUpdateRoute = ApiAdminSettingsUpdateRouteImport.update({
-  id: '/api/admin/settings/update',
-  path: '/api/admin/settings/update',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminSettingsListRoute = ApiAdminSettingsListRouteImport.update({
-  id: '/api/admin/settings/list',
-  path: '/api/admin/settings/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminReviewsListRoute = ApiAdminReviewsListRouteImport.update({
-  id: '/api/admin/reviews/list',
-  path: '/api/admin/reviews/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminReviewsIdRoute = ApiAdminReviewsIdRouteImport.update({
-  id: '/api/admin/reviews/$id',
-  path: '/api/admin/reviews/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminReturnsReviewRoute = ApiAdminReturnsReviewRouteImport.update({
-  id: '/api/admin/returns/review',
-  path: '/api/admin/returns/review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminReturnsListRoute = ApiAdminReturnsListRouteImport.update({
-  id: '/api/admin/returns/list',
-  path: '/api/admin/returns/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminPayoutsProcessRoute = ApiAdminPayoutsProcessRouteImport.update({
-  id: '/api/admin/payouts/process',
-  path: '/api/admin/payouts/process',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminPayoutsPendingRoute = ApiAdminPayoutsPendingRouteImport.update({
-  id: '/api/admin/payouts/pending',
-  path: '/api/admin/payouts/pending',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminPayoutsListRoute = ApiAdminPayoutsListRouteImport.update({
-  id: '/api/admin/payouts/list',
-  path: '/api/admin/payouts/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminMessagesCreateRoute = ApiAdminMessagesCreateRouteImport.update({
-  id: '/api/admin/messages/create',
-  path: '/api/admin/messages/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminGlobalAttributesProductMappingsRoute =
-  ApiAdminGlobalAttributesProductMappingsRouteImport.update({
-    id: '/api/admin/global-attributes/product-mappings',
-    path: '/api/admin/global-attributes/product-mappings',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminGlobalAttributesMapProductRoute =
-  ApiAdminGlobalAttributesMapProductRouteImport.update({
-    id: '/api/admin/global-attributes/map-product',
-    path: '/api/admin/global-attributes/map-product',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminGlobalAttributesListRoute =
-  ApiAdminGlobalAttributesListRouteImport.update({
-    id: '/api/admin/global-attributes/list',
-    path: '/api/admin/global-attributes/list',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminGlobalAttributesCreateRoute =
-  ApiAdminGlobalAttributesCreateRouteImport.update({
-    id: '/api/admin/global-attributes/create',
-    path: '/api/admin/global-attributes/create',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminGlobalAttributesIdRoute =
-  ApiAdminGlobalAttributesIdRouteImport.update({
-    id: '/api/admin/global-attributes/$id',
-    path: '/api/admin/global-attributes/$id',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminDashboardStatsRoute = ApiAdminDashboardStatsRouteImport.update({
-  id: '/api/admin/dashboard/stats',
-  path: '/api/admin/dashboard/stats',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminCustomersListRoute = ApiAdminCustomersListRouteImport.update({
-  id: '/api/admin/customers/list',
-  path: '/api/admin/customers/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminCustomersIdRoute = ApiAdminCustomersIdRouteImport.update({
-  id: '/api/admin/customers/$id',
-  path: '/api/admin/customers/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminCouponsListRoute = ApiAdminCouponsListRouteImport.update({
-  id: '/api/admin/coupons/list',
-  path: '/api/admin/coupons/list',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminCouponsCreateRoute = ApiAdminCouponsCreateRouteImport.update({
-  id: '/api/admin/coupons/create',
-  path: '/api/admin/coupons/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminCouponsIdRoute = ApiAdminCouponsIdRouteImport.update({
-  id: '/api/admin/coupons/$id',
-  path: '/api/admin/coupons/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminConversationsListRoute =
-  ApiAdminConversationsListRouteImport.update({
-    id: '/api/admin/conversations/list',
-    path: '/api/admin/conversations/list',
+const ApiAdminConversationsConversationIdRoute =
+  ApiAdminConversationsConversationIdRouteImport.update({
+    id: '/api/admin/conversations/$conversationId',
+    path: '/api/admin/conversations/$conversationId',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiAdminConversationsCloseRoute =
@@ -1563,22 +1068,517 @@ const ApiAdminConversationsCloseRoute =
     path: '/api/admin/conversations/close',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiAdminConversationsConversationIdRoute =
-  ApiAdminConversationsConversationIdRouteImport.update({
-    id: '/api/admin/conversations/$conversationId',
-    path: '/api/admin/conversations/$conversationId',
+const ApiAdminConversationsListRoute =
+  ApiAdminConversationsListRouteImport.update({
+    id: '/api/admin/conversations/list',
+    path: '/api/admin/conversations/list',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiAdminContentSaveRoute = ApiAdminContentSaveRouteImport.update({
-  id: '/api/admin/content/save',
-  path: '/api/admin/content/save',
+const ApiAdminCouponsIdRoute = ApiAdminCouponsIdRouteImport.update({
+  id: '/api/admin/coupons/$id',
+  path: '/api/admin/coupons/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAdminContentListRoute = ApiAdminContentListRouteImport.update({
-  id: '/api/admin/content/list',
-  path: '/api/admin/content/list',
+const ApiAdminCouponsCreateRoute = ApiAdminCouponsCreateRouteImport.update({
+  id: '/api/admin/coupons/create',
+  path: '/api/admin/coupons/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminCouponsListRoute = ApiAdminCouponsListRouteImport.update({
+  id: '/api/admin/coupons/list',
+  path: '/api/admin/coupons/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminCustomersIdRoute = ApiAdminCustomersIdRouteImport.update({
+  id: '/api/admin/customers/$id',
+  path: '/api/admin/customers/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminCustomersListRoute = ApiAdminCustomersListRouteImport.update({
+  id: '/api/admin/customers/list',
+  path: '/api/admin/customers/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminDashboardStatsRoute = ApiAdminDashboardStatsRouteImport.update({
+  id: '/api/admin/dashboard/stats',
+  path: '/api/admin/dashboard/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminGlobalAttributesIdRoute =
+  ApiAdminGlobalAttributesIdRouteImport.update({
+    id: '/api/admin/global-attributes/$id',
+    path: '/api/admin/global-attributes/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAdminGlobalAttributesCreateRoute =
+  ApiAdminGlobalAttributesCreateRouteImport.update({
+    id: '/api/admin/global-attributes/create',
+    path: '/api/admin/global-attributes/create',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAdminGlobalAttributesListRoute =
+  ApiAdminGlobalAttributesListRouteImport.update({
+    id: '/api/admin/global-attributes/list',
+    path: '/api/admin/global-attributes/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAdminGlobalAttributesMapProductRoute =
+  ApiAdminGlobalAttributesMapProductRouteImport.update({
+    id: '/api/admin/global-attributes/map-product',
+    path: '/api/admin/global-attributes/map-product',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAdminGlobalAttributesProductMappingsRoute =
+  ApiAdminGlobalAttributesProductMappingsRouteImport.update({
+    id: '/api/admin/global-attributes/product-mappings',
+    path: '/api/admin/global-attributes/product-mappings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAdminMessagesCreateRoute = ApiAdminMessagesCreateRouteImport.update({
+  id: '/api/admin/messages/create',
+  path: '/api/admin/messages/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminPayoutsListRoute = ApiAdminPayoutsListRouteImport.update({
+  id: '/api/admin/payouts/list',
+  path: '/api/admin/payouts/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminPayoutsPendingRoute = ApiAdminPayoutsPendingRouteImport.update({
+  id: '/api/admin/payouts/pending',
+  path: '/api/admin/payouts/pending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminPayoutsProcessRoute = ApiAdminPayoutsProcessRouteImport.update({
+  id: '/api/admin/payouts/process',
+  path: '/api/admin/payouts/process',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminReturnsListRoute = ApiAdminReturnsListRouteImport.update({
+  id: '/api/admin/returns/list',
+  path: '/api/admin/returns/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminReturnsReviewRoute = ApiAdminReturnsReviewRouteImport.update({
+  id: '/api/admin/returns/review',
+  path: '/api/admin/returns/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminReviewsIdRoute = ApiAdminReviewsIdRouteImport.update({
+  id: '/api/admin/reviews/$id',
+  path: '/api/admin/reviews/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminReviewsListRoute = ApiAdminReviewsListRouteImport.update({
+  id: '/api/admin/reviews/list',
+  path: '/api/admin/reviews/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSettingsListRoute = ApiAdminSettingsListRouteImport.update({
+  id: '/api/admin/settings/list',
+  path: '/api/admin/settings/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSettingsUpdateRoute = ApiAdminSettingsUpdateRouteImport.update({
+  id: '/api/admin/settings/update',
+  path: '/api/admin/settings/update',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminShopsShopIdRoute = ApiAdminShopsShopIdRouteImport.update({
+  id: '/api/admin/shops/$shopId',
+  path: '/api/admin/shops/$shopId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrdersInvoiceInvoiceIdRoute =
+  ApiOrdersInvoiceInvoiceIdRouteImport.update({
+    id: '/api/orders/invoice/$invoiceId',
+    path: '/api/orders/invoice/$invoiceId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiReviewsMyIdRoute = ApiReviewsMyIdRouteImport.update({
+  id: '/api/reviews/my/$id',
+  path: '/api/reviews/my/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiReviewsMyListRoute = ApiReviewsMyListRouteImport.update({
+  id: '/api/reviews/my/list',
+  path: '/api/reviews/my/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopFollowListRoute = ApiShopFollowListRouteImport.update({
+  id: '/api/shop/follow/list',
+  path: '/api/shop/follow/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiShopFollowToggleRoute = ApiShopFollowToggleRouteImport.update({
+  id: '/api/shop/follow/toggle',
+  path: '/api/shop/follow/toggle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorAnalyticsOverviewRoute =
+  ApiVendorAnalyticsOverviewRouteImport.update({
+    id: '/api/vendor/analytics/overview',
+    path: '/api/vendor/analytics/overview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiVendorConversationsConversationIdRoute =
+  ApiVendorConversationsConversationIdRouteImport.update({
+    id: '/api/vendor/conversations/$conversationId',
+    path: '/api/vendor/conversations/$conversationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiVendorConversationsListRoute =
+  ApiVendorConversationsListRouteImport.update({
+    id: '/api/vendor/conversations/list',
+    path: '/api/vendor/conversations/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiVendorOrdersOrderIdRoute = ApiVendorOrdersOrderIdRouteImport.update({
+  id: '/api/vendor/orders/$orderId',
+  path: '/api/vendor/orders/$orderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorOrdersCancelRoute = ApiVendorOrdersCancelRouteImport.update({
+  id: '/api/vendor/orders/cancel',
+  path: '/api/vendor/orders/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorOrdersListRoute = ApiVendorOrdersListRouteImport.update({
+  id: '/api/vendor/orders/list',
+  path: '/api/vendor/orders/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorPayoutsListRoute = ApiVendorPayoutsListRouteImport.update({
+  id: '/api/vendor/payouts/list',
+  path: '/api/vendor/payouts/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorPayoutsPendingRoute = ApiVendorPayoutsPendingRouteImport.update({
+  id: '/api/vendor/payouts/pending',
+  path: '/api/vendor/payouts/pending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorPayoutsScheduleRoute =
+  ApiVendorPayoutsScheduleRouteImport.update({
+    id: '/api/vendor/payouts/schedule',
+    path: '/api/vendor/payouts/schedule',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiVendorReturnsListRoute = ApiVendorReturnsListRouteImport.update({
+  id: '/api/vendor/returns/list',
+  path: '/api/vendor/returns/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorReturnsReviewRoute = ApiVendorReturnsReviewRouteImport.update({
+  id: '/api/vendor/returns/review',
+  path: '/api/vendor/returns/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorShippingCreateRoute = ApiVendorShippingCreateRouteImport.update({
+  id: '/api/vendor/shipping/create',
+  path: '/api/vendor/shipping/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorShippingDeleteRoute = ApiVendorShippingDeleteRouteImport.update({
+  id: '/api/vendor/shipping/delete',
+  path: '/api/vendor/shipping/delete',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorShippingEditRoute = ApiVendorShippingEditRouteImport.update({
+  id: '/api/vendor/shipping/edit',
+  path: '/api/vendor/shipping/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorShippingListRoute = ApiVendorShippingListRouteImport.update({
+  id: '/api/vendor/shipping/list',
+  path: '/api/vendor/shipping/list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVendorShopPayoutDetailsRoute =
+  ApiVendorShopPayoutDetailsRouteImport.update({
+    id: '/api/vendor/shop/payout-details',
+    path: '/api/vendor/shop/payout-details',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiVendorShopPoliciesRoute = ApiVendorShopPoliciesRouteImport.update({
+  id: '/api/vendor/shop/policies',
+  path: '/api/vendor/shop/policies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardAdminBannerAddRoute = DashboardAdminBannerAddRouteImport.update({
+  id: '/banner/add',
+  path: '/banner/add',
+  getParentRoute: () => DashboardAdminRouteRoute,
+} as any)
+const DashboardAdminBannerEditRoute =
+  DashboardAdminBannerEditRouteImport.update({
+    id: '/banner/edit',
+    path: '/banner/edit',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminBannerListRoute =
+  DashboardAdminBannerListRouteImport.update({
+    id: '/banner/list',
+    path: '/banner/list',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCategoryAddRoute =
+  DashboardAdminCategoryAddRouteImport.update({
+    id: '/category/add',
+    path: '/category/add',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCategoryAllRoute =
+  DashboardAdminCategoryAllRouteImport.update({
+    id: '/category/all',
+    path: '/category/all',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCategoryEditRoute =
+  DashboardAdminCategoryEditRouteImport.update({
+    id: '/category/edit',
+    path: '/category/edit',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminContentIndexRoute =
+  DashboardAdminContentIndexRouteImport.update({
+    id: '/content/',
+    path: '/content/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCouponsIndexRoute =
+  DashboardAdminCouponsIndexRouteImport.update({
+    id: '/coupons/',
+    path: '/coupons/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCouponsIdRoute = DashboardAdminCouponsIdRouteImport.update({
+  id: '/coupons/$id',
+  path: '/coupons/$id',
+  getParentRoute: () => DashboardAdminRouteRoute,
+} as any)
+const DashboardAdminCouponsCreateRoute =
+  DashboardAdminCouponsCreateRouteImport.update({
+    id: '/coupons/create',
+    path: '/coupons/create',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCustomersIndexRoute =
+  DashboardAdminCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminCustomersIdRoute =
+  DashboardAdminCustomersIdRouteImport.update({
+    id: '/customers/$id',
+    path: '/customers/$id',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminGlobalAttributesIndexRoute =
+  DashboardAdminGlobalAttributesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminGlobalAttributesRouteRoute,
+  } as any)
+const DashboardAdminGlobalAttributesIdRoute =
+  DashboardAdminGlobalAttributesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => DashboardAdminGlobalAttributesRouteRoute,
+  } as any)
+const DashboardAdminGlobalAttributesCreateRoute =
+  DashboardAdminGlobalAttributesCreateRouteImport.update({
+    id: '/create',
+    path: '/create',
+    getParentRoute: () => DashboardAdminGlobalAttributesRouteRoute,
+  } as any)
+const DashboardAdminMessagesIndexRoute =
+  DashboardAdminMessagesIndexRouteImport.update({
+    id: '/messages/',
+    path: '/messages/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminMessagesIdRoute =
+  DashboardAdminMessagesIdRouteImport.update({
+    id: '/messages/$id',
+    path: '/messages/$id',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminOrdersIndexRoute =
+  DashboardAdminOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminOrdersOrderIdRoute =
+  DashboardAdminOrdersOrderIdRouteImport.update({
+    id: '/orders/$orderId',
+    path: '/orders/$orderId',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminReturnsIndexRoute =
+  DashboardAdminReturnsIndexRouteImport.update({
+    id: '/returns/',
+    path: '/returns/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminReviewsIndexRoute =
+  DashboardAdminReviewsIndexRouteImport.update({
+    id: '/reviews/',
+    path: '/reviews/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminSettingsIndexRoute =
+  DashboardAdminSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminStaffIndexRoute =
+  DashboardAdminStaffIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardAdminStaffRouteRoute,
+  } as any)
+const DashboardAdminStaffAuditLogsRoute =
+  DashboardAdminStaffAuditLogsRouteImport.update({
+    id: '/audit-logs',
+    path: '/audit-logs',
+    getParentRoute: () => DashboardAdminStaffRouteRoute,
+  } as any)
+const DashboardAdminVendorsIndexRoute =
+  DashboardAdminVendorsIndexRouteImport.update({
+    id: '/vendors/',
+    path: '/vendors/',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminVendorsDetailRoute =
+  DashboardAdminVendorsDetailRouteImport.update({
+    id: '/vendors/detail',
+    path: '/vendors/detail',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardAdminVendorsPayoutsRoute =
+  DashboardAdminVendorsPayoutsRouteImport.update({
+    id: '/vendors/payouts',
+    path: '/vendors/payouts',
+    getParentRoute: () => DashboardAdminRouteRoute,
+  } as any)
+const DashboardOrdersReturnsIndexRoute =
+  DashboardOrdersReturnsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardOrdersReturnsRouteRoute,
+  } as any)
+const DashboardOrdersReturnsReturnIdRoute =
+  DashboardOrdersReturnsReturnIdRouteImport.update({
+    id: '/$returnId',
+    path: '/$returnId',
+    getParentRoute: () => DashboardOrdersReturnsRouteRoute,
+  } as any)
+const DashboardVendorOrdersIndexRoute =
+  DashboardVendorOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorOrdersOrderIdRoute =
+  DashboardVendorOrdersOrderIdRouteImport.update({
+    id: '/orders/$orderId',
+    path: '/orders/$orderId',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorPayoutsIndexRoute =
+  DashboardVendorPayoutsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardVendorPayoutsRouteRoute,
+  } as any)
+const DashboardVendorPayoutsScheduleRoute =
+  DashboardVendorPayoutsScheduleRouteImport.update({
+    id: '/schedule',
+    path: '/schedule',
+    getParentRoute: () => DashboardVendorPayoutsRouteRoute,
+  } as any)
+const DashboardVendorProductsIndexRoute =
+  DashboardVendorProductsIndexRouteImport.update({
+    id: '/products/',
+    path: '/products/',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorProductsAddRoute =
+  DashboardVendorProductsAddRouteImport.update({
+    id: '/products/add',
+    path: '/products/add',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorProductsEditRoute =
+  DashboardVendorProductsEditRouteImport.update({
+    id: '/products/edit',
+    path: '/products/edit',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorQuestionsIndexRoute =
+  DashboardVendorQuestionsIndexRouteImport.update({
+    id: '/questions/',
+    path: '/questions/',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorReturnsIndexRoute =
+  DashboardVendorReturnsIndexRouteImport.update({
+    id: '/returns/',
+    path: '/returns/',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorSalesIndexRoute =
+  DashboardVendorSalesIndexRouteImport.update({
+    id: '/sales/',
+    path: '/sales/',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorShippingIndexRoute =
+  DashboardVendorShippingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardVendorShippingRouteRoute,
+  } as any)
+const DashboardVendorShippingLabelsRoute =
+  DashboardVendorShippingLabelsRouteImport.update({
+    id: '/labels',
+    path: '/labels',
+    getParentRoute: () => DashboardVendorShippingRouteRoute,
+  } as any)
+const DashboardVendorShippingTrackingRoute =
+  DashboardVendorShippingTrackingRouteImport.update({
+    id: '/tracking',
+    path: '/tracking',
+    getParentRoute: () => DashboardVendorShippingRouteRoute,
+  } as any)
+const DashboardVendorShopIndexRoute =
+  DashboardVendorShopIndexRouteImport.update({
+    id: '/shop/',
+    path: '/shop/',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorShopBrandingRoute =
+  DashboardVendorShopBrandingRouteImport.update({
+    id: '/shop/branding',
+    path: '/shop/branding',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorShopPayoutRoute =
+  DashboardVendorShopPayoutRouteImport.update({
+    id: '/shop/payout',
+    path: '/shop/payout',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
+const DashboardVendorShopPoliciesRoute =
+  DashboardVendorShopPoliciesRouteImport.update({
+    id: '/shop/policies',
+    path: '/shop/policies',
+    getParentRoute: () => DashboardVendorRouteRoute,
+  } as any)
 const DashboardVendorShopMessagesIndexRoute =
   DashboardVendorShopMessagesIndexRouteImport.update({
     id: '/shop/messages/',
@@ -3267,130 +3267,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tracking': {
-      id: '/tracking'
-      path: '/tracking'
-      fullPath: '/tracking'
-      preLoaderRoute: typeof TrackingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shipping': {
-      id: '/shipping'
-      path: '/shipping'
-      fullPath: '/shipping'
-      preLoaderRoute: typeof ShippingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/returns': {
-      id: '/returns'
-      path: '/returns'
-      fullPath: '/returns'
-      preLoaderRoute: typeof ReturnsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recently-viewed': {
-      id: '/recently-viewed'
-      path: '/recently-viewed'
-      fullPath: '/recently-viewed'
-      preLoaderRoute: typeof RecentlyViewedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products': {
-      id: '/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/new-arrivals': {
-      id: '/new-arrivals'
-      path: '/new-arrivals'
-      fullPath: '/new-arrivals'
-      preLoaderRoute: typeof NewArrivalsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deals': {
-      id: '/deals'
-      path: '/deals'
-      fullPath: '/deals'
-      preLoaderRoute: typeof DealsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/compare': {
-      id: '/compare'
-      path: '/compare'
-      fullPath: '/compare'
-      preLoaderRoute: typeof CompareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/categories': {
-      id: '/categories'
-      path: '/categories'
-      fullPath: '/categories'
-      preLoaderRoute: typeof CategoriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bestsellers': {
-      id: '/bestsellers'
-      path: '/bestsellers'
-      fullPath: '/bestsellers'
-      preLoaderRoute: typeof BestsellersRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -3400,6 +3281,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bestsellers': {
+      id: '/bestsellers'
+      path: '/bestsellers'
+      fullPath: '/bestsellers'
+      preLoaderRoute: typeof BestsellersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -3407,123 +3330,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/deals': {
+      id: '/deals'
+      path: '/deals'
+      fullPath: '/deals'
+      preLoaderRoute: typeof DealsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shops/': {
-      id: '/shops/'
-      path: '/shops'
-      fullPath: '/shops/'
-      preLoaderRoute: typeof ShopsIndexRouteImport
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof DashboardIndexRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/shop/$slug': {
-      id: '/shop/$slug'
-      path: '/shop/$slug'
-      fullPath: '/shop/$slug'
-      preLoaderRoute: typeof ShopSlugRouteImport
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/product/$slug': {
-      id: '/product/$slug'
-      path: '/product/$slug'
-      fullPath: '/product/$slug'
-      preLoaderRoute: typeof ProductSlugRouteImport
+    '/new-arrivals': {
+      id: '/new-arrivals'
+      path: '/new-arrivals'
+      fullPath: '/new-arrivals'
+      preLoaderRoute: typeof NewArrivalsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/wishlist': {
-      id: '/dashboard/wishlist'
-      path: '/wishlist'
-      fullPath: '/dashboard/wishlist'
-      preLoaderRoute: typeof DashboardWishlistRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/wallet': {
-      id: '/dashboard/wallet'
-      path: '/wallet'
-      fullPath: '/dashboard/wallet'
-      preLoaderRoute: typeof DashboardWalletRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/my-account': {
-      id: '/dashboard/my-account'
-      path: '/my-account'
-      fullPath: '/dashboard/my-account'
-      preLoaderRoute: typeof DashboardMyAccountRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/followed-shops': {
-      id: '/dashboard/followed-shops'
-      path: '/followed-shops'
-      fullPath: '/dashboard/followed-shops'
-      preLoaderRoute: typeof DashboardFollowedShopsRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/addresses': {
-      id: '/dashboard/addresses'
-      path: '/addresses'
-      fullPath: '/dashboard/addresses'
-      preLoaderRoute: typeof DashboardAddressesRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/checkout/confirmation': {
-      id: '/checkout/confirmation'
-      path: '/confirmation'
-      fullPath: '/checkout/confirmation'
-      preLoaderRoute: typeof CheckoutConfirmationRouteImport
-      parentRoute: typeof CheckoutRoute
-    }
-    '/auth/verify': {
-      id: '/auth/verify'
-      path: '/auth/verify'
-      fullPath: '/auth/verify'
-      preLoaderRoute: typeof AuthVerifyRouteImport
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/two-factor': {
-      id: '/auth/two-factor'
-      path: '/auth/two-factor'
-      fullPath: '/auth/two-factor'
-      preLoaderRoute: typeof AuthTwoFactorRouteImport
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/signup': {
-      id: '/auth/signup'
-      path: '/auth/signup'
-      fullPath: '/auth/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
+    '/recently-viewed': {
+      id: '/recently-viewed'
+      path: '/recently-viewed'
+      fullPath: '/recently-viewed'
+      preLoaderRoute: typeof RecentlyViewedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/signin': {
-      id: '/auth/signin'
-      path: '/auth/signin'
-      fullPath: '/auth/signin'
-      preLoaderRoute: typeof AuthSigninRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/forgot-password': {
-      id: '/auth/forgot-password'
-      path: '/auth/forgot-password'
-      fullPath: '/auth/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+    '/returns': {
+      id: '/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof ReturnsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/error': {
-      id: '/auth/error'
-      path: '/auth/error'
-      fullPath: '/auth/error'
-      preLoaderRoute: typeof AuthErrorRouteImport
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tracking': {
+      id: '/tracking'
+      path: '/tracking'
+      fullPath: '/tracking'
+      preLoaderRoute: typeof TrackingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/contact': {
@@ -3533,25 +3421,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/vendor': {
-      id: '/dashboard/vendor'
-      path: '/vendor'
-      fullPath: '/dashboard/vendor'
-      preLoaderRoute: typeof DashboardVendorRouteRouteImport
+    '/auth/error': {
+      id: '/auth/error'
+      path: '/auth/error'
+      fullPath: '/auth/error'
+      preLoaderRoute: typeof AuthErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/auth/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signin': {
+      id: '/auth/signin'
+      path: '/auth/signin'
+      fullPath: '/auth/signin'
+      preLoaderRoute: typeof AuthSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signup': {
+      id: '/auth/signup'
+      path: '/auth/signup'
+      fullPath: '/auth/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/two-factor': {
+      id: '/auth/two-factor'
+      path: '/auth/two-factor'
+      fullPath: '/auth/two-factor'
+      preLoaderRoute: typeof AuthTwoFactorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/verify': {
+      id: '/auth/verify'
+      path: '/auth/verify'
+      fullPath: '/auth/verify'
+      preLoaderRoute: typeof AuthVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/confirmation': {
+      id: '/checkout/confirmation'
+      path: '/confirmation'
+      fullPath: '/checkout/confirmation'
+      preLoaderRoute: typeof CheckoutConfirmationRouteImport
+      parentRoute: typeof CheckoutRoute
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/orders': {
-      id: '/dashboard/orders'
-      path: '/orders'
-      fullPath: '/dashboard/orders'
-      preLoaderRoute: typeof DashboardOrdersRouteRouteImport
-      parentRoute: typeof DashboardRouteRoute
-    }
-    '/dashboard/become-vendor': {
-      id: '/dashboard/become-vendor'
-      path: '/become-vendor'
-      fullPath: '/dashboard/become-vendor'
-      preLoaderRoute: typeof DashboardBecomeVendorRouteRouteImport
+    '/dashboard/addresses': {
+      id: '/dashboard/addresses'
+      path: '/addresses'
+      fullPath: '/dashboard/addresses'
+      preLoaderRoute: typeof DashboardAddressesRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
     '/dashboard/admin': {
@@ -3561,739 +3491,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/vouchers/': {
-      id: '/dashboard/vouchers/'
-      path: '/vouchers'
-      fullPath: '/dashboard/vouchers/'
-      preLoaderRoute: typeof DashboardVouchersIndexRouteImport
+    '/dashboard/become-vendor': {
+      id: '/dashboard/become-vendor'
+      path: '/become-vendor'
+      fullPath: '/dashboard/become-vendor'
+      preLoaderRoute: typeof DashboardBecomeVendorRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/vendor/': {
-      id: '/dashboard/vendor/'
-      path: '/'
-      fullPath: '/dashboard/vendor/'
-      preLoaderRoute: typeof DashboardVendorIndexRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/reviews/': {
-      id: '/dashboard/reviews/'
-      path: '/reviews'
-      fullPath: '/dashboard/reviews/'
-      preLoaderRoute: typeof DashboardReviewsIndexRouteImport
+    '/dashboard/followed-shops': {
+      id: '/dashboard/followed-shops'
+      path: '/followed-shops'
+      fullPath: '/dashboard/followed-shops'
+      preLoaderRoute: typeof DashboardFollowedShopsRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/orders/': {
-      id: '/dashboard/orders/'
-      path: '/'
-      fullPath: '/dashboard/orders/'
-      preLoaderRoute: typeof DashboardOrdersIndexRouteImport
-      parentRoute: typeof DashboardOrdersRouteRoute
-    }
-    '/dashboard/messages/': {
-      id: '/dashboard/messages/'
-      path: '/messages'
-      fullPath: '/dashboard/messages/'
-      preLoaderRoute: typeof DashboardMessagesIndexRouteImport
+    '/dashboard/my-account': {
+      id: '/dashboard/my-account'
+      path: '/my-account'
+      fullPath: '/dashboard/my-account'
+      preLoaderRoute: typeof DashboardMyAccountRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/become-vendor/': {
-      id: '/dashboard/become-vendor/'
-      path: '/'
-      fullPath: '/dashboard/become-vendor/'
-      preLoaderRoute: typeof DashboardBecomeVendorIndexRouteImport
-      parentRoute: typeof DashboardBecomeVendorRouteRoute
-    }
-    '/dashboard/admin/': {
-      id: '/dashboard/admin/'
-      path: '/'
-      fullPath: '/dashboard/admin/'
-      preLoaderRoute: typeof DashboardAdminIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/api/global-attributes/': {
-      id: '/api/global-attributes/'
-      path: '/api/global-attributes'
-      fullPath: '/api/global-attributes/'
-      preLoaderRoute: typeof ApiGlobalAttributesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/products/category/$slug': {
-      id: '/products/category/$slug'
-      path: '/category/$slug'
-      fullPath: '/products/category/$slug'
-      preLoaderRoute: typeof ProductsCategorySlugRouteImport
-      parentRoute: typeof ProductsRoute
-    }
-    '/dashboard/orders/$orderId': {
-      id: '/dashboard/orders/$orderId'
-      path: '/$orderId'
-      fullPath: '/dashboard/orders/$orderId'
-      preLoaderRoute: typeof DashboardOrdersOrderIdRouteImport
-      parentRoute: typeof DashboardOrdersRouteRoute
-    }
-    '/dashboard/messages/$id': {
-      id: '/dashboard/messages/$id'
-      path: '/messages/$id'
-      fullPath: '/dashboard/messages/$id'
-      preLoaderRoute: typeof DashboardMessagesIdRouteImport
+    '/dashboard/orders': {
+      id: '/dashboard/orders'
+      path: '/orders'
+      fullPath: '/dashboard/orders'
+      preLoaderRoute: typeof DashboardOrdersRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/become-vendor/pending': {
-      id: '/dashboard/become-vendor/pending'
-      path: '/pending'
-      fullPath: '/dashboard/become-vendor/pending'
-      preLoaderRoute: typeof DashboardBecomeVendorPendingRouteImport
-      parentRoute: typeof DashboardBecomeVendorRouteRoute
-    }
-    '/dashboard/become-vendor/apply': {
-      id: '/dashboard/become-vendor/apply'
-      path: '/apply'
-      fullPath: '/dashboard/become-vendor/apply'
-      preLoaderRoute: typeof DashboardBecomeVendorApplyRouteImport
-      parentRoute: typeof DashboardBecomeVendorRouteRoute
-    }
-    '/api/wishlist/remove': {
-      id: '/api/wishlist/remove'
-      path: '/api/wishlist/remove'
-      fullPath: '/api/wishlist/remove'
-      preLoaderRoute: typeof ApiWishlistRemoveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/wishlist/list': {
-      id: '/api/wishlist/list'
-      path: '/api/wishlist/list'
-      fullPath: '/api/wishlist/list'
-      preLoaderRoute: typeof ApiWishlistListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/wishlist/add': {
-      id: '/api/wishlist/add'
-      path: '/api/wishlist/add'
-      fullPath: '/api/wishlist/add'
-      preLoaderRoute: typeof ApiWishlistAddRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/wallet/top-up': {
-      id: '/api/wallet/top-up'
-      path: '/api/wallet/top-up'
-      fullPath: '/api/wallet/top-up'
-      preLoaderRoute: typeof ApiWalletTopUpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/wallet/get': {
-      id: '/api/wallet/get'
-      path: '/api/wallet/get'
-      fullPath: '/api/wallet/get'
-      preLoaderRoute: typeof ApiWalletGetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/wallet/bkash-callback': {
-      id: '/api/wallet/bkash-callback'
-      path: '/api/wallet/bkash-callback'
-      fullPath: '/api/wallet/bkash-callback'
-      preLoaderRoute: typeof ApiWalletBkashCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vouchers/product-vouchers': {
-      id: '/api/vouchers/product-vouchers'
-      path: '/api/vouchers/product-vouchers'
-      fullPath: '/api/vouchers/product-vouchers'
-      preLoaderRoute: typeof ApiVouchersProductVouchersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vouchers/my': {
-      id: '/api/vouchers/my'
-      path: '/api/vouchers/my'
-      fullPath: '/api/vouchers/my'
-      preLoaderRoute: typeof ApiVouchersMyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vouchers/collect': {
-      id: '/api/vouchers/collect'
-      path: '/api/vouchers/collect'
-      fullPath: '/api/vouchers/collect'
-      preLoaderRoute: typeof ApiVouchersCollectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vouchers/auto-apply': {
-      id: '/api/vouchers/auto-apply'
-      path: '/api/vouchers/auto-apply'
-      fullPath: '/api/vouchers/auto-apply'
-      preLoaderRoute: typeof ApiVouchersAutoApplyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/questions': {
-      id: '/api/vendor/questions'
-      path: '/api/vendor/questions'
-      fullPath: '/api/vendor/questions'
-      preLoaderRoute: typeof ApiVendorQuestionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/upload/message': {
-      id: '/api/upload/message'
-      path: '/api/upload/message'
-      fullPath: '/api/upload/message'
-      preLoaderRoute: typeof ApiUploadMessageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/upload/avatar': {
-      id: '/api/upload/avatar'
-      path: '/api/upload/avatar'
-      fullPath: '/api/upload/avatar'
-      preLoaderRoute: typeof ApiUploadAvatarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/update': {
-      id: '/api/shop/update'
-      path: '/api/shop/update'
-      fullPath: '/api/shop/update'
-      preLoaderRoute: typeof ApiShopUpdateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/unsuspend': {
-      id: '/api/shop/unsuspend'
-      path: '/api/shop/unsuspend'
-      fullPath: '/api/shop/unsuspend'
-      preLoaderRoute: typeof ApiShopUnsuspendRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/suspend': {
-      id: '/api/shop/suspend'
-      path: '/api/shop/suspend'
-      fullPath: '/api/shop/suspend'
-      preLoaderRoute: typeof ApiShopSuspendRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/reject': {
-      id: '/api/shop/reject'
-      path: '/api/shop/reject'
-      fullPath: '/api/shop/reject'
-      preLoaderRoute: typeof ApiShopRejectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/public-single': {
-      id: '/api/shop/public-single'
-      path: '/api/shop/public-single'
-      fullPath: '/api/shop/public-single'
-      preLoaderRoute: typeof ApiShopPublicSingleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/public-products': {
-      id: '/api/shop/public-products'
-      path: '/api/shop/public-products'
-      fullPath: '/api/shop/public-products'
-      preLoaderRoute: typeof ApiShopPublicProductsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/public-list': {
-      id: '/api/shop/public-list'
-      path: '/api/shop/public-list'
-      fullPath: '/api/shop/public-list'
-      preLoaderRoute: typeof ApiShopPublicListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/my-shop': {
-      id: '/api/shop/my-shop'
-      path: '/api/shop/my-shop'
-      fullPath: '/api/shop/my-shop'
-      preLoaderRoute: typeof ApiShopMyShopRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/get-single': {
-      id: '/api/shop/get-single'
-      path: '/api/shop/get-single'
-      fullPath: '/api/shop/get-single'
-      preLoaderRoute: typeof ApiShopGetSingleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/approve': {
-      id: '/api/shop/approve'
-      path: '/api/shop/approve'
-      fullPath: '/api/shop/approve'
-      preLoaderRoute: typeof ApiShopApproveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/apply': {
-      id: '/api/shop/apply'
-      path: '/api/shop/apply'
-      fullPath: '/api/shop/apply'
-      preLoaderRoute: typeof ApiShopApplyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/admin-list': {
-      id: '/api/shop/admin-list'
-      path: '/api/shop/admin-list'
-      fullPath: '/api/shop/admin-list'
-      preLoaderRoute: typeof ApiShopAdminListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/settings/public': {
-      id: '/api/settings/public'
-      path: '/api/settings/public'
-      fullPath: '/api/settings/public'
-      preLoaderRoute: typeof ApiSettingsPublicRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/returns/list': {
-      id: '/api/returns/list'
-      path: '/api/returns/list'
-      fullPath: '/api/returns/list'
-      preLoaderRoute: typeof ApiReturnsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/returns/create': {
-      id: '/api/returns/create'
-      path: '/api/returns/create'
-      fullPath: '/api/returns/create'
-      preLoaderRoute: typeof ApiReturnsCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/returns/$returnId': {
-      id: '/api/returns/$returnId'
-      path: '/api/returns/$returnId'
-      fullPath: '/api/returns/$returnId'
-      preLoaderRoute: typeof ApiReturnsReturnIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/vendor-list': {
-      id: '/api/product/vendor-list'
-      path: '/api/product/vendor-list'
-      fullPath: '/api/product/vendor-list'
-      preLoaderRoute: typeof ApiProductVendorListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/vendor-categories': {
-      id: '/api/product/vendor-categories'
-      path: '/api/product/vendor-categories'
-      fullPath: '/api/product/vendor-categories'
-      preLoaderRoute: typeof ApiProductVendorCategoriesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-single': {
-      id: '/api/product/public-single'
-      path: '/api/product/public-single'
-      fullPath: '/api/product/public-single'
-      preLoaderRoute: typeof ApiProductPublicSingleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-reviews': {
-      id: '/api/product/public-reviews'
-      path: '/api/product/public-reviews'
-      fullPath: '/api/product/public-reviews'
-      preLoaderRoute: typeof ApiProductPublicReviewsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-recent': {
-      id: '/api/product/public-recent'
-      path: '/api/product/public-recent'
-      fullPath: '/api/product/public-recent'
-      preLoaderRoute: typeof ApiProductPublicRecentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-questions': {
-      id: '/api/product/public-questions'
-      path: '/api/product/public-questions'
-      fullPath: '/api/product/public-questions'
-      preLoaderRoute: typeof ApiProductPublicQuestionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-list': {
-      id: '/api/product/public-list'
-      path: '/api/product/public-list'
-      fullPath: '/api/product/public-list'
-      preLoaderRoute: typeof ApiProductPublicListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-compare': {
-      id: '/api/product/public-compare'
-      path: '/api/product/public-compare'
-      fullPath: '/api/product/public-compare'
-      preLoaderRoute: typeof ApiProductPublicCompareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-by-category': {
-      id: '/api/product/public-by-category'
-      path: '/api/product/public-by-category'
-      fullPath: '/api/product/public-by-category'
-      preLoaderRoute: typeof ApiProductPublicByCategoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/public-bestsellers': {
-      id: '/api/product/public-bestsellers'
-      path: '/api/product/public-bestsellers'
-      fullPath: '/api/product/public-bestsellers'
-      preLoaderRoute: typeof ApiProductPublicBestsellersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/helpful-vote': {
-      id: '/api/product/helpful-vote'
-      path: '/api/product/helpful-vote'
-      fullPath: '/api/product/helpful-vote'
-      preLoaderRoute: typeof ApiProductHelpfulVoteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/get-single': {
-      id: '/api/product/get-single'
-      path: '/api/product/get-single'
-      fullPath: '/api/product/get-single'
-      preLoaderRoute: typeof ApiProductGetSingleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/edit': {
-      id: '/api/product/edit'
-      path: '/api/product/edit'
-      fullPath: '/api/product/edit'
-      preLoaderRoute: typeof ApiProductEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/delete': {
-      id: '/api/product/delete'
-      path: '/api/product/delete'
-      fullPath: '/api/product/delete'
-      preLoaderRoute: typeof ApiProductDeleteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/create-review': {
-      id: '/api/product/create-review'
-      path: '/api/product/create-review'
-      fullPath: '/api/product/create-review'
-      preLoaderRoute: typeof ApiProductCreateReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/create': {
-      id: '/api/product/create'
-      path: '/api/product/create'
-      fullPath: '/api/product/create'
-      preLoaderRoute: typeof ApiProductCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/check-sku': {
-      id: '/api/product/check-sku'
-      path: '/api/product/check-sku'
-      fullPath: '/api/product/check-sku'
-      preLoaderRoute: typeof ApiProductCheckSkuRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/product/answer-question': {
-      id: '/api/product/answer-question'
-      path: '/api/product/answer-question'
-      fullPath: '/api/product/answer-question'
-      preLoaderRoute: typeof ApiProductAnswerQuestionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/list': {
-      id: '/api/orders/list'
-      path: '/api/orders/list'
-      fullPath: '/api/orders/list'
-      preLoaderRoute: typeof ApiOrdersListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/cancel': {
-      id: '/api/orders/cancel'
-      path: '/api/orders/cancel'
-      fullPath: '/api/orders/cancel'
-      preLoaderRoute: typeof ApiOrdersCancelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/admin-single': {
-      id: '/api/orders/admin-single'
-      path: '/api/orders/admin-single'
-      fullPath: '/api/orders/admin-single'
-      preLoaderRoute: typeof ApiOrdersAdminSingleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/admin-refund': {
-      id: '/api/orders/admin-refund'
-      path: '/api/orders/admin-refund'
-      fullPath: '/api/orders/admin-refund'
-      preLoaderRoute: typeof ApiOrdersAdminRefundRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/admin-list': {
-      id: '/api/orders/admin-list'
-      path: '/api/orders/admin-list'
-      fullPath: '/api/orders/admin-list'
-      preLoaderRoute: typeof ApiOrdersAdminListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/admin-fulfill': {
-      id: '/api/orders/admin-fulfill'
-      path: '/api/orders/admin-fulfill'
-      fullPath: '/api/orders/admin-fulfill'
-      preLoaderRoute: typeof ApiOrdersAdminFulfillRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/admin-cancel': {
-      id: '/api/orders/admin-cancel'
-      path: '/api/orders/admin-cancel'
-      fullPath: '/api/orders/admin-cancel'
-      preLoaderRoute: typeof ApiOrdersAdminCancelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/$orderId': {
-      id: '/api/orders/$orderId'
-      path: '/api/orders/$orderId'
-      fullPath: '/api/orders/$orderId'
-      preLoaderRoute: typeof ApiOrdersOrderIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/newsletter/subscribe': {
-      id: '/api/newsletter/subscribe'
-      path: '/api/newsletter/subscribe'
-      fullPath: '/api/newsletter/subscribe'
-      preLoaderRoute: typeof ApiNewsletterSubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/messages/list': {
-      id: '/api/messages/list'
-      path: '/api/messages/list'
-      fullPath: '/api/messages/list'
-      preLoaderRoute: typeof ApiMessagesListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/messages/create': {
-      id: '/api/messages/create'
-      path: '/api/messages/create'
-      fullPath: '/api/messages/create'
-      preLoaderRoute: typeof ApiMessagesCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/conversations/unread': {
-      id: '/api/conversations/unread'
-      path: '/api/conversations/unread'
-      fullPath: '/api/conversations/unread'
-      preLoaderRoute: typeof ApiConversationsUnreadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/conversations/list': {
-      id: '/api/conversations/list'
-      path: '/api/conversations/list'
-      fullPath: '/api/conversations/list'
-      preLoaderRoute: typeof ApiConversationsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/conversations/create': {
-      id: '/api/conversations/create'
-      path: '/api/conversations/create'
-      fullPath: '/api/conversations/create'
-      preLoaderRoute: typeof ApiConversationsCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/conversations/$conversationId': {
-      id: '/api/conversations/$conversationId'
-      path: '/api/conversations/$conversationId'
-      fullPath: '/api/conversations/$conversationId'
-      preLoaderRoute: typeof ApiConversationsConversationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/content/get': {
-      id: '/api/content/get'
-      path: '/api/content/get'
-      fullPath: '/api/content/get'
-      preLoaderRoute: typeof ApiContentGetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/checkout/validate-coupon': {
-      id: '/api/checkout/validate-coupon'
-      path: '/api/checkout/validate-coupon'
-      fullPath: '/api/checkout/validate-coupon'
-      preLoaderRoute: typeof ApiCheckoutValidateCouponRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/checkout/discount-preview': {
-      id: '/api/checkout/discount-preview'
-      path: '/api/checkout/discount-preview'
-      fullPath: '/api/checkout/discount-preview'
-      preLoaderRoute: typeof ApiCheckoutDiscountPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/checkout/create': {
-      id: '/api/checkout/create'
-      path: '/api/checkout/create'
-      fullPath: '/api/checkout/create'
-      preLoaderRoute: typeof ApiCheckoutCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/checkout/bkash-pay': {
-      id: '/api/checkout/bkash-pay'
-      path: '/api/checkout/bkash-pay'
-      fullPath: '/api/checkout/bkash-pay'
-      preLoaderRoute: typeof ApiCheckoutBkashPayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/checkout/bkash-ipn': {
-      id: '/api/checkout/bkash-ipn'
-      path: '/api/checkout/bkash-ipn'
-      fullPath: '/api/checkout/bkash-ipn'
-      preLoaderRoute: typeof ApiCheckoutBkashIpnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/checkout/bkash-callback': {
-      id: '/api/checkout/bkash-callback'
-      path: '/api/checkout/bkash-callback'
-      fullPath: '/api/checkout/bkash-callback'
-      preLoaderRoute: typeof ApiCheckoutBkashCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/categories/public-list': {
-      id: '/api/categories/public-list'
-      path: '/api/categories/public-list'
-      fullPath: '/api/categories/public-list'
-      preLoaderRoute: typeof ApiCategoriesPublicListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/categories/list': {
-      id: '/api/categories/list'
-      path: '/api/categories/list'
-      fullPath: '/api/categories/list'
-      preLoaderRoute: typeof ApiCategoriesListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/categories/get-single': {
-      id: '/api/categories/get-single'
-      path: '/api/categories/get-single'
-      fullPath: '/api/categories/get-single'
-      preLoaderRoute: typeof ApiCategoriesGetSingleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/categories/edit': {
-      id: '/api/categories/edit'
-      path: '/api/categories/edit'
-      fullPath: '/api/categories/edit'
-      preLoaderRoute: typeof ApiCategoriesEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/categories/delete': {
-      id: '/api/categories/delete'
-      path: '/api/categories/delete'
-      fullPath: '/api/categories/delete'
-      preLoaderRoute: typeof ApiCategoriesDeleteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/categories/add': {
-      id: '/api/categories/add'
-      path: '/api/categories/add'
-      fullPath: '/api/categories/add'
-      preLoaderRoute: typeof ApiCategoriesAddRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/cart/update': {
-      id: '/api/cart/update'
-      path: '/api/cart/update'
-      fullPath: '/api/cart/update'
-      preLoaderRoute: typeof ApiCartUpdateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/cart/remove': {
-      id: '/api/cart/remove'
-      path: '/api/cart/remove'
-      fullPath: '/api/cart/remove'
-      preLoaderRoute: typeof ApiCartRemoveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/cart/get': {
-      id: '/api/cart/get'
-      path: '/api/cart/get'
-      fullPath: '/api/cart/get'
-      preLoaderRoute: typeof ApiCartGetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/cart/add': {
-      id: '/api/cart/add'
-      path: '/api/cart/add'
-      fullPath: '/api/cart/add'
-      preLoaderRoute: typeof ApiCartAddRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/banners/hero': {
-      id: '/api/banners/hero'
-      path: '/api/banners/hero'
-      fullPath: '/api/banners/hero'
-      preLoaderRoute: typeof ApiBannersHeroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/banners/get-single': {
-      id: '/api/banners/get-single'
-      path: '/api/banners/get-single'
-      fullPath: '/api/banners/get-single'
-      preLoaderRoute: typeof ApiBannersGetSingleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/banners/edit': {
-      id: '/api/banners/edit'
-      path: '/api/banners/edit'
-      fullPath: '/api/banners/edit'
-      preLoaderRoute: typeof ApiBannersEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/banners/delete': {
-      id: '/api/banners/delete'
-      path: '/api/banners/delete'
-      fullPath: '/api/banners/delete'
-      preLoaderRoute: typeof ApiBannersDeleteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/banners/admin-list': {
-      id: '/api/banners/admin-list'
-      path: '/api/banners/admin-list'
-      fullPath: '/api/banners/admin-list'
-      preLoaderRoute: typeof ApiBannersAdminListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/banners/add': {
-      id: '/api/banners/add'
-      path: '/api/banners/add'
-      fullPath: '/api/banners/add'
-      preLoaderRoute: typeof ApiBannersAddRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/send-password-reset-confirmation': {
-      id: '/api/auth/send-password-reset-confirmation'
-      path: '/api/auth/send-password-reset-confirmation'
-      fullPath: '/api/auth/send-password-reset-confirmation'
-      preLoaderRoute: typeof ApiAuthSendPasswordResetConfirmationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/check-email': {
-      id: '/api/auth/check-email'
-      path: '/api/auth/check-email'
-      fullPath: '/api/auth/check-email'
-      preLoaderRoute: typeof ApiAuthCheckEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/audit-logs': {
-      id: '/api/admin/audit-logs'
-      path: '/api/admin/audit-logs'
-      fullPath: '/api/admin/audit-logs'
-      preLoaderRoute: typeof ApiAdminAuditLogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/addresses/list': {
-      id: '/api/addresses/list'
-      path: '/api/addresses/list'
-      fullPath: '/api/addresses/list'
-      preLoaderRoute: typeof ApiAddressesListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/addresses/edit': {
-      id: '/api/addresses/edit'
-      path: '/api/addresses/edit'
-      fullPath: '/api/addresses/edit'
-      preLoaderRoute: typeof ApiAddressesEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/addresses/delete': {
-      id: '/api/addresses/delete'
-      path: '/api/addresses/delete'
-      fullPath: '/api/addresses/delete'
-      preLoaderRoute: typeof ApiAddressesDeleteRouteImport
+    '/dashboard/vendor': {
+      id: '/dashboard/vendor'
+      path: '/vendor'
+      fullPath: '/dashboard/vendor'
+      preLoaderRoute: typeof DashboardVendorRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/wallet': {
+      id: '/dashboard/wallet'
+      path: '/wallet'
+      fullPath: '/dashboard/wallet'
+      preLoaderRoute: typeof DashboardWalletRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/wishlist': {
+      id: '/dashboard/wishlist'
+      path: '/wishlist'
+      fullPath: '/dashboard/wishlist'
+      preLoaderRoute: typeof DashboardWishlistRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop/$slug': {
+      id: '/shop/$slug'
+      path: '/shop/$slug'
+      fullPath: '/shop/$slug'
+      preLoaderRoute: typeof ShopSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shops/': {
+      id: '/shops/'
+      path: '/shops'
+      fullPath: '/shops/'
+      preLoaderRoute: typeof ShopsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/addresses/create': {
@@ -4303,32 +3568,662 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAddressesCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/vendor/shipping': {
-      id: '/dashboard/vendor/shipping'
-      path: '/shipping'
-      fullPath: '/dashboard/vendor/shipping'
-      preLoaderRoute: typeof DashboardVendorShippingRouteRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
+    '/api/addresses/delete': {
+      id: '/api/addresses/delete'
+      path: '/api/addresses/delete'
+      fullPath: '/api/addresses/delete'
+      preLoaderRoute: typeof ApiAddressesDeleteRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/dashboard/vendor/payouts': {
-      id: '/dashboard/vendor/payouts'
-      path: '/payouts'
-      fullPath: '/dashboard/vendor/payouts'
-      preLoaderRoute: typeof DashboardVendorPayoutsRouteRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
+    '/api/addresses/edit': {
+      id: '/api/addresses/edit'
+      path: '/api/addresses/edit'
+      fullPath: '/api/addresses/edit'
+      preLoaderRoute: typeof ApiAddressesEditRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/dashboard/orders/returns': {
-      id: '/dashboard/orders/returns'
-      path: '/returns'
-      fullPath: '/dashboard/orders/returns'
-      preLoaderRoute: typeof DashboardOrdersReturnsRouteRouteImport
-      parentRoute: typeof DashboardOrdersRouteRoute
+    '/api/addresses/list': {
+      id: '/api/addresses/list'
+      path: '/api/addresses/list'
+      fullPath: '/api/addresses/list'
+      preLoaderRoute: typeof ApiAddressesListRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/dashboard/admin/staff': {
-      id: '/dashboard/admin/staff'
-      path: '/staff'
-      fullPath: '/dashboard/admin/staff'
-      preLoaderRoute: typeof DashboardAdminStaffRouteRouteImport
+    '/api/admin/audit-logs': {
+      id: '/api/admin/audit-logs'
+      path: '/api/admin/audit-logs'
+      fullPath: '/api/admin/audit-logs'
+      preLoaderRoute: typeof ApiAdminAuditLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/check-email': {
+      id: '/api/auth/check-email'
+      path: '/api/auth/check-email'
+      fullPath: '/api/auth/check-email'
+      preLoaderRoute: typeof ApiAuthCheckEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/send-password-reset-confirmation': {
+      id: '/api/auth/send-password-reset-confirmation'
+      path: '/api/auth/send-password-reset-confirmation'
+      fullPath: '/api/auth/send-password-reset-confirmation'
+      preLoaderRoute: typeof ApiAuthSendPasswordResetConfirmationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/banners/add': {
+      id: '/api/banners/add'
+      path: '/api/banners/add'
+      fullPath: '/api/banners/add'
+      preLoaderRoute: typeof ApiBannersAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/banners/admin-list': {
+      id: '/api/banners/admin-list'
+      path: '/api/banners/admin-list'
+      fullPath: '/api/banners/admin-list'
+      preLoaderRoute: typeof ApiBannersAdminListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/banners/delete': {
+      id: '/api/banners/delete'
+      path: '/api/banners/delete'
+      fullPath: '/api/banners/delete'
+      preLoaderRoute: typeof ApiBannersDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/banners/edit': {
+      id: '/api/banners/edit'
+      path: '/api/banners/edit'
+      fullPath: '/api/banners/edit'
+      preLoaderRoute: typeof ApiBannersEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/banners/get-single': {
+      id: '/api/banners/get-single'
+      path: '/api/banners/get-single'
+      fullPath: '/api/banners/get-single'
+      preLoaderRoute: typeof ApiBannersGetSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/banners/hero': {
+      id: '/api/banners/hero'
+      path: '/api/banners/hero'
+      fullPath: '/api/banners/hero'
+      preLoaderRoute: typeof ApiBannersHeroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cart/add': {
+      id: '/api/cart/add'
+      path: '/api/cart/add'
+      fullPath: '/api/cart/add'
+      preLoaderRoute: typeof ApiCartAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cart/get': {
+      id: '/api/cart/get'
+      path: '/api/cart/get'
+      fullPath: '/api/cart/get'
+      preLoaderRoute: typeof ApiCartGetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cart/remove': {
+      id: '/api/cart/remove'
+      path: '/api/cart/remove'
+      fullPath: '/api/cart/remove'
+      preLoaderRoute: typeof ApiCartRemoveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cart/update': {
+      id: '/api/cart/update'
+      path: '/api/cart/update'
+      fullPath: '/api/cart/update'
+      preLoaderRoute: typeof ApiCartUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/add': {
+      id: '/api/categories/add'
+      path: '/api/categories/add'
+      fullPath: '/api/categories/add'
+      preLoaderRoute: typeof ApiCategoriesAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/delete': {
+      id: '/api/categories/delete'
+      path: '/api/categories/delete'
+      fullPath: '/api/categories/delete'
+      preLoaderRoute: typeof ApiCategoriesDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/edit': {
+      id: '/api/categories/edit'
+      path: '/api/categories/edit'
+      fullPath: '/api/categories/edit'
+      preLoaderRoute: typeof ApiCategoriesEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/get-single': {
+      id: '/api/categories/get-single'
+      path: '/api/categories/get-single'
+      fullPath: '/api/categories/get-single'
+      preLoaderRoute: typeof ApiCategoriesGetSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/list': {
+      id: '/api/categories/list'
+      path: '/api/categories/list'
+      fullPath: '/api/categories/list'
+      preLoaderRoute: typeof ApiCategoriesListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/public-list': {
+      id: '/api/categories/public-list'
+      path: '/api/categories/public-list'
+      fullPath: '/api/categories/public-list'
+      preLoaderRoute: typeof ApiCategoriesPublicListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/bkash-callback': {
+      id: '/api/checkout/bkash-callback'
+      path: '/api/checkout/bkash-callback'
+      fullPath: '/api/checkout/bkash-callback'
+      preLoaderRoute: typeof ApiCheckoutBkashCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/bkash-ipn': {
+      id: '/api/checkout/bkash-ipn'
+      path: '/api/checkout/bkash-ipn'
+      fullPath: '/api/checkout/bkash-ipn'
+      preLoaderRoute: typeof ApiCheckoutBkashIpnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/bkash-pay': {
+      id: '/api/checkout/bkash-pay'
+      path: '/api/checkout/bkash-pay'
+      fullPath: '/api/checkout/bkash-pay'
+      preLoaderRoute: typeof ApiCheckoutBkashPayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/create': {
+      id: '/api/checkout/create'
+      path: '/api/checkout/create'
+      fullPath: '/api/checkout/create'
+      preLoaderRoute: typeof ApiCheckoutCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/discount-preview': {
+      id: '/api/checkout/discount-preview'
+      path: '/api/checkout/discount-preview'
+      fullPath: '/api/checkout/discount-preview'
+      preLoaderRoute: typeof ApiCheckoutDiscountPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/validate-coupon': {
+      id: '/api/checkout/validate-coupon'
+      path: '/api/checkout/validate-coupon'
+      fullPath: '/api/checkout/validate-coupon'
+      preLoaderRoute: typeof ApiCheckoutValidateCouponRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/content/get': {
+      id: '/api/content/get'
+      path: '/api/content/get'
+      fullPath: '/api/content/get'
+      preLoaderRoute: typeof ApiContentGetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/conversations/$conversationId': {
+      id: '/api/conversations/$conversationId'
+      path: '/api/conversations/$conversationId'
+      fullPath: '/api/conversations/$conversationId'
+      preLoaderRoute: typeof ApiConversationsConversationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/conversations/create': {
+      id: '/api/conversations/create'
+      path: '/api/conversations/create'
+      fullPath: '/api/conversations/create'
+      preLoaderRoute: typeof ApiConversationsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/conversations/list': {
+      id: '/api/conversations/list'
+      path: '/api/conversations/list'
+      fullPath: '/api/conversations/list'
+      preLoaderRoute: typeof ApiConversationsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/conversations/unread': {
+      id: '/api/conversations/unread'
+      path: '/api/conversations/unread'
+      fullPath: '/api/conversations/unread'
+      preLoaderRoute: typeof ApiConversationsUnreadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/global-attributes/': {
+      id: '/api/global-attributes/'
+      path: '/api/global-attributes'
+      fullPath: '/api/global-attributes/'
+      preLoaderRoute: typeof ApiGlobalAttributesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/messages/create': {
+      id: '/api/messages/create'
+      path: '/api/messages/create'
+      fullPath: '/api/messages/create'
+      preLoaderRoute: typeof ApiMessagesCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/messages/list': {
+      id: '/api/messages/list'
+      path: '/api/messages/list'
+      fullPath: '/api/messages/list'
+      preLoaderRoute: typeof ApiMessagesListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/newsletter/subscribe': {
+      id: '/api/newsletter/subscribe'
+      path: '/api/newsletter/subscribe'
+      fullPath: '/api/newsletter/subscribe'
+      preLoaderRoute: typeof ApiNewsletterSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/$orderId': {
+      id: '/api/orders/$orderId'
+      path: '/api/orders/$orderId'
+      fullPath: '/api/orders/$orderId'
+      preLoaderRoute: typeof ApiOrdersOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/admin-cancel': {
+      id: '/api/orders/admin-cancel'
+      path: '/api/orders/admin-cancel'
+      fullPath: '/api/orders/admin-cancel'
+      preLoaderRoute: typeof ApiOrdersAdminCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/admin-fulfill': {
+      id: '/api/orders/admin-fulfill'
+      path: '/api/orders/admin-fulfill'
+      fullPath: '/api/orders/admin-fulfill'
+      preLoaderRoute: typeof ApiOrdersAdminFulfillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/admin-list': {
+      id: '/api/orders/admin-list'
+      path: '/api/orders/admin-list'
+      fullPath: '/api/orders/admin-list'
+      preLoaderRoute: typeof ApiOrdersAdminListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/admin-refund': {
+      id: '/api/orders/admin-refund'
+      path: '/api/orders/admin-refund'
+      fullPath: '/api/orders/admin-refund'
+      preLoaderRoute: typeof ApiOrdersAdminRefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/admin-single': {
+      id: '/api/orders/admin-single'
+      path: '/api/orders/admin-single'
+      fullPath: '/api/orders/admin-single'
+      preLoaderRoute: typeof ApiOrdersAdminSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/cancel': {
+      id: '/api/orders/cancel'
+      path: '/api/orders/cancel'
+      fullPath: '/api/orders/cancel'
+      preLoaderRoute: typeof ApiOrdersCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/list': {
+      id: '/api/orders/list'
+      path: '/api/orders/list'
+      fullPath: '/api/orders/list'
+      preLoaderRoute: typeof ApiOrdersListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/answer-question': {
+      id: '/api/product/answer-question'
+      path: '/api/product/answer-question'
+      fullPath: '/api/product/answer-question'
+      preLoaderRoute: typeof ApiProductAnswerQuestionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/check-sku': {
+      id: '/api/product/check-sku'
+      path: '/api/product/check-sku'
+      fullPath: '/api/product/check-sku'
+      preLoaderRoute: typeof ApiProductCheckSkuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/create': {
+      id: '/api/product/create'
+      path: '/api/product/create'
+      fullPath: '/api/product/create'
+      preLoaderRoute: typeof ApiProductCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/create-review': {
+      id: '/api/product/create-review'
+      path: '/api/product/create-review'
+      fullPath: '/api/product/create-review'
+      preLoaderRoute: typeof ApiProductCreateReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/delete': {
+      id: '/api/product/delete'
+      path: '/api/product/delete'
+      fullPath: '/api/product/delete'
+      preLoaderRoute: typeof ApiProductDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/edit': {
+      id: '/api/product/edit'
+      path: '/api/product/edit'
+      fullPath: '/api/product/edit'
+      preLoaderRoute: typeof ApiProductEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/get-single': {
+      id: '/api/product/get-single'
+      path: '/api/product/get-single'
+      fullPath: '/api/product/get-single'
+      preLoaderRoute: typeof ApiProductGetSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/helpful-vote': {
+      id: '/api/product/helpful-vote'
+      path: '/api/product/helpful-vote'
+      fullPath: '/api/product/helpful-vote'
+      preLoaderRoute: typeof ApiProductHelpfulVoteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-bestsellers': {
+      id: '/api/product/public-bestsellers'
+      path: '/api/product/public-bestsellers'
+      fullPath: '/api/product/public-bestsellers'
+      preLoaderRoute: typeof ApiProductPublicBestsellersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-by-category': {
+      id: '/api/product/public-by-category'
+      path: '/api/product/public-by-category'
+      fullPath: '/api/product/public-by-category'
+      preLoaderRoute: typeof ApiProductPublicByCategoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-compare': {
+      id: '/api/product/public-compare'
+      path: '/api/product/public-compare'
+      fullPath: '/api/product/public-compare'
+      preLoaderRoute: typeof ApiProductPublicCompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-list': {
+      id: '/api/product/public-list'
+      path: '/api/product/public-list'
+      fullPath: '/api/product/public-list'
+      preLoaderRoute: typeof ApiProductPublicListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-questions': {
+      id: '/api/product/public-questions'
+      path: '/api/product/public-questions'
+      fullPath: '/api/product/public-questions'
+      preLoaderRoute: typeof ApiProductPublicQuestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-recent': {
+      id: '/api/product/public-recent'
+      path: '/api/product/public-recent'
+      fullPath: '/api/product/public-recent'
+      preLoaderRoute: typeof ApiProductPublicRecentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-reviews': {
+      id: '/api/product/public-reviews'
+      path: '/api/product/public-reviews'
+      fullPath: '/api/product/public-reviews'
+      preLoaderRoute: typeof ApiProductPublicReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/public-single': {
+      id: '/api/product/public-single'
+      path: '/api/product/public-single'
+      fullPath: '/api/product/public-single'
+      preLoaderRoute: typeof ApiProductPublicSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/vendor-categories': {
+      id: '/api/product/vendor-categories'
+      path: '/api/product/vendor-categories'
+      fullPath: '/api/product/vendor-categories'
+      preLoaderRoute: typeof ApiProductVendorCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/product/vendor-list': {
+      id: '/api/product/vendor-list'
+      path: '/api/product/vendor-list'
+      fullPath: '/api/product/vendor-list'
+      preLoaderRoute: typeof ApiProductVendorListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/returns/$returnId': {
+      id: '/api/returns/$returnId'
+      path: '/api/returns/$returnId'
+      fullPath: '/api/returns/$returnId'
+      preLoaderRoute: typeof ApiReturnsReturnIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/returns/create': {
+      id: '/api/returns/create'
+      path: '/api/returns/create'
+      fullPath: '/api/returns/create'
+      preLoaderRoute: typeof ApiReturnsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/returns/list': {
+      id: '/api/returns/list'
+      path: '/api/returns/list'
+      fullPath: '/api/returns/list'
+      preLoaderRoute: typeof ApiReturnsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/settings/public': {
+      id: '/api/settings/public'
+      path: '/api/settings/public'
+      fullPath: '/api/settings/public'
+      preLoaderRoute: typeof ApiSettingsPublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/admin-list': {
+      id: '/api/shop/admin-list'
+      path: '/api/shop/admin-list'
+      fullPath: '/api/shop/admin-list'
+      preLoaderRoute: typeof ApiShopAdminListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/apply': {
+      id: '/api/shop/apply'
+      path: '/api/shop/apply'
+      fullPath: '/api/shop/apply'
+      preLoaderRoute: typeof ApiShopApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/approve': {
+      id: '/api/shop/approve'
+      path: '/api/shop/approve'
+      fullPath: '/api/shop/approve'
+      preLoaderRoute: typeof ApiShopApproveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/get-single': {
+      id: '/api/shop/get-single'
+      path: '/api/shop/get-single'
+      fullPath: '/api/shop/get-single'
+      preLoaderRoute: typeof ApiShopGetSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/my-shop': {
+      id: '/api/shop/my-shop'
+      path: '/api/shop/my-shop'
+      fullPath: '/api/shop/my-shop'
+      preLoaderRoute: typeof ApiShopMyShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/public-list': {
+      id: '/api/shop/public-list'
+      path: '/api/shop/public-list'
+      fullPath: '/api/shop/public-list'
+      preLoaderRoute: typeof ApiShopPublicListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/public-products': {
+      id: '/api/shop/public-products'
+      path: '/api/shop/public-products'
+      fullPath: '/api/shop/public-products'
+      preLoaderRoute: typeof ApiShopPublicProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/public-single': {
+      id: '/api/shop/public-single'
+      path: '/api/shop/public-single'
+      fullPath: '/api/shop/public-single'
+      preLoaderRoute: typeof ApiShopPublicSingleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/reject': {
+      id: '/api/shop/reject'
+      path: '/api/shop/reject'
+      fullPath: '/api/shop/reject'
+      preLoaderRoute: typeof ApiShopRejectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/suspend': {
+      id: '/api/shop/suspend'
+      path: '/api/shop/suspend'
+      fullPath: '/api/shop/suspend'
+      preLoaderRoute: typeof ApiShopSuspendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/unsuspend': {
+      id: '/api/shop/unsuspend'
+      path: '/api/shop/unsuspend'
+      fullPath: '/api/shop/unsuspend'
+      preLoaderRoute: typeof ApiShopUnsuspendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/update': {
+      id: '/api/shop/update'
+      path: '/api/shop/update'
+      fullPath: '/api/shop/update'
+      preLoaderRoute: typeof ApiShopUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/upload/avatar': {
+      id: '/api/upload/avatar'
+      path: '/api/upload/avatar'
+      fullPath: '/api/upload/avatar'
+      preLoaderRoute: typeof ApiUploadAvatarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/upload/message': {
+      id: '/api/upload/message'
+      path: '/api/upload/message'
+      fullPath: '/api/upload/message'
+      preLoaderRoute: typeof ApiUploadMessageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/questions': {
+      id: '/api/vendor/questions'
+      path: '/api/vendor/questions'
+      fullPath: '/api/vendor/questions'
+      preLoaderRoute: typeof ApiVendorQuestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vouchers/auto-apply': {
+      id: '/api/vouchers/auto-apply'
+      path: '/api/vouchers/auto-apply'
+      fullPath: '/api/vouchers/auto-apply'
+      preLoaderRoute: typeof ApiVouchersAutoApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vouchers/collect': {
+      id: '/api/vouchers/collect'
+      path: '/api/vouchers/collect'
+      fullPath: '/api/vouchers/collect'
+      preLoaderRoute: typeof ApiVouchersCollectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vouchers/my': {
+      id: '/api/vouchers/my'
+      path: '/api/vouchers/my'
+      fullPath: '/api/vouchers/my'
+      preLoaderRoute: typeof ApiVouchersMyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vouchers/product-vouchers': {
+      id: '/api/vouchers/product-vouchers'
+      path: '/api/vouchers/product-vouchers'
+      fullPath: '/api/vouchers/product-vouchers'
+      preLoaderRoute: typeof ApiVouchersProductVouchersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wallet/bkash-callback': {
+      id: '/api/wallet/bkash-callback'
+      path: '/api/wallet/bkash-callback'
+      fullPath: '/api/wallet/bkash-callback'
+      preLoaderRoute: typeof ApiWalletBkashCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wallet/get': {
+      id: '/api/wallet/get'
+      path: '/api/wallet/get'
+      fullPath: '/api/wallet/get'
+      preLoaderRoute: typeof ApiWalletGetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wallet/top-up': {
+      id: '/api/wallet/top-up'
+      path: '/api/wallet/top-up'
+      fullPath: '/api/wallet/top-up'
+      preLoaderRoute: typeof ApiWalletTopUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wishlist/add': {
+      id: '/api/wishlist/add'
+      path: '/api/wishlist/add'
+      fullPath: '/api/wishlist/add'
+      preLoaderRoute: typeof ApiWishlistAddRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wishlist/list': {
+      id: '/api/wishlist/list'
+      path: '/api/wishlist/list'
+      fullPath: '/api/wishlist/list'
+      preLoaderRoute: typeof ApiWishlistListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wishlist/remove': {
+      id: '/api/wishlist/remove'
+      path: '/api/wishlist/remove'
+      fullPath: '/api/wishlist/remove'
+      preLoaderRoute: typeof ApiWishlistRemoveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/admin/': {
+      id: '/dashboard/admin/'
+      path: '/'
+      fullPath: '/dashboard/admin/'
+      preLoaderRoute: typeof DashboardAdminIndexRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
     '/dashboard/admin/global-attributes': {
@@ -4338,655 +4233,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAdminGlobalAttributesRouteRouteImport
       parentRoute: typeof DashboardAdminRouteRoute
     }
-    '/dashboard/vendor/shop/': {
-      id: '/dashboard/vendor/shop/'
-      path: '/shop'
-      fullPath: '/dashboard/vendor/shop/'
-      preLoaderRoute: typeof DashboardVendorShopIndexRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
+    '/dashboard/admin/staff': {
+      id: '/dashboard/admin/staff'
+      path: '/staff'
+      fullPath: '/dashboard/admin/staff'
+      preLoaderRoute: typeof DashboardAdminStaffRouteRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
     }
-    '/dashboard/vendor/shipping/': {
-      id: '/dashboard/vendor/shipping/'
+    '/dashboard/become-vendor/': {
+      id: '/dashboard/become-vendor/'
       path: '/'
-      fullPath: '/dashboard/vendor/shipping/'
-      preLoaderRoute: typeof DashboardVendorShippingIndexRouteImport
-      parentRoute: typeof DashboardVendorShippingRouteRoute
+      fullPath: '/dashboard/become-vendor/'
+      preLoaderRoute: typeof DashboardBecomeVendorIndexRouteImport
+      parentRoute: typeof DashboardBecomeVendorRouteRoute
     }
-    '/dashboard/vendor/sales/': {
-      id: '/dashboard/vendor/sales/'
-      path: '/sales'
-      fullPath: '/dashboard/vendor/sales/'
-      preLoaderRoute: typeof DashboardVendorSalesIndexRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
+    '/dashboard/become-vendor/apply': {
+      id: '/dashboard/become-vendor/apply'
+      path: '/apply'
+      fullPath: '/dashboard/become-vendor/apply'
+      preLoaderRoute: typeof DashboardBecomeVendorApplyRouteImport
+      parentRoute: typeof DashboardBecomeVendorRouteRoute
     }
-    '/dashboard/vendor/returns/': {
-      id: '/dashboard/vendor/returns/'
-      path: '/returns'
-      fullPath: '/dashboard/vendor/returns/'
-      preLoaderRoute: typeof DashboardVendorReturnsIndexRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
+    '/dashboard/become-vendor/pending': {
+      id: '/dashboard/become-vendor/pending'
+      path: '/pending'
+      fullPath: '/dashboard/become-vendor/pending'
+      preLoaderRoute: typeof DashboardBecomeVendorPendingRouteImport
+      parentRoute: typeof DashboardBecomeVendorRouteRoute
     }
-    '/dashboard/vendor/questions/': {
-      id: '/dashboard/vendor/questions/'
-      path: '/questions'
-      fullPath: '/dashboard/vendor/questions/'
-      preLoaderRoute: typeof DashboardVendorQuestionsIndexRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/vendor/products/': {
-      id: '/dashboard/vendor/products/'
-      path: '/products'
-      fullPath: '/dashboard/vendor/products/'
-      preLoaderRoute: typeof DashboardVendorProductsIndexRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/vendor/payouts/': {
-      id: '/dashboard/vendor/payouts/'
-      path: '/'
-      fullPath: '/dashboard/vendor/payouts/'
-      preLoaderRoute: typeof DashboardVendorPayoutsIndexRouteImport
-      parentRoute: typeof DashboardVendorPayoutsRouteRoute
-    }
-    '/dashboard/vendor/orders/': {
-      id: '/dashboard/vendor/orders/'
-      path: '/orders'
-      fullPath: '/dashboard/vendor/orders/'
-      preLoaderRoute: typeof DashboardVendorOrdersIndexRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/orders/returns/': {
-      id: '/dashboard/orders/returns/'
-      path: '/'
-      fullPath: '/dashboard/orders/returns/'
-      preLoaderRoute: typeof DashboardOrdersReturnsIndexRouteImport
-      parentRoute: typeof DashboardOrdersReturnsRouteRoute
-    }
-    '/dashboard/admin/vendors/': {
-      id: '/dashboard/admin/vendors/'
-      path: '/vendors'
-      fullPath: '/dashboard/admin/vendors/'
-      preLoaderRoute: typeof DashboardAdminVendorsIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/staff/': {
-      id: '/dashboard/admin/staff/'
-      path: '/'
-      fullPath: '/dashboard/admin/staff/'
-      preLoaderRoute: typeof DashboardAdminStaffIndexRouteImport
-      parentRoute: typeof DashboardAdminStaffRouteRoute
-    }
-    '/dashboard/admin/settings/': {
-      id: '/dashboard/admin/settings/'
-      path: '/settings'
-      fullPath: '/dashboard/admin/settings/'
-      preLoaderRoute: typeof DashboardAdminSettingsIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/reviews/': {
-      id: '/dashboard/admin/reviews/'
-      path: '/reviews'
-      fullPath: '/dashboard/admin/reviews/'
-      preLoaderRoute: typeof DashboardAdminReviewsIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/returns/': {
-      id: '/dashboard/admin/returns/'
-      path: '/returns'
-      fullPath: '/dashboard/admin/returns/'
-      preLoaderRoute: typeof DashboardAdminReturnsIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/orders/': {
-      id: '/dashboard/admin/orders/'
-      path: '/orders'
-      fullPath: '/dashboard/admin/orders/'
-      preLoaderRoute: typeof DashboardAdminOrdersIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/messages/': {
-      id: '/dashboard/admin/messages/'
+    '/dashboard/messages/': {
+      id: '/dashboard/messages/'
       path: '/messages'
-      fullPath: '/dashboard/admin/messages/'
-      preLoaderRoute: typeof DashboardAdminMessagesIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+      fullPath: '/dashboard/messages/'
+      preLoaderRoute: typeof DashboardMessagesIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/admin/global-attributes/': {
-      id: '/dashboard/admin/global-attributes/'
-      path: '/'
-      fullPath: '/dashboard/admin/global-attributes/'
-      preLoaderRoute: typeof DashboardAdminGlobalAttributesIndexRouteImport
-      parentRoute: typeof DashboardAdminGlobalAttributesRouteRoute
-    }
-    '/dashboard/admin/customers/': {
-      id: '/dashboard/admin/customers/'
-      path: '/customers'
-      fullPath: '/dashboard/admin/customers/'
-      preLoaderRoute: typeof DashboardAdminCustomersIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/coupons/': {
-      id: '/dashboard/admin/coupons/'
-      path: '/coupons'
-      fullPath: '/dashboard/admin/coupons/'
-      preLoaderRoute: typeof DashboardAdminCouponsIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/content/': {
-      id: '/dashboard/admin/content/'
-      path: '/content'
-      fullPath: '/dashboard/admin/content/'
-      preLoaderRoute: typeof DashboardAdminContentIndexRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/vendor/shop/policies': {
-      id: '/dashboard/vendor/shop/policies'
-      path: '/shop/policies'
-      fullPath: '/dashboard/vendor/shop/policies'
-      preLoaderRoute: typeof DashboardVendorShopPoliciesRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/vendor/shop/payout': {
-      id: '/dashboard/vendor/shop/payout'
-      path: '/shop/payout'
-      fullPath: '/dashboard/vendor/shop/payout'
-      preLoaderRoute: typeof DashboardVendorShopPayoutRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/vendor/shop/branding': {
-      id: '/dashboard/vendor/shop/branding'
-      path: '/shop/branding'
-      fullPath: '/dashboard/vendor/shop/branding'
-      preLoaderRoute: typeof DashboardVendorShopBrandingRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/vendor/shipping/tracking': {
-      id: '/dashboard/vendor/shipping/tracking'
-      path: '/tracking'
-      fullPath: '/dashboard/vendor/shipping/tracking'
-      preLoaderRoute: typeof DashboardVendorShippingTrackingRouteImport
-      parentRoute: typeof DashboardVendorShippingRouteRoute
-    }
-    '/dashboard/vendor/shipping/labels': {
-      id: '/dashboard/vendor/shipping/labels'
-      path: '/labels'
-      fullPath: '/dashboard/vendor/shipping/labels'
-      preLoaderRoute: typeof DashboardVendorShippingLabelsRouteImport
-      parentRoute: typeof DashboardVendorShippingRouteRoute
-    }
-    '/dashboard/vendor/products/edit': {
-      id: '/dashboard/vendor/products/edit'
-      path: '/products/edit'
-      fullPath: '/dashboard/vendor/products/edit'
-      preLoaderRoute: typeof DashboardVendorProductsEditRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/vendor/products/add': {
-      id: '/dashboard/vendor/products/add'
-      path: '/products/add'
-      fullPath: '/dashboard/vendor/products/add'
-      preLoaderRoute: typeof DashboardVendorProductsAddRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/vendor/payouts/schedule': {
-      id: '/dashboard/vendor/payouts/schedule'
-      path: '/schedule'
-      fullPath: '/dashboard/vendor/payouts/schedule'
-      preLoaderRoute: typeof DashboardVendorPayoutsScheduleRouteImport
-      parentRoute: typeof DashboardVendorPayoutsRouteRoute
-    }
-    '/dashboard/vendor/orders/$orderId': {
-      id: '/dashboard/vendor/orders/$orderId'
-      path: '/orders/$orderId'
-      fullPath: '/dashboard/vendor/orders/$orderId'
-      preLoaderRoute: typeof DashboardVendorOrdersOrderIdRouteImport
-      parentRoute: typeof DashboardVendorRouteRoute
-    }
-    '/dashboard/orders/returns/$returnId': {
-      id: '/dashboard/orders/returns/$returnId'
-      path: '/$returnId'
-      fullPath: '/dashboard/orders/returns/$returnId'
-      preLoaderRoute: typeof DashboardOrdersReturnsReturnIdRouteImport
-      parentRoute: typeof DashboardOrdersReturnsRouteRoute
-    }
-    '/dashboard/admin/vendors/payouts': {
-      id: '/dashboard/admin/vendors/payouts'
-      path: '/vendors/payouts'
-      fullPath: '/dashboard/admin/vendors/payouts'
-      preLoaderRoute: typeof DashboardAdminVendorsPayoutsRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/vendors/detail': {
-      id: '/dashboard/admin/vendors/detail'
-      path: '/vendors/detail'
-      fullPath: '/dashboard/admin/vendors/detail'
-      preLoaderRoute: typeof DashboardAdminVendorsDetailRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/staff/audit-logs': {
-      id: '/dashboard/admin/staff/audit-logs'
-      path: '/audit-logs'
-      fullPath: '/dashboard/admin/staff/audit-logs'
-      preLoaderRoute: typeof DashboardAdminStaffAuditLogsRouteImport
-      parentRoute: typeof DashboardAdminStaffRouteRoute
-    }
-    '/dashboard/admin/orders/$orderId': {
-      id: '/dashboard/admin/orders/$orderId'
-      path: '/orders/$orderId'
-      fullPath: '/dashboard/admin/orders/$orderId'
-      preLoaderRoute: typeof DashboardAdminOrdersOrderIdRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/messages/$id': {
-      id: '/dashboard/admin/messages/$id'
+    '/dashboard/messages/$id': {
+      id: '/dashboard/messages/$id'
       path: '/messages/$id'
-      fullPath: '/dashboard/admin/messages/$id'
-      preLoaderRoute: typeof DashboardAdminMessagesIdRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+      fullPath: '/dashboard/messages/$id'
+      preLoaderRoute: typeof DashboardMessagesIdRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/admin/global-attributes/create': {
-      id: '/dashboard/admin/global-attributes/create'
-      path: '/create'
-      fullPath: '/dashboard/admin/global-attributes/create'
-      preLoaderRoute: typeof DashboardAdminGlobalAttributesCreateRouteImport
-      parentRoute: typeof DashboardAdminGlobalAttributesRouteRoute
+    '/dashboard/orders/': {
+      id: '/dashboard/orders/'
+      path: '/'
+      fullPath: '/dashboard/orders/'
+      preLoaderRoute: typeof DashboardOrdersIndexRouteImport
+      parentRoute: typeof DashboardOrdersRouteRoute
     }
-    '/dashboard/admin/global-attributes/$id': {
-      id: '/dashboard/admin/global-attributes/$id'
-      path: '/$id'
-      fullPath: '/dashboard/admin/global-attributes/$id'
-      preLoaderRoute: typeof DashboardAdminGlobalAttributesIdRouteImport
-      parentRoute: typeof DashboardAdminGlobalAttributesRouteRoute
+    '/dashboard/orders/$orderId': {
+      id: '/dashboard/orders/$orderId'
+      path: '/$orderId'
+      fullPath: '/dashboard/orders/$orderId'
+      preLoaderRoute: typeof DashboardOrdersOrderIdRouteImport
+      parentRoute: typeof DashboardOrdersRouteRoute
     }
-    '/dashboard/admin/customers/$id': {
-      id: '/dashboard/admin/customers/$id'
-      path: '/customers/$id'
-      fullPath: '/dashboard/admin/customers/$id'
-      preLoaderRoute: typeof DashboardAdminCustomersIdRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+    '/dashboard/orders/returns': {
+      id: '/dashboard/orders/returns'
+      path: '/returns'
+      fullPath: '/dashboard/orders/returns'
+      preLoaderRoute: typeof DashboardOrdersReturnsRouteRouteImport
+      parentRoute: typeof DashboardOrdersRouteRoute
     }
-    '/dashboard/admin/coupons/create': {
-      id: '/dashboard/admin/coupons/create'
-      path: '/coupons/create'
-      fullPath: '/dashboard/admin/coupons/create'
-      preLoaderRoute: typeof DashboardAdminCouponsCreateRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+    '/dashboard/reviews/': {
+      id: '/dashboard/reviews/'
+      path: '/reviews'
+      fullPath: '/dashboard/reviews/'
+      preLoaderRoute: typeof DashboardReviewsIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/admin/coupons/$id': {
-      id: '/dashboard/admin/coupons/$id'
-      path: '/coupons/$id'
-      fullPath: '/dashboard/admin/coupons/$id'
-      preLoaderRoute: typeof DashboardAdminCouponsIdRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+    '/dashboard/vendor/': {
+      id: '/dashboard/vendor/'
+      path: '/'
+      fullPath: '/dashboard/vendor/'
+      preLoaderRoute: typeof DashboardVendorIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
     }
-    '/dashboard/admin/category/edit': {
-      id: '/dashboard/admin/category/edit'
-      path: '/category/edit'
-      fullPath: '/dashboard/admin/category/edit'
-      preLoaderRoute: typeof DashboardAdminCategoryEditRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+    '/dashboard/vendor/payouts': {
+      id: '/dashboard/vendor/payouts'
+      path: '/payouts'
+      fullPath: '/dashboard/vendor/payouts'
+      preLoaderRoute: typeof DashboardVendorPayoutsRouteRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
     }
-    '/dashboard/admin/category/all': {
-      id: '/dashboard/admin/category/all'
-      path: '/category/all'
-      fullPath: '/dashboard/admin/category/all'
-      preLoaderRoute: typeof DashboardAdminCategoryAllRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+    '/dashboard/vendor/shipping': {
+      id: '/dashboard/vendor/shipping'
+      path: '/shipping'
+      fullPath: '/dashboard/vendor/shipping'
+      preLoaderRoute: typeof DashboardVendorShippingRouteRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
     }
-    '/dashboard/admin/category/add': {
-      id: '/dashboard/admin/category/add'
-      path: '/category/add'
-      fullPath: '/dashboard/admin/category/add'
-      preLoaderRoute: typeof DashboardAdminCategoryAddRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+    '/dashboard/vouchers/': {
+      id: '/dashboard/vouchers/'
+      path: '/vouchers'
+      fullPath: '/dashboard/vouchers/'
+      preLoaderRoute: typeof DashboardVouchersIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
     }
-    '/dashboard/admin/banner/list': {
-      id: '/dashboard/admin/banner/list'
-      path: '/banner/list'
-      fullPath: '/dashboard/admin/banner/list'
-      preLoaderRoute: typeof DashboardAdminBannerListRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
+    '/products/category/$slug': {
+      id: '/products/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/products/category/$slug'
+      preLoaderRoute: typeof ProductsCategorySlugRouteImport
+      parentRoute: typeof ProductsRoute
     }
-    '/dashboard/admin/banner/edit': {
-      id: '/dashboard/admin/banner/edit'
-      path: '/banner/edit'
-      fullPath: '/dashboard/admin/banner/edit'
-      preLoaderRoute: typeof DashboardAdminBannerEditRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/dashboard/admin/banner/add': {
-      id: '/dashboard/admin/banner/add'
-      path: '/banner/add'
-      fullPath: '/dashboard/admin/banner/add'
-      preLoaderRoute: typeof DashboardAdminBannerAddRouteImport
-      parentRoute: typeof DashboardAdminRouteRoute
-    }
-    '/api/vendor/shop/policies': {
-      id: '/api/vendor/shop/policies'
-      path: '/api/vendor/shop/policies'
-      fullPath: '/api/vendor/shop/policies'
-      preLoaderRoute: typeof ApiVendorShopPoliciesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/shop/payout-details': {
-      id: '/api/vendor/shop/payout-details'
-      path: '/api/vendor/shop/payout-details'
-      fullPath: '/api/vendor/shop/payout-details'
-      preLoaderRoute: typeof ApiVendorShopPayoutDetailsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/shipping/list': {
-      id: '/api/vendor/shipping/list'
-      path: '/api/vendor/shipping/list'
-      fullPath: '/api/vendor/shipping/list'
-      preLoaderRoute: typeof ApiVendorShippingListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/shipping/edit': {
-      id: '/api/vendor/shipping/edit'
-      path: '/api/vendor/shipping/edit'
-      fullPath: '/api/vendor/shipping/edit'
-      preLoaderRoute: typeof ApiVendorShippingEditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/shipping/delete': {
-      id: '/api/vendor/shipping/delete'
-      path: '/api/vendor/shipping/delete'
-      fullPath: '/api/vendor/shipping/delete'
-      preLoaderRoute: typeof ApiVendorShippingDeleteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/shipping/create': {
-      id: '/api/vendor/shipping/create'
-      path: '/api/vendor/shipping/create'
-      fullPath: '/api/vendor/shipping/create'
-      preLoaderRoute: typeof ApiVendorShippingCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/returns/review': {
-      id: '/api/vendor/returns/review'
-      path: '/api/vendor/returns/review'
-      fullPath: '/api/vendor/returns/review'
-      preLoaderRoute: typeof ApiVendorReturnsReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/returns/list': {
-      id: '/api/vendor/returns/list'
-      path: '/api/vendor/returns/list'
-      fullPath: '/api/vendor/returns/list'
-      preLoaderRoute: typeof ApiVendorReturnsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/payouts/schedule': {
-      id: '/api/vendor/payouts/schedule'
-      path: '/api/vendor/payouts/schedule'
-      fullPath: '/api/vendor/payouts/schedule'
-      preLoaderRoute: typeof ApiVendorPayoutsScheduleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/payouts/pending': {
-      id: '/api/vendor/payouts/pending'
-      path: '/api/vendor/payouts/pending'
-      fullPath: '/api/vendor/payouts/pending'
-      preLoaderRoute: typeof ApiVendorPayoutsPendingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/payouts/list': {
-      id: '/api/vendor/payouts/list'
-      path: '/api/vendor/payouts/list'
-      fullPath: '/api/vendor/payouts/list'
-      preLoaderRoute: typeof ApiVendorPayoutsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/orders/list': {
-      id: '/api/vendor/orders/list'
-      path: '/api/vendor/orders/list'
-      fullPath: '/api/vendor/orders/list'
-      preLoaderRoute: typeof ApiVendorOrdersListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/orders/cancel': {
-      id: '/api/vendor/orders/cancel'
-      path: '/api/vendor/orders/cancel'
-      fullPath: '/api/vendor/orders/cancel'
-      preLoaderRoute: typeof ApiVendorOrdersCancelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/orders/$orderId': {
-      id: '/api/vendor/orders/$orderId'
-      path: '/api/vendor/orders/$orderId'
-      fullPath: '/api/vendor/orders/$orderId'
-      preLoaderRoute: typeof ApiVendorOrdersOrderIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/conversations/list': {
-      id: '/api/vendor/conversations/list'
-      path: '/api/vendor/conversations/list'
-      fullPath: '/api/vendor/conversations/list'
-      preLoaderRoute: typeof ApiVendorConversationsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/conversations/$conversationId': {
-      id: '/api/vendor/conversations/$conversationId'
-      path: '/api/vendor/conversations/$conversationId'
-      fullPath: '/api/vendor/conversations/$conversationId'
-      preLoaderRoute: typeof ApiVendorConversationsConversationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/vendor/analytics/overview': {
-      id: '/api/vendor/analytics/overview'
-      path: '/api/vendor/analytics/overview'
-      fullPath: '/api/vendor/analytics/overview'
-      preLoaderRoute: typeof ApiVendorAnalyticsOverviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/follow/toggle': {
-      id: '/api/shop/follow/toggle'
-      path: '/api/shop/follow/toggle'
-      fullPath: '/api/shop/follow/toggle'
-      preLoaderRoute: typeof ApiShopFollowToggleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/shop/follow/list': {
-      id: '/api/shop/follow/list'
-      path: '/api/shop/follow/list'
-      fullPath: '/api/shop/follow/list'
-      preLoaderRoute: typeof ApiShopFollowListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/reviews/my/list': {
-      id: '/api/reviews/my/list'
-      path: '/api/reviews/my/list'
-      fullPath: '/api/reviews/my/list'
-      preLoaderRoute: typeof ApiReviewsMyListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/reviews/my/$id': {
-      id: '/api/reviews/my/$id'
-      path: '/api/reviews/my/$id'
-      fullPath: '/api/reviews/my/$id'
-      preLoaderRoute: typeof ApiReviewsMyIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/orders/invoice/$invoiceId': {
-      id: '/api/orders/invoice/$invoiceId'
-      path: '/api/orders/invoice/$invoiceId'
-      fullPath: '/api/orders/invoice/$invoiceId'
-      preLoaderRoute: typeof ApiOrdersInvoiceInvoiceIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/shops/$shopId': {
-      id: '/api/admin/shops/$shopId'
-      path: '/api/admin/shops/$shopId'
-      fullPath: '/api/admin/shops/$shopId'
-      preLoaderRoute: typeof ApiAdminShopsShopIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/settings/update': {
-      id: '/api/admin/settings/update'
-      path: '/api/admin/settings/update'
-      fullPath: '/api/admin/settings/update'
-      preLoaderRoute: typeof ApiAdminSettingsUpdateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/settings/list': {
-      id: '/api/admin/settings/list'
-      path: '/api/admin/settings/list'
-      fullPath: '/api/admin/settings/list'
-      preLoaderRoute: typeof ApiAdminSettingsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/reviews/list': {
-      id: '/api/admin/reviews/list'
-      path: '/api/admin/reviews/list'
-      fullPath: '/api/admin/reviews/list'
-      preLoaderRoute: typeof ApiAdminReviewsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/reviews/$id': {
-      id: '/api/admin/reviews/$id'
-      path: '/api/admin/reviews/$id'
-      fullPath: '/api/admin/reviews/$id'
-      preLoaderRoute: typeof ApiAdminReviewsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/returns/review': {
-      id: '/api/admin/returns/review'
-      path: '/api/admin/returns/review'
-      fullPath: '/api/admin/returns/review'
-      preLoaderRoute: typeof ApiAdminReturnsReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/returns/list': {
-      id: '/api/admin/returns/list'
-      path: '/api/admin/returns/list'
-      fullPath: '/api/admin/returns/list'
-      preLoaderRoute: typeof ApiAdminReturnsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/payouts/process': {
-      id: '/api/admin/payouts/process'
-      path: '/api/admin/payouts/process'
-      fullPath: '/api/admin/payouts/process'
-      preLoaderRoute: typeof ApiAdminPayoutsProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/payouts/pending': {
-      id: '/api/admin/payouts/pending'
-      path: '/api/admin/payouts/pending'
-      fullPath: '/api/admin/payouts/pending'
-      preLoaderRoute: typeof ApiAdminPayoutsPendingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/payouts/list': {
-      id: '/api/admin/payouts/list'
-      path: '/api/admin/payouts/list'
-      fullPath: '/api/admin/payouts/list'
-      preLoaderRoute: typeof ApiAdminPayoutsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/messages/create': {
-      id: '/api/admin/messages/create'
-      path: '/api/admin/messages/create'
-      fullPath: '/api/admin/messages/create'
-      preLoaderRoute: typeof ApiAdminMessagesCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/global-attributes/product-mappings': {
-      id: '/api/admin/global-attributes/product-mappings'
-      path: '/api/admin/global-attributes/product-mappings'
-      fullPath: '/api/admin/global-attributes/product-mappings'
-      preLoaderRoute: typeof ApiAdminGlobalAttributesProductMappingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/global-attributes/map-product': {
-      id: '/api/admin/global-attributes/map-product'
-      path: '/api/admin/global-attributes/map-product'
-      fullPath: '/api/admin/global-attributes/map-product'
-      preLoaderRoute: typeof ApiAdminGlobalAttributesMapProductRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/global-attributes/list': {
-      id: '/api/admin/global-attributes/list'
-      path: '/api/admin/global-attributes/list'
-      fullPath: '/api/admin/global-attributes/list'
-      preLoaderRoute: typeof ApiAdminGlobalAttributesListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/global-attributes/create': {
-      id: '/api/admin/global-attributes/create'
-      path: '/api/admin/global-attributes/create'
-      fullPath: '/api/admin/global-attributes/create'
-      preLoaderRoute: typeof ApiAdminGlobalAttributesCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/global-attributes/$id': {
-      id: '/api/admin/global-attributes/$id'
-      path: '/api/admin/global-attributes/$id'
-      fullPath: '/api/admin/global-attributes/$id'
-      preLoaderRoute: typeof ApiAdminGlobalAttributesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/dashboard/stats': {
-      id: '/api/admin/dashboard/stats'
-      path: '/api/admin/dashboard/stats'
-      fullPath: '/api/admin/dashboard/stats'
-      preLoaderRoute: typeof ApiAdminDashboardStatsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/customers/list': {
-      id: '/api/admin/customers/list'
-      path: '/api/admin/customers/list'
-      fullPath: '/api/admin/customers/list'
-      preLoaderRoute: typeof ApiAdminCustomersListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/customers/$id': {
-      id: '/api/admin/customers/$id'
-      path: '/api/admin/customers/$id'
-      fullPath: '/api/admin/customers/$id'
-      preLoaderRoute: typeof ApiAdminCustomersIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/coupons/list': {
-      id: '/api/admin/coupons/list'
-      path: '/api/admin/coupons/list'
-      fullPath: '/api/admin/coupons/list'
-      preLoaderRoute: typeof ApiAdminCouponsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/coupons/create': {
-      id: '/api/admin/coupons/create'
-      path: '/api/admin/coupons/create'
-      fullPath: '/api/admin/coupons/create'
-      preLoaderRoute: typeof ApiAdminCouponsCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/coupons/$id': {
-      id: '/api/admin/coupons/$id'
-      path: '/api/admin/coupons/$id'
-      fullPath: '/api/admin/coupons/$id'
-      preLoaderRoute: typeof ApiAdminCouponsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/conversations/list': {
-      id: '/api/admin/conversations/list'
-      path: '/api/admin/conversations/list'
-      fullPath: '/api/admin/conversations/list'
-      preLoaderRoute: typeof ApiAdminConversationsListRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/conversations/close': {
-      id: '/api/admin/conversations/close'
-      path: '/api/admin/conversations/close'
-      fullPath: '/api/admin/conversations/close'
-      preLoaderRoute: typeof ApiAdminConversationsCloseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/conversations/$conversationId': {
-      id: '/api/admin/conversations/$conversationId'
-      path: '/api/admin/conversations/$conversationId'
-      fullPath: '/api/admin/conversations/$conversationId'
-      preLoaderRoute: typeof ApiAdminConversationsConversationIdRouteImport
+    '/api/admin/content/list': {
+      id: '/api/admin/content/list'
+      path: '/api/admin/content/list'
+      fullPath: '/api/admin/content/list'
+      preLoaderRoute: typeof ApiAdminContentListRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/content/save': {
@@ -4996,12 +4352,656 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminContentSaveRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/admin/content/list': {
-      id: '/api/admin/content/list'
-      path: '/api/admin/content/list'
-      fullPath: '/api/admin/content/list'
-      preLoaderRoute: typeof ApiAdminContentListRouteImport
+    '/api/admin/conversations/$conversationId': {
+      id: '/api/admin/conversations/$conversationId'
+      path: '/api/admin/conversations/$conversationId'
+      fullPath: '/api/admin/conversations/$conversationId'
+      preLoaderRoute: typeof ApiAdminConversationsConversationIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/conversations/close': {
+      id: '/api/admin/conversations/close'
+      path: '/api/admin/conversations/close'
+      fullPath: '/api/admin/conversations/close'
+      preLoaderRoute: typeof ApiAdminConversationsCloseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/conversations/list': {
+      id: '/api/admin/conversations/list'
+      path: '/api/admin/conversations/list'
+      fullPath: '/api/admin/conversations/list'
+      preLoaderRoute: typeof ApiAdminConversationsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/coupons/$id': {
+      id: '/api/admin/coupons/$id'
+      path: '/api/admin/coupons/$id'
+      fullPath: '/api/admin/coupons/$id'
+      preLoaderRoute: typeof ApiAdminCouponsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/coupons/create': {
+      id: '/api/admin/coupons/create'
+      path: '/api/admin/coupons/create'
+      fullPath: '/api/admin/coupons/create'
+      preLoaderRoute: typeof ApiAdminCouponsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/coupons/list': {
+      id: '/api/admin/coupons/list'
+      path: '/api/admin/coupons/list'
+      fullPath: '/api/admin/coupons/list'
+      preLoaderRoute: typeof ApiAdminCouponsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/customers/$id': {
+      id: '/api/admin/customers/$id'
+      path: '/api/admin/customers/$id'
+      fullPath: '/api/admin/customers/$id'
+      preLoaderRoute: typeof ApiAdminCustomersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/customers/list': {
+      id: '/api/admin/customers/list'
+      path: '/api/admin/customers/list'
+      fullPath: '/api/admin/customers/list'
+      preLoaderRoute: typeof ApiAdminCustomersListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/dashboard/stats': {
+      id: '/api/admin/dashboard/stats'
+      path: '/api/admin/dashboard/stats'
+      fullPath: '/api/admin/dashboard/stats'
+      preLoaderRoute: typeof ApiAdminDashboardStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/global-attributes/$id': {
+      id: '/api/admin/global-attributes/$id'
+      path: '/api/admin/global-attributes/$id'
+      fullPath: '/api/admin/global-attributes/$id'
+      preLoaderRoute: typeof ApiAdminGlobalAttributesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/global-attributes/create': {
+      id: '/api/admin/global-attributes/create'
+      path: '/api/admin/global-attributes/create'
+      fullPath: '/api/admin/global-attributes/create'
+      preLoaderRoute: typeof ApiAdminGlobalAttributesCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/global-attributes/list': {
+      id: '/api/admin/global-attributes/list'
+      path: '/api/admin/global-attributes/list'
+      fullPath: '/api/admin/global-attributes/list'
+      preLoaderRoute: typeof ApiAdminGlobalAttributesListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/global-attributes/map-product': {
+      id: '/api/admin/global-attributes/map-product'
+      path: '/api/admin/global-attributes/map-product'
+      fullPath: '/api/admin/global-attributes/map-product'
+      preLoaderRoute: typeof ApiAdminGlobalAttributesMapProductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/global-attributes/product-mappings': {
+      id: '/api/admin/global-attributes/product-mappings'
+      path: '/api/admin/global-attributes/product-mappings'
+      fullPath: '/api/admin/global-attributes/product-mappings'
+      preLoaderRoute: typeof ApiAdminGlobalAttributesProductMappingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/messages/create': {
+      id: '/api/admin/messages/create'
+      path: '/api/admin/messages/create'
+      fullPath: '/api/admin/messages/create'
+      preLoaderRoute: typeof ApiAdminMessagesCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/payouts/list': {
+      id: '/api/admin/payouts/list'
+      path: '/api/admin/payouts/list'
+      fullPath: '/api/admin/payouts/list'
+      preLoaderRoute: typeof ApiAdminPayoutsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/payouts/pending': {
+      id: '/api/admin/payouts/pending'
+      path: '/api/admin/payouts/pending'
+      fullPath: '/api/admin/payouts/pending'
+      preLoaderRoute: typeof ApiAdminPayoutsPendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/payouts/process': {
+      id: '/api/admin/payouts/process'
+      path: '/api/admin/payouts/process'
+      fullPath: '/api/admin/payouts/process'
+      preLoaderRoute: typeof ApiAdminPayoutsProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/returns/list': {
+      id: '/api/admin/returns/list'
+      path: '/api/admin/returns/list'
+      fullPath: '/api/admin/returns/list'
+      preLoaderRoute: typeof ApiAdminReturnsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/returns/review': {
+      id: '/api/admin/returns/review'
+      path: '/api/admin/returns/review'
+      fullPath: '/api/admin/returns/review'
+      preLoaderRoute: typeof ApiAdminReturnsReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/reviews/$id': {
+      id: '/api/admin/reviews/$id'
+      path: '/api/admin/reviews/$id'
+      fullPath: '/api/admin/reviews/$id'
+      preLoaderRoute: typeof ApiAdminReviewsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/reviews/list': {
+      id: '/api/admin/reviews/list'
+      path: '/api/admin/reviews/list'
+      fullPath: '/api/admin/reviews/list'
+      preLoaderRoute: typeof ApiAdminReviewsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/settings/list': {
+      id: '/api/admin/settings/list'
+      path: '/api/admin/settings/list'
+      fullPath: '/api/admin/settings/list'
+      preLoaderRoute: typeof ApiAdminSettingsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/settings/update': {
+      id: '/api/admin/settings/update'
+      path: '/api/admin/settings/update'
+      fullPath: '/api/admin/settings/update'
+      preLoaderRoute: typeof ApiAdminSettingsUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/shops/$shopId': {
+      id: '/api/admin/shops/$shopId'
+      path: '/api/admin/shops/$shopId'
+      fullPath: '/api/admin/shops/$shopId'
+      preLoaderRoute: typeof ApiAdminShopsShopIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orders/invoice/$invoiceId': {
+      id: '/api/orders/invoice/$invoiceId'
+      path: '/api/orders/invoice/$invoiceId'
+      fullPath: '/api/orders/invoice/$invoiceId'
+      preLoaderRoute: typeof ApiOrdersInvoiceInvoiceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/reviews/my/$id': {
+      id: '/api/reviews/my/$id'
+      path: '/api/reviews/my/$id'
+      fullPath: '/api/reviews/my/$id'
+      preLoaderRoute: typeof ApiReviewsMyIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/reviews/my/list': {
+      id: '/api/reviews/my/list'
+      path: '/api/reviews/my/list'
+      fullPath: '/api/reviews/my/list'
+      preLoaderRoute: typeof ApiReviewsMyListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/follow/list': {
+      id: '/api/shop/follow/list'
+      path: '/api/shop/follow/list'
+      fullPath: '/api/shop/follow/list'
+      preLoaderRoute: typeof ApiShopFollowListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/shop/follow/toggle': {
+      id: '/api/shop/follow/toggle'
+      path: '/api/shop/follow/toggle'
+      fullPath: '/api/shop/follow/toggle'
+      preLoaderRoute: typeof ApiShopFollowToggleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/analytics/overview': {
+      id: '/api/vendor/analytics/overview'
+      path: '/api/vendor/analytics/overview'
+      fullPath: '/api/vendor/analytics/overview'
+      preLoaderRoute: typeof ApiVendorAnalyticsOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/conversations/$conversationId': {
+      id: '/api/vendor/conversations/$conversationId'
+      path: '/api/vendor/conversations/$conversationId'
+      fullPath: '/api/vendor/conversations/$conversationId'
+      preLoaderRoute: typeof ApiVendorConversationsConversationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/conversations/list': {
+      id: '/api/vendor/conversations/list'
+      path: '/api/vendor/conversations/list'
+      fullPath: '/api/vendor/conversations/list'
+      preLoaderRoute: typeof ApiVendorConversationsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/orders/$orderId': {
+      id: '/api/vendor/orders/$orderId'
+      path: '/api/vendor/orders/$orderId'
+      fullPath: '/api/vendor/orders/$orderId'
+      preLoaderRoute: typeof ApiVendorOrdersOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/orders/cancel': {
+      id: '/api/vendor/orders/cancel'
+      path: '/api/vendor/orders/cancel'
+      fullPath: '/api/vendor/orders/cancel'
+      preLoaderRoute: typeof ApiVendorOrdersCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/orders/list': {
+      id: '/api/vendor/orders/list'
+      path: '/api/vendor/orders/list'
+      fullPath: '/api/vendor/orders/list'
+      preLoaderRoute: typeof ApiVendorOrdersListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/payouts/list': {
+      id: '/api/vendor/payouts/list'
+      path: '/api/vendor/payouts/list'
+      fullPath: '/api/vendor/payouts/list'
+      preLoaderRoute: typeof ApiVendorPayoutsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/payouts/pending': {
+      id: '/api/vendor/payouts/pending'
+      path: '/api/vendor/payouts/pending'
+      fullPath: '/api/vendor/payouts/pending'
+      preLoaderRoute: typeof ApiVendorPayoutsPendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/payouts/schedule': {
+      id: '/api/vendor/payouts/schedule'
+      path: '/api/vendor/payouts/schedule'
+      fullPath: '/api/vendor/payouts/schedule'
+      preLoaderRoute: typeof ApiVendorPayoutsScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/returns/list': {
+      id: '/api/vendor/returns/list'
+      path: '/api/vendor/returns/list'
+      fullPath: '/api/vendor/returns/list'
+      preLoaderRoute: typeof ApiVendorReturnsListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/returns/review': {
+      id: '/api/vendor/returns/review'
+      path: '/api/vendor/returns/review'
+      fullPath: '/api/vendor/returns/review'
+      preLoaderRoute: typeof ApiVendorReturnsReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/shipping/create': {
+      id: '/api/vendor/shipping/create'
+      path: '/api/vendor/shipping/create'
+      fullPath: '/api/vendor/shipping/create'
+      preLoaderRoute: typeof ApiVendorShippingCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/shipping/delete': {
+      id: '/api/vendor/shipping/delete'
+      path: '/api/vendor/shipping/delete'
+      fullPath: '/api/vendor/shipping/delete'
+      preLoaderRoute: typeof ApiVendorShippingDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/shipping/edit': {
+      id: '/api/vendor/shipping/edit'
+      path: '/api/vendor/shipping/edit'
+      fullPath: '/api/vendor/shipping/edit'
+      preLoaderRoute: typeof ApiVendorShippingEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/shipping/list': {
+      id: '/api/vendor/shipping/list'
+      path: '/api/vendor/shipping/list'
+      fullPath: '/api/vendor/shipping/list'
+      preLoaderRoute: typeof ApiVendorShippingListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/shop/payout-details': {
+      id: '/api/vendor/shop/payout-details'
+      path: '/api/vendor/shop/payout-details'
+      fullPath: '/api/vendor/shop/payout-details'
+      preLoaderRoute: typeof ApiVendorShopPayoutDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/vendor/shop/policies': {
+      id: '/api/vendor/shop/policies'
+      path: '/api/vendor/shop/policies'
+      fullPath: '/api/vendor/shop/policies'
+      preLoaderRoute: typeof ApiVendorShopPoliciesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/admin/banner/add': {
+      id: '/dashboard/admin/banner/add'
+      path: '/banner/add'
+      fullPath: '/dashboard/admin/banner/add'
+      preLoaderRoute: typeof DashboardAdminBannerAddRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/banner/edit': {
+      id: '/dashboard/admin/banner/edit'
+      path: '/banner/edit'
+      fullPath: '/dashboard/admin/banner/edit'
+      preLoaderRoute: typeof DashboardAdminBannerEditRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/banner/list': {
+      id: '/dashboard/admin/banner/list'
+      path: '/banner/list'
+      fullPath: '/dashboard/admin/banner/list'
+      preLoaderRoute: typeof DashboardAdminBannerListRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/category/add': {
+      id: '/dashboard/admin/category/add'
+      path: '/category/add'
+      fullPath: '/dashboard/admin/category/add'
+      preLoaderRoute: typeof DashboardAdminCategoryAddRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/category/all': {
+      id: '/dashboard/admin/category/all'
+      path: '/category/all'
+      fullPath: '/dashboard/admin/category/all'
+      preLoaderRoute: typeof DashboardAdminCategoryAllRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/category/edit': {
+      id: '/dashboard/admin/category/edit'
+      path: '/category/edit'
+      fullPath: '/dashboard/admin/category/edit'
+      preLoaderRoute: typeof DashboardAdminCategoryEditRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/content/': {
+      id: '/dashboard/admin/content/'
+      path: '/content'
+      fullPath: '/dashboard/admin/content/'
+      preLoaderRoute: typeof DashboardAdminContentIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/coupons/': {
+      id: '/dashboard/admin/coupons/'
+      path: '/coupons'
+      fullPath: '/dashboard/admin/coupons/'
+      preLoaderRoute: typeof DashboardAdminCouponsIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/coupons/$id': {
+      id: '/dashboard/admin/coupons/$id'
+      path: '/coupons/$id'
+      fullPath: '/dashboard/admin/coupons/$id'
+      preLoaderRoute: typeof DashboardAdminCouponsIdRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/coupons/create': {
+      id: '/dashboard/admin/coupons/create'
+      path: '/coupons/create'
+      fullPath: '/dashboard/admin/coupons/create'
+      preLoaderRoute: typeof DashboardAdminCouponsCreateRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/customers/': {
+      id: '/dashboard/admin/customers/'
+      path: '/customers'
+      fullPath: '/dashboard/admin/customers/'
+      preLoaderRoute: typeof DashboardAdminCustomersIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/customers/$id': {
+      id: '/dashboard/admin/customers/$id'
+      path: '/customers/$id'
+      fullPath: '/dashboard/admin/customers/$id'
+      preLoaderRoute: typeof DashboardAdminCustomersIdRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/global-attributes/': {
+      id: '/dashboard/admin/global-attributes/'
+      path: '/'
+      fullPath: '/dashboard/admin/global-attributes/'
+      preLoaderRoute: typeof DashboardAdminGlobalAttributesIndexRouteImport
+      parentRoute: typeof DashboardAdminGlobalAttributesRouteRoute
+    }
+    '/dashboard/admin/global-attributes/$id': {
+      id: '/dashboard/admin/global-attributes/$id'
+      path: '/$id'
+      fullPath: '/dashboard/admin/global-attributes/$id'
+      preLoaderRoute: typeof DashboardAdminGlobalAttributesIdRouteImport
+      parentRoute: typeof DashboardAdminGlobalAttributesRouteRoute
+    }
+    '/dashboard/admin/global-attributes/create': {
+      id: '/dashboard/admin/global-attributes/create'
+      path: '/create'
+      fullPath: '/dashboard/admin/global-attributes/create'
+      preLoaderRoute: typeof DashboardAdminGlobalAttributesCreateRouteImport
+      parentRoute: typeof DashboardAdminGlobalAttributesRouteRoute
+    }
+    '/dashboard/admin/messages/': {
+      id: '/dashboard/admin/messages/'
+      path: '/messages'
+      fullPath: '/dashboard/admin/messages/'
+      preLoaderRoute: typeof DashboardAdminMessagesIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/messages/$id': {
+      id: '/dashboard/admin/messages/$id'
+      path: '/messages/$id'
+      fullPath: '/dashboard/admin/messages/$id'
+      preLoaderRoute: typeof DashboardAdminMessagesIdRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/orders/': {
+      id: '/dashboard/admin/orders/'
+      path: '/orders'
+      fullPath: '/dashboard/admin/orders/'
+      preLoaderRoute: typeof DashboardAdminOrdersIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/orders/$orderId': {
+      id: '/dashboard/admin/orders/$orderId'
+      path: '/orders/$orderId'
+      fullPath: '/dashboard/admin/orders/$orderId'
+      preLoaderRoute: typeof DashboardAdminOrdersOrderIdRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/returns/': {
+      id: '/dashboard/admin/returns/'
+      path: '/returns'
+      fullPath: '/dashboard/admin/returns/'
+      preLoaderRoute: typeof DashboardAdminReturnsIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/reviews/': {
+      id: '/dashboard/admin/reviews/'
+      path: '/reviews'
+      fullPath: '/dashboard/admin/reviews/'
+      preLoaderRoute: typeof DashboardAdminReviewsIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/settings/': {
+      id: '/dashboard/admin/settings/'
+      path: '/settings'
+      fullPath: '/dashboard/admin/settings/'
+      preLoaderRoute: typeof DashboardAdminSettingsIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/staff/': {
+      id: '/dashboard/admin/staff/'
+      path: '/'
+      fullPath: '/dashboard/admin/staff/'
+      preLoaderRoute: typeof DashboardAdminStaffIndexRouteImport
+      parentRoute: typeof DashboardAdminStaffRouteRoute
+    }
+    '/dashboard/admin/staff/audit-logs': {
+      id: '/dashboard/admin/staff/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/dashboard/admin/staff/audit-logs'
+      preLoaderRoute: typeof DashboardAdminStaffAuditLogsRouteImport
+      parentRoute: typeof DashboardAdminStaffRouteRoute
+    }
+    '/dashboard/admin/vendors/': {
+      id: '/dashboard/admin/vendors/'
+      path: '/vendors'
+      fullPath: '/dashboard/admin/vendors/'
+      preLoaderRoute: typeof DashboardAdminVendorsIndexRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/vendors/detail': {
+      id: '/dashboard/admin/vendors/detail'
+      path: '/vendors/detail'
+      fullPath: '/dashboard/admin/vendors/detail'
+      preLoaderRoute: typeof DashboardAdminVendorsDetailRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/admin/vendors/payouts': {
+      id: '/dashboard/admin/vendors/payouts'
+      path: '/vendors/payouts'
+      fullPath: '/dashboard/admin/vendors/payouts'
+      preLoaderRoute: typeof DashboardAdminVendorsPayoutsRouteImport
+      parentRoute: typeof DashboardAdminRouteRoute
+    }
+    '/dashboard/orders/returns/': {
+      id: '/dashboard/orders/returns/'
+      path: '/'
+      fullPath: '/dashboard/orders/returns/'
+      preLoaderRoute: typeof DashboardOrdersReturnsIndexRouteImport
+      parentRoute: typeof DashboardOrdersReturnsRouteRoute
+    }
+    '/dashboard/orders/returns/$returnId': {
+      id: '/dashboard/orders/returns/$returnId'
+      path: '/$returnId'
+      fullPath: '/dashboard/orders/returns/$returnId'
+      preLoaderRoute: typeof DashboardOrdersReturnsReturnIdRouteImport
+      parentRoute: typeof DashboardOrdersReturnsRouteRoute
+    }
+    '/dashboard/vendor/orders/': {
+      id: '/dashboard/vendor/orders/'
+      path: '/orders'
+      fullPath: '/dashboard/vendor/orders/'
+      preLoaderRoute: typeof DashboardVendorOrdersIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/orders/$orderId': {
+      id: '/dashboard/vendor/orders/$orderId'
+      path: '/orders/$orderId'
+      fullPath: '/dashboard/vendor/orders/$orderId'
+      preLoaderRoute: typeof DashboardVendorOrdersOrderIdRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/payouts/': {
+      id: '/dashboard/vendor/payouts/'
+      path: '/'
+      fullPath: '/dashboard/vendor/payouts/'
+      preLoaderRoute: typeof DashboardVendorPayoutsIndexRouteImport
+      parentRoute: typeof DashboardVendorPayoutsRouteRoute
+    }
+    '/dashboard/vendor/payouts/schedule': {
+      id: '/dashboard/vendor/payouts/schedule'
+      path: '/schedule'
+      fullPath: '/dashboard/vendor/payouts/schedule'
+      preLoaderRoute: typeof DashboardVendorPayoutsScheduleRouteImport
+      parentRoute: typeof DashboardVendorPayoutsRouteRoute
+    }
+    '/dashboard/vendor/products/': {
+      id: '/dashboard/vendor/products/'
+      path: '/products'
+      fullPath: '/dashboard/vendor/products/'
+      preLoaderRoute: typeof DashboardVendorProductsIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/products/add': {
+      id: '/dashboard/vendor/products/add'
+      path: '/products/add'
+      fullPath: '/dashboard/vendor/products/add'
+      preLoaderRoute: typeof DashboardVendorProductsAddRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/products/edit': {
+      id: '/dashboard/vendor/products/edit'
+      path: '/products/edit'
+      fullPath: '/dashboard/vendor/products/edit'
+      preLoaderRoute: typeof DashboardVendorProductsEditRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/questions/': {
+      id: '/dashboard/vendor/questions/'
+      path: '/questions'
+      fullPath: '/dashboard/vendor/questions/'
+      preLoaderRoute: typeof DashboardVendorQuestionsIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/returns/': {
+      id: '/dashboard/vendor/returns/'
+      path: '/returns'
+      fullPath: '/dashboard/vendor/returns/'
+      preLoaderRoute: typeof DashboardVendorReturnsIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/sales/': {
+      id: '/dashboard/vendor/sales/'
+      path: '/sales'
+      fullPath: '/dashboard/vendor/sales/'
+      preLoaderRoute: typeof DashboardVendorSalesIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/shipping/': {
+      id: '/dashboard/vendor/shipping/'
+      path: '/'
+      fullPath: '/dashboard/vendor/shipping/'
+      preLoaderRoute: typeof DashboardVendorShippingIndexRouteImport
+      parentRoute: typeof DashboardVendorShippingRouteRoute
+    }
+    '/dashboard/vendor/shipping/labels': {
+      id: '/dashboard/vendor/shipping/labels'
+      path: '/labels'
+      fullPath: '/dashboard/vendor/shipping/labels'
+      preLoaderRoute: typeof DashboardVendorShippingLabelsRouteImport
+      parentRoute: typeof DashboardVendorShippingRouteRoute
+    }
+    '/dashboard/vendor/shipping/tracking': {
+      id: '/dashboard/vendor/shipping/tracking'
+      path: '/tracking'
+      fullPath: '/dashboard/vendor/shipping/tracking'
+      preLoaderRoute: typeof DashboardVendorShippingTrackingRouteImport
+      parentRoute: typeof DashboardVendorShippingRouteRoute
+    }
+    '/dashboard/vendor/shop/': {
+      id: '/dashboard/vendor/shop/'
+      path: '/shop'
+      fullPath: '/dashboard/vendor/shop/'
+      preLoaderRoute: typeof DashboardVendorShopIndexRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/shop/branding': {
+      id: '/dashboard/vendor/shop/branding'
+      path: '/shop/branding'
+      fullPath: '/dashboard/vendor/shop/branding'
+      preLoaderRoute: typeof DashboardVendorShopBrandingRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/shop/payout': {
+      id: '/dashboard/vendor/shop/payout'
+      path: '/shop/payout'
+      fullPath: '/dashboard/vendor/shop/payout'
+      preLoaderRoute: typeof DashboardVendorShopPayoutRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
+    }
+    '/dashboard/vendor/shop/policies': {
+      id: '/dashboard/vendor/shop/policies'
+      path: '/shop/policies'
+      fullPath: '/dashboard/vendor/shop/policies'
+      preLoaderRoute: typeof DashboardVendorShopPoliciesRouteImport
+      parentRoute: typeof DashboardVendorRouteRoute
     }
     '/dashboard/vendor/shop/messages/': {
       id: '/dashboard/vendor/shop/messages/'
